@@ -4,7 +4,9 @@
 
 **Overview**
 
+Code example:
 
+```fortran	
 subroutine hdaily(nm,nd,xm,monlen,no_negatives,xdh)
 
     implicit none
@@ -32,3 +34,5 @@ subroutine hdaily(nm,nd,xm,monlen,no_negatives,xdh)
 
 end subroutine hdaily
 ```
+
+Some more text.
