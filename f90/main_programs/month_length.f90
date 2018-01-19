@@ -48,8 +48,8 @@ integer(4)              :: iostatus ! IOSTAT value
 
 data monname /'Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'/
 
-outpath = "/Projects/Calendar/data/work01/"
-infopath = "/Projects/Calendar/data/work01/"
+outpath = "../../PaleoCalendarAdjust/data/month_lengths/"
+infopath = "../../PaleoCalendarAdjust/info_files/"
 infofile = "month_length_info.csv"
 
 ! open the info file, and loop over specified calendar tables

@@ -82,10 +82,9 @@ integer(4)              :: max_threads                  ! if OpenMP enabled
 integer(4)              :: iostatus                     ! IOSTAT value
 
 ! file paths and names
-character(2048)         :: nc_path, ncfile_in, ncfile_out, nc_fname, monlenpath, infopath, debugfile
+character(2048)         :: nc_path, ncfile_in, ncfile_out, nc_fname, infopath, debugpath, debugfile
 character(64)           :: infofile
 character(1)            :: csvheader                            ! info .csv file header
-
 
 ! if OpenMP enabled
 max_threads = omp_get_max_threads()
@@ -93,12 +92,16 @@ write (*,'("OMP max_threads: ",i4)') max_threads
 max_threads = max_threads - 4 ! to be able to do other things
 call omp_set_num_threads(max_threads)
 
-nc_path = "/Projects/Calendar/data/nc_files/"
-monlenpath = "/Projects/Calendar/data/work01/"
-debugfile="debug_cal_adjust.dat"
-open (10, file=trim(nc_path)//trim(debugfile))
+! path to netCDF files
+nc_path = "../../data/nc_files/"
 
-infopath = "/Projects/Calendar/data/nc_files/"
+! debugging output files
+debugpath="../../debug_files"
+debugfile="debug_cal_adjust.dat"
+open (10, file=trim(debugpath)//trim(debugfile))
+
+! info files
+infopath = "../../PaleoCalendarAdjust/info_files/"
 infofile = "cal_adj_info.csv"
 
 ! open the info file, and loop over specified calendar tables

@@ -1,7 +1,6 @@
 prefix,calendar_type,begageBP,endageBP,agestep,begyrCE,nsimyrs,note
 tr21,noleap,-22000,39,1,1950,1,generate tables of month lengths
 PMIP4,noleap,-150000,0,1000,1950,1,
-GENMOM,noleap,-26000,0,100,1950,1,
 PMIP360,360_day,-150000,0,1000,1950,1,
 CCSM4_006ka_Aclim,365_day,-6000,-6000,1,1000,1,"Aclim-type files, 6ka and present calendars"
 CNRM-CM5_006ka_Aclim,standard,-6000,-6000,1,1950,1,
