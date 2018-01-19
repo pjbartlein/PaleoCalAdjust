@@ -27,7 +27,7 @@ integer(4), allocatable :: ndays(:)                     ! ny number of days in y
 
 ! pseudo-daily values
 integer(4)              :: ndtot                        ! total number of days
-real(8)                 :: yrdy         ! decimal day time (BP)
+real(8)                 :: yrdy                         ! decimal day time (BP)
 real(8), allocatable    :: xd(:)                        ! pseudo-daily values (ndtot)
 
 ! output calendar-adjusted monthly averages
@@ -40,7 +40,7 @@ logical                 :: no_negatives = .false. ! restrict pseudo-daily interp
 
 integer(4)              :: n, m, i
 
-character(2048)         :: datapath, monfile, infile, dailyfile, outfile, debugfile
+character(2048)         :: datapath, infile, dailyfile, outfile, monlenpath, monfile, debugpath, debugfile
 character(128)          :: header_out
 character(32)           :: voutname='tas'
 character(3)            :: monname_JanDec(nm)           ! month names (for header)
@@ -49,11 +49,15 @@ character(1)            :: header_in
 data imonlen_00 /31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31/
 data monname_JanDec/'Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'/
 
-datapath = "/Projects/Calendar/data/work02/"
-monfile = "tr21_cal_noleap_rmonlen.csv"
+datapath = "../../PaleoCalendarAdjust/data/TraCE_example/"
 infile = "TraCE_c30r40_tas_land_monlen0ka_Jan-Dec.csv"
-dailyfile = "TraCE_c30r40_tas_land_monlen0ka_Jan-Dec_ts_daily_v2.csv"
+!dailyfile = "TraCE_c30r40_tas_land_monlen0ka_Jan-Dec_ts_daily_v2.csv" ! uncomment to see daily data
 outfile = "TraCE_c30r40_tas_land_monlenadj_Jan-Dec_v2.csv"
+
+monlenpath = "../../PaleoCalendarAdjust/data/month_lengths/"
+monfile = "tr21_cal_noleap_rmonlen.csv"
+
+debugpath="../../debug_files/"
 debugfile="debug_demo_03_c30r40_v2.dat"
 
 ! open output files and write headers
@@ -63,7 +67,7 @@ do m=1,nm
     header_out=trim(header_out)//", "//trim(voutname)//"_"//trim(monname_JanDec(m))
 end do
 write (3,'(a)') trim(header_out)
-open (10, file=trim(datapath)//trim(debugfile))
+open (10, file=trim(debugpath)//trim(debugfile))
 
 ! allocate large arrays
 allocate (yrbp(ny),xm(nt))
@@ -90,7 +94,7 @@ do n=1,ny
 end do
 
 ! read the month-length variables and get total number of days
-open (1, file=trim(datapath)//trim(monfile))
+open (1, file=trim(monlenpath)//trim(monfile))
 read (1,'(a)') header_in
 ndtot = 0
 do n=1,ny

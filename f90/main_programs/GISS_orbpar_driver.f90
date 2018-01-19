@@ -26,8 +26,8 @@ integer(4)      :: n                ! year index
 
 character(2056) :: outpath, outfile ! output file name
 
-outpath="e:\Projects\Calendar\data\GISS_orbpar\"
-outfile="orb_elt_150ka_1kyr.csv" ! "orb_elt_26ka_100yr.csv" ! 
+outpath = "../../PaleoCalendarAdjust/data/GISS_orbital/"
+outfile="orb_elt_150ka_1kyr.csv" 
 open (1, file=trim(outpath)//trim(outfile))
 write (1,'(a)') "YearCE, YearBP, Eccen, Obliq_deg, Perih_deg, ClimPrecc"
 
@@ -35,7 +35,6 @@ write (1,'(a)') "YearCE, YearBP, Eccen, Obliq_deg, Perih_deg, ClimPrecc"
 
 year_type = "BP"
 begyr=-150000; endyr=0; yrstep=1000
-!begyr=-26000; endyr=0; yrstep=100
 
 do n=begyr,endyr,yrstep
     ! NOTE:  Year CE/AD = 0 is assumed to exist, and is equivalent to 1950 BP (-1950)

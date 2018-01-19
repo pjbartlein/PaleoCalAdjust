@@ -16,18 +16,24 @@ integer(4), parameter   :: nm=12
 integer(4)      :: iyminBP, iymaxBP, iyinc, iyminCE, iymaxCE, iyearCE, ndays, i4yrs
 real(8)         :: veqday, veqday2, perihelion, aphelion
 character(2)    :: year_type
+character(2056) :: outpath
+character(64)   :: sreventsfile, VPAdayfile
 
-iyminBP = -3000 ! -22000 ! -150000 ! 
-iymaxBP = 70 ! 0 ! 70 ! 
-iyinc = 1 ! 1000 ! 1 ! 
+outpath = "../../PaleoCalendarAdjust/data/GISS_orbital/"
+sreventsfile="srevents_150ka_1kyr.txt" 
+VPAdayfile="VPAday_150ka_1kyr.csv" 
+
+open (1, file=trim(outpath)//trim(sreventsfile))
+open (2, file=trim(outpath)//trim(VPAdayfile))
+
+iyminBP = -150000 ! 
+iymaxBP =  0 
+iyinc = 1000 
 
 year_type = 'CE'
 iyminCE = iyminBP + 1950
 iymaxCE = iymaxBP + 1950
 
-open (1, file="e:\Projects\Calendar\data\GISS_srevents\3ka_srevents.dat")
-open (2, file="e:\Projects\Calendar\data\GISS_srevents\3ka_VPAday.csv")
- 
 !  Write header information
 WRITE (1,920) EDAYzY
 write (2,'(a)') "YearBP, YearCE, ndays, before_leap, veq_day, veq_day2, perihelion_day, aphelion_day"

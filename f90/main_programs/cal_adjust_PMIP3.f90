@@ -96,7 +96,7 @@ call omp_set_num_threads(max_threads)
 nc_path = "../../data/nc_files/"
 
 ! debugging output files
-debugpath="../../debug_files"
+debugpath="../../debug_files/"
 debugfile="debug_cal_adjust.dat"
 open (10, file=trim(debugpath)//trim(debugfile))
 
