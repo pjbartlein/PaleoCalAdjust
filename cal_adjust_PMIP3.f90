@@ -2,6 +2,8 @@ program cal_adjust_PMIP3
 ! adjusts data in a CMIP5/PMIP3 netCDF file
 ! creates a new netCDF file by copying dimension variables and global attributes from input file
 
+! this version uses an info file
+
 use calendar_effects
 use pseudo_daily_interp
 use month_length_subs
