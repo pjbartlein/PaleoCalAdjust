@@ -101,7 +101,7 @@ debugfile="debug_cal_adjust.dat"
 open (10, file=trim(debugpath)//trim(debugfile))
 
 ! info files
-infopath = "../../PaleoCalendarAdjust/info_files/"
+infopath = "../../PaleoCalendarAdjust/data/info_files/"
 infofile = "cal_adj_info.csv"
 
 ! open the info file, and loop over specified calendar tables
@@ -194,13 +194,13 @@ do
     write (*,'("ny, nt, ndtot: ",4i8)') ny, nt, ndtot, ndtot_0ka
 
     ! input netCDF file
-    nc_fname = trim(nc_path)//trim(ncfile_in)
+    nc_fname = trim(nc_path)//"source/"//trim(ncfile_in)
     print '(" nc_fname (in) = ",a)', trim(nc_fname)
     call check( nf90_open(nc_fname, nf90_nowrite, ncid_in) )
     if (nc_print) print '("  ncid_in = ",i8)', ncid_in
 
     ! output netCDF file
-    nc_fname = trim(nc_path)//trim(ncfile_out)
+    nc_fname = trim(nc_path)//"adjusted/"//trim(ncfile_out)
     print '(" nc_fname (out) = ",a)', trim(nc_fname)
     call check( nf90_create(nc_fname, 0, ncid_out) )
     if (nc_print) print '("  ncid_put = ",i8)', ncid_out
