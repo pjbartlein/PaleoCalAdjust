@@ -1,8 +1,34 @@
 program cal_adjust_PMIP3
-! adjusts data in a CMIP5/PMIP3 netCDF file
-! creates a new netCDF file by copying dimension variables and global attributes from input file
+! Calculates calendar (month-leghth) adjustments of data in a CMIP5/PMIP3-formatted netCDF file.
+! Creates a new netCDF file by copying dimension variables and global attributes from the input file.
+! This version supports 3-D (longitude, latitude, time) long-term mean (AClim), monthly (Amon) or daily input files.
+    
+! The program requires the modules: calendar_effects_module.f90, CMIP5_netCDF_module.f90, GISS_orbpar_module.f90, 
+! GISS_srevents_module.f90, month_length_module.f90 and pseudo_daily_interp_module.f90
+! The program must be compiled with local netCDF support, and it will use OpenMP if available
 
-! this version uses an info file
+! An info .csv file (with an appropriate header) containing the following information is read:
+! variable      :: (string) CMIP5/PMIP3 variable name (e.g. "tas", "pr")
+! time_freq     :: (string) CMIP5/PMIP3 output time-frequency type (e.g. "Amon", "Aclim",'...)
+! model         :: (string) CMIP5/PMIP3 model name
+! experiment    :: (string) CMIP5/PMIP3 experiment name (e.g. "midHolocene")
+! ensemble      :: (string) CMIP5/PMIP3 ensemble member code (e.g. "r1i1p1") 
+! begdate       :: (string) beginning date of simulation as YYYYMM or YYYMMDD string
+! enddate       :: (string) ending date of simulation as YYYYMM or YYYMMDD string
+! suffix        :: (string) filename suffix (usually blank, or "-clim" for Aclim-type files)
+! adj_name      :: (string) filename suffix for adjusted netCDF file (e.g. "_cal_adj")
+! calendar_type :: (string) calendar type (e.g. "noleap", "proleptic_gregorian", etc.)
+! begageBP      :: (integer) beginning age of the table (e.g. 21000 (= 21 ka)
+! endageBP      :: (integer) ending age of the table (e.g. 0 (= 0ka)
+! agestep       :: (integer) interval between age calculations
+! begyrCE       :: (integer) beginning calendar year of simulation for multi-year simulations at each age
+! nsimyrs       :: (integer) number of calendar years
+! (The above information could also be gotten by parsing the netCDF file name, and reading the calendar attribute.)
+
+! Author: Patrick J. Bartlein, Univ. of Oregon (bartlein@uoregon.edu), with contributions by S.L. Shafer (sshafer@usgs.gov)
+!
+! Version: 1.0
+! Last update: 2018-xx-xx
 
 use calendar_effects
 use pseudo_daily_interp
@@ -15,22 +41,22 @@ use omp_lib
 implicit none
 
 ! past ages are negative, e.g. 21 ka = 21,000 cal yr BP = -21000, and 1950 CE = 0 cal yr BP = 0
-! simulation age-related variables (controls orbital parameters)
+! simulation age-related variables (controls of orbital parameters)
 integer(4)              :: begageBP             ! beginning year (BP) (negative, e.g. 10 ka = -10000 BP)
 integer(4)              :: endageBP             ! ending year (BP) 
 integer(4)              :: agestep              ! age step size
 integer(4)              :: nages                ! number of simulation ages 
 integer(4), allocatable :: iageBP(:)            ! year BP 1950 (negative, e.g. 1900 CE = -50.0d0 BP)
 
-! simulation year-related variables (controls VE_day and leap-year status)
+! simulation year-related variables (controls of VE_day and leap-year status)
 integer(4)              :: begyrCE              ! beginning (pseudo-) year of individual model simulation
 integer(4)              :: nsimyrs              ! number of years of simulation
 integer(4), allocatable :: iyearCE(:)           ! yearCE simulation year (e.g. 1850CE, 850CE, etc.)
 
 ! month-length variables
-integer(4), allocatable :: imonlen_0ka(:,:),imonmid_0ka(:,:)    ! integer-value month lengths -- 0ka
+integer(4), allocatable :: imonlen_0ka(:,:),imonmid_0ka(:,:)    ! integer-value month lengths and mid days-- 0ka
 integer(4), allocatable :: imonbeg_0ka(:,:),imonend_0ka(:,:)    ! integer-value month beginning and ending days -- 0ka
-integer(4), allocatable :: imonlen(:,:),imonmid(:,:)    ! integer-value month lengths (paleo)
+integer(4), allocatable :: imonlen(:,:),imonmid(:,:)    ! integer-value month lengths and mid days (paleo)
 integer(4), allocatable :: imonbeg(:,:),imonend(:,:)    ! integer-value month beginning and ending days (paleo)
 real(8), allocatable    :: rmonlen(:,:),rmonmid(:,:)    ! real-value month lengths and mid days (paleo) 
 real(8), allocatable    :: rmonbeg(:,:),rmonend(:,:)    ! real-value month beginning and ending days (paleo) 
@@ -92,7 +118,7 @@ write (*,'("OMP max_threads: ",i4)') max_threads
 max_threads = max_threads - 4 ! to be able to do other things
 call omp_set_num_threads(max_threads)
 
-! path to netCDF files
+! path to netCDF folders and files (i.e. /source/*.nc (input) and /adjusted/*.nc (output))
 nc_path = "../../data/nc_files/"
 
 ! debugging output files
@@ -226,7 +252,14 @@ do
     ! define the output (adjusted) variable, and copy attributes
     write (*,'(a)') "Defining (new) adjusted variable..."
     addvarattname = "paleo_calendar_adjustment"
-    addvaratt = "long-term mean values adjusted for the appropriate paleo calendar"
+    if (trim(time_freq).eq."Aclim") then
+        addvaratt = "long-term mean values adjusted for the appropriate paleo calendar"
+    else if (trim(time_freq).eq."Amon") then
+        addvaratt = "monthly values adjusted for the appropriate paleo calendar"
+    else if (trim(time_freq).eq."day") then
+        addvaratt = "daily values converted to monthly values adjusted for the appropriate paleo calendar"
+    end if
+
     call define_outvar(ncid_in, ncid_out, varinname, varid_out, varoutname, addvarattname, addvaratt, varid_in, nlon, nlat, nt)
 
     ! allocate variables
@@ -239,29 +272,20 @@ do
 
     ! get input data to be adjusted
     write (*,'(a)') "Reading input data..."
-    if (trim(time_freq) .eq. 'day') then
-        call check( nf90_get_var(ncid_in, varid_in, var3d_in) )
-    else
-        call check( nf90_get_var(ncid_in, varid_in, var3d_in) )
-    end if
+    call check( nf90_get_var(ncid_in, varid_in, var3d_in) )
     
     ! get _FillValue
     call check( nf90_get_att(ncid_in, varid_in, '_FillValue', vfill) )
     write (*,'("_FillValue:", g14.6)') vfill
-    !var3d_in(:,:,1:60)=vfill
-    !var3d_in(:,:,131:150)=vfill
-    !write (10,'(12g14.6)') var3d_in(40,80,:)
 
     ! loop over lons and lats
     write (*,'(a)') "Interpolating (if necessary) and aggregating..."
     !!$omp parallel do
     do j=1,nlon ! 
-    !do j=40,40
         write(*,'(\,i5)') j; if (mod(j,25).eq.0) write (*,'(" ")')
         if (trim(time_freq) .eq.'day') xdh(:,:) = var3d_in(j,:,:)
         !$omp parallel do
-        do k=1,nlat !
-        !do k=80,80
+        do k=1,nlat 
             ! unless the input data is daily, read the monthly input data
             if (trim(time_freq) .ne. 'day') then
                 call mon_to_day_ts(nt, imonlen_0ka_ts, dble(var3d_in(j,k,:)), dble(vfill), & 

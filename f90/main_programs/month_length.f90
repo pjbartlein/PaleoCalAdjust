@@ -1,7 +1,26 @@
 program month_length
-! length of months under different paleo calendars
-! Uses orbital-elements parameters calculated by GISS orbpar.for using Berger (1978) JAS 35:2362-2367 algorithm and tables
-! and generalization of 360-day month-length algorithm from Kutzbach and Gallimore (1988) JGR 93(D1):803-821.
+! Calculates the length of months under different paleo calendars, using 
+! - orbital-element parameters calculated by GISS orbpar.for (https://data.giss.nasa.gov/ar5/SOLAR/ORBPAR.FOR) using 
+!   Berger (1978) JAS 35:2362-2367 algorithm and tables;
+! - "solar events" (i.e. vernal equinox day) calculated by GISS SREVENTS.FOR (https://data.giss.nasa.gov/ar5/SOLAR/SREVENTS.FOR)
+!   (Orbital-element parameter calculations are thought to be valid over the past and future 1.0 Myr)
+! - generalization of the 360-day month-length algorithm from Kutzbach and Gallimore (1988) JGR 93(D1):803-821.
+   
+! The program requires the modules month_length_module.f90, GISS_orbpar_module.f90 and GISS_srevents_module.f90
+
+! An info .csv file (with an appropriate header) containing the following information is read:
+! prefix        :: (string) a short name for the output month-length table
+! calendar_type :: (string) calendar type (e.g. "noleap", "proleptic_gregorian", etc.)
+! begageBP      :: (integer) beginning age of the table (e.g. 21000 (= 21 ka)
+! endageBP      :: (integer) ending age of the table (e.g. 0 (= 0ka)
+! agestep       :: (integer) interval between age calculations
+! begyrCE       :: (integer) beginning calendar year of simulation for multi-year simulations at each age
+! nsimyrs       :: (integer) number of calendar years
+    
+! Author: Patrick J. Bartlein, Univ. of Oregon (bartlein@uoregon.edu), with contributions by S.L. Shafer (sshafer@usgs.gov)
+!
+! Version: 1.0
+! Last update: 2018-xx-xx
 
 use month_length_subs
     
@@ -14,13 +33,13 @@ integer(4)              :: agestep              ! age step size
 integer(4)              :: nages                ! number of simulation ages 
 integer(4), allocatable :: iageBP(:)            ! year BP 1950 (negative, e.g. 1900 CE = -50.0d0 BP)
 
-! simulation year-related variables (controls VE_day and leap-year status)
+! individual model simulation year-related variables (controls VE_day and leap-year status)
 integer(4)              :: begyrCE              ! beginning (pseudo-) year of individual model simulation
 integer(4)              :: nsimyrs              ! number of years of simulation
 integer(4), allocatable :: iyearCE(:)           ! yearCE simulation year (e.g. 1850CE, 850CE, etc.)
 
 ! month-length variables
-integer(4), allocatable :: imonlen(:,:),imonmid(:,:)    ! integer-value month lengths
+integer(4), allocatable :: imonlen(:,:),imonmid(:,:)    ! integer-value month lengths and mid days
 integer(4), allocatable :: imonbeg(:,:),imonend(:,:)    ! integer-value month beginning and ending days 
 real(8), allocatable    :: rmonlen(:,:),rmonmid(:,:)    ! real-value month lengths and mid days 
 real(8), allocatable    :: rmonbeg(:,:),rmonend(:,:)    ! real-value month beginning and ending days 
