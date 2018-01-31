@@ -1,6 +1,6 @@
 ## netCDF files on Dropbox ##
 
-Example CMIP5/PMIP3-formatted netCDF source files and resulting month-length adjusted files can be downloaded using the following links:
+Example CMIP5/PMIP3-formatted netCDF source files and resulting month-length adjusted files can be downloaded using the following URLs:
 
 ### Dropbox:  [[https://www.dropbox.com/sh/waerdamq9jgwtav/AAAQPgeJV-npNiTidUGyfvHJa?dl=0]](https://www.dropbox.com/sh/waerdamq9jgwtav/AAAQPgeJV-npNiTidUGyfvHJa?dl=0) ###
 
