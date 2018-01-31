@@ -25,7 +25,7 @@ There are two folders:
 		`pr_Amon_CCSM4_midHolocene_r1i1p1_100001-130012.nc`
 		`pr_Amon_MPI-ESM-P_midHolocene_r1i1p1_185001-194912.nc`
 
-- `/adjusted`, which contains monthlength-adjusted files created by `cal_adjust_PMIP.f90`:
+- `/adjusted`, which contains month-length-adjusted files created by `cal_adjust_PMIP.f90`:
 
 	`/data/nc_files/adjusted/`
 		`tas_Aclim_CCSM4_midHolocene_r1i1p1_100001-130012-clim_cal_adj.nc`
