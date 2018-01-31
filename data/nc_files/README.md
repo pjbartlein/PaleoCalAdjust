@@ -1,7 +1,6 @@
 ## netCDF files on Dropbox ##
 
-Example CMIP5/PMIP3-formatted netCDF source files and resulting month-length adjusted files are available using the following links:
- 
+Example CMIP5/PMIP3-formatted netCDF source files and resulting month-length adjusted files can be downloaded using the following links:
 
 ### Dropbox:  [[https://www.dropbox.com/sh/waerdamq9jgwtav/AAAQPgeJV-npNiTidUGyfvHJa?dl=0]](https://www.dropbox.com/sh/waerdamq9jgwtav/AAAQPgeJV-npNiTidUGyfvHJa?dl=0) ###
 
@@ -10,7 +9,7 @@ Example CMIP5/PMIP3-formatted netCDF source files and resulting month-length adj
 
 
 There are two folders:  
-- `/source`, which contains some typical CMIP5/PMIP3 netCDF files, including long-term means (`Aclim`) files, monthly time series (`Amon` files), and daily time series (`day`) files
+- `/source`, which contains some typical CMIP5/PMIP3 netCDF files, including long-term means (`Aclim`) files, monthly time series (`Amon` files), and daily time series (`day`) files:
 	
 	`/data/nc_files/source/`
 		`tas_Aclim_CCSM4_midHolocene_r1i1p1_100001-130012-clim.nc`
@@ -26,7 +25,7 @@ There are two folders:
 		`pr_Amon_CCSM4_midHolocene_r1i1p1_100001-130012.nc`
 		`pr_Amon_MPI-ESM-P_midHolocene_r1i1p1_185001-194912.nc`
 
-- `/adjusted`, which contains files created by `cal_adjust_PMIP.f90`
+- `/adjusted`, which contains monthlength-adjusted files created by `cal_adjust_PMIP.f90`:
 
 	`/data/nc_files/adjusted/`
 		`tas_Aclim_CCSM4_midHolocene_r1i1p1_100001-130012-clim_cal_adj.nc`
