@@ -24,7 +24,7 @@ subroutine mon_to_day_ts(nt,imonlen,xm_in,xfill,no_negatives,smooth,restore,ndto
     logical, intent(in)     :: no_negatives,smooth,restore
     real(8), intent(out)    :: xd_out(ndtot)
     
-    real(8)                 :: xm(nm),xdh(ndl),xd_out1(ndtot),xd_out2(ndtot),xd_out3(ndtot),xdhmean(nm)
+    real(8)                 :: xm(nm),xdh(ndl),xd_temp(ndtot),xdhmean(nm)
     real(8)                 :: xm_ltm,xd_ltm,monlentot,ltmdiff
     real(8)                 :: pi,x,wgt(nw),wsum
     integer(4)              :: iml(nm),nd
@@ -50,7 +50,7 @@ subroutine mon_to_day_ts(nt,imonlen,xm_in,xfill,no_negatives,smooth,restore,ndto
     end do
        
     ! intialize output variables
-    xd_out=xfill; xd_out1=xfill; xd_out2=xfill; xd_out3=xfill
+    xd_out=xfill; xd_temp=xfill
     
     ! main loop 
     n=0; mm=0
@@ -81,23 +81,25 @@ subroutine mon_to_day_ts(nt,imonlen,xm_in,xfill,no_negatives,smooth,restore,ndto
             ! save daily values
             do i=1,nd
                 n=n+1
-                xd_out1(n)=xdh(i)
-                !if (debug_write) write (debug_unit,'("n,i, xd_out1(n) ",i9,i4,g14.6)') n,i,xd_out1(n)
-                !if (debug_write) write (11,'(i9,", ",i3,", ",g14.6)') n,i,xd_out1(n)
+                xd_out(n)=xdh(i)
+                !if (debug_write) write (debug_unit,'("n,i, xd_out(n) ",i9,i4,g14.6)') n,i,xd_out(n)
+                !if (debug_write) write (11,'(i9,", ",i3,", ",g14.6)') n,i,xd_out(n)
             end do
         else        
             do i=1,nd
                 n=n+1
-                xd_out1(n)=xfill
-                !if (debug_write) write (debug_unit,'("n,i, xd_out1(n) xfill",i9,i4,g14.6)') n,i,xd_out1(n)
-                !if (debug_write) write (11,'("f1",i8,", ",i3,", ",g14.6)') n,i,xd_out1(n)
+                xd_out(n)=xfill
+                !if (debug_write) write (debug_unit,'("n,i, xd_out1(n) xfill",i9,i4,g14.6)') n,i,xd_out(n)
+                !if (debug_write) write (11,'("f1",i8,", ",i3,", ",g14.6)') n,i,xd_out(n)
             end do      
         end if
     end do
-    xd_out2=xd_out1
     
     if (smooth) then
     
+        ! save xd_out
+        xd_temp = xd_out
+        
         ! smooth across years
         n=imonlen(1)+imonlen(2)+imonlen(3)+imonlen(4)+imonlen(5)+imonlen(6) &
             +imonlen(7)+imonlen(8)+imonlen(9)+imonlen(10)+imonlen(11)+imonlen(12)
@@ -105,26 +107,26 @@ subroutine mon_to_day_ts(nt,imonlen,xm_in,xfill,no_negatives,smooth,restore,ndto
         if (debug_write) write (debug_unit,'("smooth:  n,mm: ",2i6)') n,mm
         do nn=1,nyrs-1
             jjj=n-(nsw/2)-1
-            !if (debug_write) write (*,*) nn,mm,n,jjj,xd_out2(n)        
+            !if (debug_write) write (*,*) nn,mm,n,jjj,xd_out(n)        
             do js=1,nsw
                 jjj=jjj+1
-                !if (debug_write) write (*,*) js,jjj,xd_out2(jjj)
-                wsum=0.0d0; xd_out2(jjj)=0.0d0
+                !if (debug_write) write (*,*) js,jjj,xd_out(jjj)
+                wsum=0.0d0; xd_out(jjj)=0.0d0
                 jj=jjj-((nw-1)/2)-1
                 do j=1,nw
                     jj=jj+1
                     !if (debug_write) write (*,*) j,jj,wgt(j),xd_out1(jj)
-                    if (xd_out1(jj) .ne. xfill) then
-                        xd_out2(jjj)=xd_out2(jjj)+xd_out1(jj)*wgt(j)
+                    if (xd_temp(jj) .ne. xfill) then
+                        xd_out(jjj)=xd_out(jjj)+xd_temp(jj)*wgt(j)
                         wsum=wsum+wgt(j)
                     end if
                 end do
                 if (wsum.ne.0.0d0) then
-                    xd_out2(jjj)=xd_out2(jjj)/wsum
-                    !if (debug_write) write (debug_unit,'("      xd_out1, xd_out2: ",2g14.6)') xd_out1(jjj),xd_out2(jjj)
+                    xd_out(jjj)=xd_out(jjj)/wsum
+                    !if (debug_write) write (debug_unit,'("      xd_temp, xd_out: ",2g14.6)') xd_temp(jjj),xd_out(jjj)
                 else
-                    xd_out2(jjj)=xfill
-                    !if (debug_write) write (debug_unit,'("xfill xd_out1, xd_out2: ",2g14.6)') xd_out1(jjj),xd_out2(jjj)
+                    xd_out(jjj)=xfill
+                    !if (debug_write) write (debug_unit,'("xfill xd_temp, xd_out: ",2g14.6)') xd_temp(jjj),xd_out(jjj)
                 end if
 
             end do
@@ -135,7 +137,6 @@ subroutine mon_to_day_ts(nt,imonlen,xm_in,xfill,no_negatives,smooth,restore,ndto
         end do
         
     end if
-    xd_out3=xd_out2  
     
     if (restore) then
     
@@ -153,9 +154,9 @@ subroutine mon_to_day_ts(nt,imonlen,xm_in,xfill,no_negatives,smooth,restore,ndto
             end do
             nzero=0
             do n=1,ndtot
-                if (xd_out3(n).gt.0.0d0) then
-                    if (xd_out3(n).ne. xfill) then
-                        xd_ltm=xd_ltm+xd_out3(n)
+                if (xd_out(n).gt.0.0d0) then
+                    if (xd_out(n).ne. xfill) then
+                        xd_ltm=xd_ltm+xd_out(n)
                         nzero=nzero+1
                     end if
                 end if
@@ -182,8 +183,8 @@ subroutine mon_to_day_ts(nt,imonlen,xm_in,xfill,no_negatives,smooth,restore,ndto
             end do
             nnonfill=0
             do n=1,ndtot
-                if (xd_out3(n).ne.xfill) then
-                    xd_ltm=xd_ltm+xd_out3(n)
+                if (xd_out(n).ne.xfill) then
+                    xd_ltm=xd_ltm+xd_out(n)
                     nnonfill = nnonfill +1
                 end if
             end do
@@ -204,25 +205,23 @@ subroutine mon_to_day_ts(nt,imonlen,xm_in,xfill,no_negatives,smooth,restore,ndto
     
         if (no_negatives) then
             do n=1,ndtot
-                if (xd_out3(n).ne.xfill) then
-                    if (xd_out3(n).gt.0.0d0) then
-                        if (xd_out3(n)+ltmdiff.gt.0.0d0) then
-                            xd_out3(n)=xd_out3(n)+ltmdiff
+                if (xd_out(n).ne.xfill) then
+                    if (xd_out(n).gt.0.0d0) then
+                        if (xd_out(n)+ltmdiff.gt.0.0d0) then
+                            xd_out(n)=xd_out(n)+ltmdiff
                         end if
                     end if
                 end if
             end do
         else
             do n=1,ndtot
-                if (xd_out3(n).ne.xfill) then
-                    xd_out3(n)=xd_out3(n)+ltmdiff
+                if (xd_out(n).ne.xfill) then
+                    xd_out(n)=xd_out(n)+ltmdiff
                 end if
             end do
         end if
         
     end if
-    
-    xd_out=xd_out3
     
     !do n=1,ndtot
     !    write (debug_unit,'(i8,3(", ",f14.6))') n,xd_out1(n),xd_out2(n),xd_out3(n)
