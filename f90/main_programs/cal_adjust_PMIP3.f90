@@ -3,8 +3,8 @@ program cal_adjust_PMIP3
 ! Creates a new netCDF file by copying dimension variables and global attributes from the input file.
 ! This version supports 3-D (longitude, latitude, time) long-term mean (AClim), monthly (Amon) or daily input files.
 
-! The program requires the modules: calendar_effects_module.f90, CMIP5_netCDF_module.f90, GISS_orbpar_module.f90,
-! GISS_srevents_module.f90, month_length_module.f90 and pseudo_daily_interp_module.f90
+! The program requires the modules: calendar_effects_subs.f90, CMIP5_netCDF_subs.f90, GISS_orbpar_subs.f90,
+! GISS_srevents_subs.f90, month_length_subs.f90 and pseudo_daily_interp_subs.f90
 ! The program must be compiled with local netCDF support, and it will use OpenMP if available
 
 ! An info .csv file (with an appropriate header) containing the following information is read:
@@ -28,7 +28,7 @@ program cal_adjust_PMIP3
 ! Author: Patrick J. Bartlein, Univ. of Oregon (bartlein@uoregon.edu), with contributions by S.L. Shafer (sshafer@usgs.gov)
 !
 ! Version: 1.0
-! Last update: 2018-xx-xx
+! Last update: 2018-05-09
 
 use calendar_effects_subs
 use pseudo_daily_interp_subs

@@ -1,7 +1,7 @@
 program demo01_pseudo_daily_interp
 ! compares linear and harmonic (Epstein, 1991) pseudo-daily interpolation
 
-use pseudo_daily_interp
+use pseudo_daily_interp_subs
 
 implicit none
 

@@ -2,7 +2,7 @@ program demo_03_adjust_TraCE_ts
 ! adjust a single TraCE-21ka grid-point time series
 ! interpolate to pseudo-daily values, and reaggregate using appropriate paleo month lengths
     
-use calendar_effects
+use calendar_effects_subs
 
 implicit none
 

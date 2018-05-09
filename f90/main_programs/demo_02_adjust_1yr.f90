@@ -2,8 +2,8 @@ program demo_02_adjust_1yr
 ! demonstrates (paleo) calendar adjustment for one year (of monthly values)
 ! 6 ka example using a 365-day "noleaps" calendar
     
-use pseudo_daily_interp                 ! pseudo-daily interpolation module
-use calendar_effects                    ! calendar effects subroutines
+use pseudo_daily_interp_subs    ! pseudo-daily interpolation module
+use calendar_effects_subs       ! calendar effects subroutines
 
 implicit none
 
