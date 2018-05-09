@@ -34,8 +34,6 @@ use calendar_effects_subs
 use pseudo_daily_interp_subs
 use month_length_subs
 use CMIP5_netCDF_subs
-use netcdf
-use typesizes
 use omp_lib
 
 implicit none
