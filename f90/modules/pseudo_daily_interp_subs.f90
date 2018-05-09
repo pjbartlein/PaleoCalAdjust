@@ -1,4 +1,4 @@
-module pseudo_daily_interp
+module pseudo_daily_interp_subs
     
 implicit none
 
@@ -412,4 +412,4 @@ subroutine ann_mean(n,x,xm)
     
 end subroutine ann_mean   
 
-end module pseudo_daily_interp
+end module pseudo_daily_interp_subs

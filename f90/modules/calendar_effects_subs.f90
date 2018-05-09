@@ -1,4 +1,4 @@
-module calendar_effects
+module calendar_effects_subs
     
 implicit none
 
@@ -13,7 +13,7 @@ subroutine mon_to_day_ts(nt,imonlen,xm_in,xfill,no_negatives,smooth,restore,ndto
 ! daily interpolation of a monthly time series
 ! this version makes one pass over the input times series, and optionally smooths and restores the long-term mean
 
-    use pseudo_daily_interp
+    use pseudo_daily_interp_subs
 
     implicit none
     
@@ -328,4 +328,4 @@ subroutine day_to_mon_ts(ny,ndays,rmonbeg,rmonend,ndtot,xd,xfill,xm_adj)
 end subroutine day_to_mon_ts
 
 
-end module calendar_effects
+end module calendar_effects_subs

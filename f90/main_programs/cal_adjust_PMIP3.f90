@@ -2,8 +2,8 @@ program cal_adjust_PMIP3
 ! Calculates calendar (month-leghth) adjustments of data in a CMIP5/PMIP3-formatted netCDF file.
 ! Creates a new netCDF file by copying dimension variables and global attributes from the input file.
 ! This version supports 3-D (longitude, latitude, time) long-term mean (AClim), monthly (Amon) or daily input files.
-    
-! The program requires the modules: calendar_effects_module.f90, CMIP5_netCDF_module.f90, GISS_orbpar_module.f90, 
+
+! The program requires the modules: calendar_effects_module.f90, CMIP5_netCDF_module.f90, GISS_orbpar_module.f90,
 ! GISS_srevents_module.f90, month_length_module.f90 and pseudo_daily_interp_module.f90
 ! The program must be compiled with local netCDF support, and it will use OpenMP if available
 
@@ -12,7 +12,7 @@ program cal_adjust_PMIP3
 ! time_freq     :: (string) CMIP5/PMIP3 output time-frequency type (e.g. "Amon", "Aclim",'...)
 ! model         :: (string) CMIP5/PMIP3 model name
 ! experiment    :: (string) CMIP5/PMIP3 experiment name (e.g. "midHolocene")
-! ensemble      :: (string) CMIP5/PMIP3 ensemble member code (e.g. "r1i1p1") 
+! ensemble      :: (string) CMIP5/PMIP3 ensemble member code (e.g. "r1i1p1")
 ! begdate       :: (string) beginning date of simulation as YYYYMM or YYYMMDD string
 ! enddate       :: (string) ending date of simulation as YYYYMM or YYYMMDD string
 ! suffix        :: (string) filename suffix (usually blank, or "-clim" for Aclim-type files)
@@ -21,7 +21,7 @@ program cal_adjust_PMIP3
 ! begageBP      :: (integer) beginning age of the table (e.g. 21000 (= 21 ka)
 ! endageBP      :: (integer) ending age of the table (e.g. 0 (= 0ka)
 ! agestep       :: (integer) interval between age calculations
-! begyrCE       :: (integer) beginning calendar year of simulation for multi-year simulations at each age
+! begyrCE       :: (integer) beginning calendar year of simulation for multi-year simulations at each agedd
 ! nsimyrs       :: (integer) number of calendar years
 ! (The above information could also be gotten by parsing the netCDF file name, and reading the calendar attribute.)
 
@@ -30,10 +30,10 @@ program cal_adjust_PMIP3
 ! Version: 1.0
 ! Last update: 2018-xx-xx
 
-use calendar_effects
-use pseudo_daily_interp
+use calendar_effects_subs
+use pseudo_daily_interp_subs
 use month_length_subs
-use CMIP5_netCDF
+use CMIP5_netCDF_subs
 use netcdf
 use typesizes
 use omp_lib
@@ -43,9 +43,9 @@ implicit none
 ! past ages are negative, e.g. 21 ka = 21,000 cal yr BP = -21000, and 1950 CE = 0 cal yr BP = 0
 ! simulation age-related variables (controls of orbital parameters)
 integer(4)              :: begageBP             ! beginning year (BP) (negative, e.g. 10 ka = -10000 BP)
-integer(4)              :: endageBP             ! ending year (BP) 
+integer(4)              :: endageBP             ! ending year (BP)
 integer(4)              :: agestep              ! age step size
-integer(4)              :: nages                ! number of simulation ages 
+integer(4)              :: nages                ! number of simulation ages
 integer(4), allocatable :: iageBP(:)            ! year BP 1950 (negative, e.g. 1900 CE = -50.0d0 BP)
 
 ! simulation year-related variables (controls of VE_day and leap-year status)
@@ -58,8 +58,8 @@ integer(4), allocatable :: imonlen_0ka(:,:),imonmid_0ka(:,:)    ! integer-value 
 integer(4), allocatable :: imonbeg_0ka(:,:),imonend_0ka(:,:)    ! integer-value month beginning and ending days -- 0ka
 integer(4), allocatable :: imonlen(:,:),imonmid(:,:)    ! integer-value month lengths and mid days (paleo)
 integer(4), allocatable :: imonbeg(:,:),imonend(:,:)    ! integer-value month beginning and ending days (paleo)
-real(8), allocatable    :: rmonlen(:,:),rmonmid(:,:)    ! real-value month lengths and mid days (paleo) 
-real(8), allocatable    :: rmonbeg(:,:),rmonend(:,:)    ! real-value month beginning and ending days (paleo) 
+real(8), allocatable    :: rmonlen(:,:),rmonmid(:,:)    ! real-value month lengths and mid days (paleo)
+real(8), allocatable    :: rmonbeg(:,:),rmonend(:,:)    ! real-value month beginning and ending days (paleo)
 real(8), allocatable    :: VE_day(:)                    ! vernal equinox day
 integer(4), allocatable :: ndays(:)                     ! number of days in year
 
@@ -83,9 +83,9 @@ character(64)           :: variable                     ! variable name
 character(8)            :: time_freq                    ! type of CMIP5/PMIP3 time frequency (e.g. Aclim, Amon, day, etc.)
 character(8)            :: time_freq_output             ! time_freq output label
 character(64)           :: model                        ! model name
-character(64)           :: experiment                   ! experiment name   
+character(64)           :: experiment                   ! experiment name
 character(16)           :: ensemble                     ! ensemble designator
-character(8)            :: begdate, enddate             ! string beginning and ending dates of simulation   
+character(8)            :: begdate, enddate             ! string beginning and ending dates of simulation
 character(32)           :: suffix                       ! file name suffix (e.g. "-clim")
 character(32)           :: adj_name                     ! adjustment name (e.g. "_adj")
 
@@ -115,7 +115,7 @@ character(1)            :: csvheader                            ! info .csv file
 ! if OpenMP enabled
 max_threads = omp_get_max_threads()
 write (*,'("OMP max_threads: ",i4)') max_threads
-max_threads = max_threads - 4 ! to be able to do other things
+max_threads = max_threads - 2 ! to be able to do other things
 call omp_set_num_threads(max_threads)
 
 ! path to netCDF folders and files (i.e. /source/*.nc (input) and /adjusted/*.nc (output))
@@ -132,18 +132,19 @@ infofile = "cal_adj_info.csv"
 
 ! open the info file, and loop over specified calendar tables
 open (3,file=trim(infopath)//trim(infofile))
+write (*,'(a)') trim(infopath)//trim(infofile)
 read (3,'(a)') csvheader
 
 iostatus = 1
 do
     ! read a line from the info file, and construct netCDF file names
-    write (*,'(125("="))') 
+    write (*,'(125("="))')
     suffix = ""
     read (3,*,iostat=iostatus) variable, time_freq, model, experiment, ensemble, begdate, enddate, suffix, adj_name, &
         calendar_type, begageBP, endageBP, agestep, begyrCE, nsimyrs
-    !write (*,'("iostatus = ",i2)') iostatus
+    write (*,'("iostatus = ",i2)') iostatus
     if (iostatus.lt.0) exit
-    
+
     varinname = trim(variable); varoutname = varinname
     time_freq_output = trim(time_freq)
     if (trim(time_freq_output) .eq. 'day') time_freq_output = "Amon2"
@@ -152,9 +153,9 @@ do
         trim(ensemble)//"_"//trim(begdate)//"-"//trim(enddate)//trim(suffix)//".nc"
     ncfile_out = trim(variable)//"_"//trim(time_freq_output)//"_"//trim(model)//"_"//trim(experiment)//"_"// &
         trim(ensemble)//"_"//trim(begdate)//"-"//trim(enddate)//trim(suffix)//trim(adj_name)//".nc"
-    
+
     write (*,'(" ncfile_in: ",a)') trim(ncfile_in)
-    write (*,'("ncfile_out: ",a)') trim(ncfile_out)    
+    write (*,'("ncfile_out: ",a)') trim(ncfile_out)
     write (*,'(a, 1x, a, 1x, 5i7)') trim(variable),trim(calendar_type), begageBP, endageBP, agestep, begyrCE, nsimyrs
 
     ! set no_negatives flag
@@ -162,7 +163,7 @@ do
     select case (trim(variable))
     case ('pr','clt')
         no_negatives = .true.
-    case default    
+    case default
         continue
     end select
     write (*,'("no_negatives: ", l1)') no_negatives
@@ -181,23 +182,23 @@ do
     allocate (mon_time(nt), mon_time_bnds(2,nt))
 
     ! get month lengths
-    
+
     ! 0 ka month lengths (used in pseudo-daily interpolation)
     if (trim(time_freq) .ne. 'day') then
         write (*,'(a)') "0 ka month lengths for pseudo-daily interpolation..."
-        call get_month_lengths(calendar_type, 0, 0, agestep, nages, begyrCE, nsimyrs, & 
+        call get_month_lengths(calendar_type, 0, 0, agestep, nages, begyrCE, nsimyrs, &
             iageBP, iyearCE, imonlen_0ka, imonmid_0ka, imonbeg_0ka, imonend_0ka, rmonlen, rmonmid, rmonbeg, rmonend, VE_day, ndays)
     end if
 
     ! paleo month lengths
     write (*,'(a)') "Paleo month-lengths for aggregation of daily data..."
-    call get_month_lengths(calendar_type, begageBP, endageBP, agestep, nages, begyrCE, nsimyrs, & 
+    call get_month_lengths(calendar_type, begageBP, endageBP, agestep, nages, begyrCE, nsimyrs, &
         iageBP, iyearCE, imonlen, imonmid, imonbeg, imonend, rmonlen, rmonmid, rmonbeg, rmonend, VE_day, ndays)
 
     ! reshape month lengths into time series, and get cumulative number of days in years
     ndtot_0ka = 0; ndyr = 0
     do n=1,ny
-        ndtot_0ka=ndtot_0ka + ndays(n)   
+        ndtot_0ka=ndtot_0ka + ndays(n)
         ndyr = ndyr + ndays(n)
         !write (10,'(2i6,f12.6,2i8)') iageBP(n),iyearCE(n),VE_day(n),ndays(n),ndtot_0ka
         do m=1,nm
@@ -206,7 +207,7 @@ do
             rmonmid_ts(i) = rmonmid(n,m); rmonbeg_ts(i) = rmonbeg(n,m); rmonend_ts(i) = rmonend(n,m)
             imonmid_ts(i) = imonmid(n,m); imonbeg_ts(i) = imonbeg(n,m); imonend_ts(i) = imonend(n,m)
             ndays_ts(i) = ndyr
-            write (10,'(3i6,i4,f12.6,i9,3i4)') & 
+            write (10,'(3i6,i4,f12.6,i9,3i4)') &
                 n,m,i,imonlen_0ka_ts(i),rmonmid_ts(i),ndays_ts(i), imonmid_ts(i),imonbeg_ts(i),imonend_ts(i)
         end do
     end do
@@ -246,7 +247,7 @@ do
     call current_time(current)
     addglattname = "paleo_calendar_adjustment"
     addglatt = trim(current)//" paleo calendar adjustment by cal_adjust_PMIP3.f90"
-    call copy_dims_and_glatts_redef_time(ncid_in, ncid_out, addglattname, addglatt, nt, & 
+    call copy_dims_and_glatts_redef_time(ncid_in, ncid_out, addglattname, addglatt, nt, &
         mon_time, mon_time_bnds, time_comment, varid_out)
 
     ! define the output (adjusted) variable, and copy attributes
@@ -273,7 +274,7 @@ do
     ! get input data to be adjusted
     write (*,'(a)') "Reading input data..."
     call check( nf90_get_var(ncid_in, varid_in, var3d_in) )
-    
+
     ! get _FillValue
     call check( nf90_get_att(ncid_in, varid_in, '_FillValue', vfill) )
     write (*,'("_FillValue:", g14.6)') vfill
@@ -281,29 +282,34 @@ do
     ! loop over lons and lats
     write (*,'(a)') "Interpolating (if necessary) and aggregating..."
     !!$omp parallel do
-    do j=1,nlon ! 
-        write(*,'(\,i5)') j; if (mod(j,25).eq.0) write (*,'(" ")')
+    do j=1,nlon !
+        write(*,'(i5)', advance='no') j; if (mod(j,25).eq.0) write (*,'(" ")')
         if (trim(time_freq) .eq.'day') xdh(:,:) = var3d_in(j,:,:)
         !$omp parallel do
-        do k=1,nlat 
-            ! unless the input data is daily, read the monthly input data
+        do k=1,nlat
+            !write (*,'(2i5)') j,k
+            ! unless the input data is daily, do pseudo-daily interpolation of the monthly input data
             if (trim(time_freq) .ne. 'day') then
-                call mon_to_day_ts(nt, imonlen_0ka_ts, dble(var3d_in(j,k,:)), dble(vfill), & 
+                call mon_to_day_ts(nt, imonlen_0ka_ts, dble(var3d_in(j,k,:)), dble(vfill), &
                     no_negatives, smooth, restore, ndtot, nw_tmp, nsw_tmp, xdh(k,:))
+                ! reaggregate daily data using correct calendar
                 call day_to_mon_ts(ny,ndays,rmonbeg,rmonend,ndtot,xdh(k,:),dble(vfill),var3d_adj(k,:))
             else
+                ! reaggregate daily data using correct calendar
                 call day_to_mon_ts(ny,ndays,rmonbeg,rmonend,ndtot,xdh(k,:),dble(vfill),var3d_adj(k,:))
             end if
-        
+
             var3d_out(j,k,:)=sngl(var3d_adj(k,:))
         end do
         !$omp end parallel do
     end do
     !!$omp end parallel do
+    write (*,'(a)') " "
+    write (*,'(a)') "out of loop"
 
-    where (var3d_in .eq. vfill) var3d_out = vfill
-    write (10,'(a)') " "
-    write (10,'(12g14.6)') var3d_out(40,80,:)
+!    where (var3d_in .eq. vfill) var3d_out = vfill
+!    write (10,'(a)') " "
+!    write (10,'(12g14.6)') var3d_out(40,80,:)
 
 
     ! write out adjusted data
@@ -312,7 +318,7 @@ do
 
     ! close the output file
     call check( nf90_close(ncid_out) )
-    
+
     deallocate (iageBP, iyearCE)
     deallocate (imonlen_0ka,imonmid_0ka,imonbeg_0ka,imonend_0ka)
     deallocate (imonlen, imonmid, imonbeg, imonend)
@@ -321,10 +327,10 @@ do
     deallocate (imonmid_ts, imonbeg_ts,imonend_ts, rmonmid_ts, rmonbeg_ts, rmonend_ts)
     deallocate (mon_time, mon_time_bnds)
     deallocate (var3d_in, xdh, var3d_adj, var3d_out)
-    
+
     write (*,'(a)') " "
 
 end do
 
-end program 
-    
+end program
+

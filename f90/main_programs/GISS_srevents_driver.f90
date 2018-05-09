@@ -85,7 +85,7 @@ GO TO 999
 927 format (i7,3(i3,'/',i2.2,i3,':',i2.2),3(i4,'/',i2.2,i3,':',i2.2))
 928 format (i7,3(i3,'/',i2.2,i3,':',i2.2),  i4,'/',i2.2,i3,':',i2.2, &
             13x, i4,'/',i2.2,i3,':',i2.2)
-981 format (a / a)
+! 981 format (a / a)
 999 continue
     
 end program srevents 
