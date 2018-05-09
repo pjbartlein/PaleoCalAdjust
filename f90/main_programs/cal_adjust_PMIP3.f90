@@ -28,7 +28,7 @@ program cal_adjust_PMIP3
 ! Author: Patrick J. Bartlein, Univ. of Oregon (bartlein@uoregon.edu), with contributions by S.L. Shafer (sshafer@usgs.gov)
 !
 ! Version: 1.0
-! Last update: 2018-05-09
+! Last update: 2018-05-09 xx
 
 use calendar_effects_subs
 use pseudo_daily_interp_subs
