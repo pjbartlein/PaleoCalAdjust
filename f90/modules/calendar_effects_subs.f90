@@ -65,17 +65,17 @@ subroutine mon_to_day_ts(nt,imonlen,xm_in,xfill,no_negatives,smooth,restore,ndto
             nd=nd+iml(m)
             !if (debug_write) write (debug_unit, '("nn,m,mm,iml(m),nd: ",5i8)') nn,m,mm,iml(m),nd
         end do
-        !if (debug_write) write (debug_unit,'("nfill:  ",i4)') nfill
-        !if (debug_write) write (debug_unit,'(i12,i12,i8,12g14.6)') n,nn,mm,(xm(m),m=1,nm)
-        !if (debug_write) write (debug_unit,'(24x,13i14)') (iml(m),m=1,nm),nd
+        if (debug_write) write (debug_unit,'("nfill:  ",i4)') nfill
+        if (debug_write) write (debug_unit,'(i12,i12,i8,12g14.6)') n,nn,mm,(xm(m),m=1,nm)
+        if (debug_write) write (debug_unit,'(24x,13i14)') (iml(m),m=1,nm),nd
         
         ! check for fill value in any month, skip whole year if found
         if (nfill .eq. 0) then         
             ! mean-preserving daily interpolation
             call hdaily(nm,nd,xm,iml,no_negatives,xdh)           
             call monmean(nm,nd,iml,xdh,xdhmean)
-            !if (debug_write) write (debug_unit,'(32x,12f14.6)') (xdhmean(m),m=1,nm)
-            !if (debug_write) write (debug_unit,'(32x,12f14.6)') ((xm(m)-xdhmean(m)),m=1,nm)
+            if (debug_write) write (debug_unit,'(32x,12f14.6)') (xdhmean(m),m=1,nm)
+            if (debug_write) write (debug_unit,'(32x,12f14.6)') ((xm(m)-xdhmean(m)),m=1,nm)
             !if (debug_write) write (debug_unit,'(24x,13i14)') (iml(m),m=1,nm),nd
 
             ! save daily values
