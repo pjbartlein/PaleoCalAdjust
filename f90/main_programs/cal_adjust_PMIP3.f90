@@ -28,7 +28,7 @@ program cal_adjust_PMIP3
 ! Author: Patrick J. Bartlein, Univ. of Oregon (bartlein@uoregon.edu), with contributions by S.L. Shafer (sshafer@usgs.gov)
 !
 ! Version: 1.0
-! Last update: 2018-05-09 xx
+! Last update: 2018-06-09 xx
 
 use calendar_effects_subs
 use pseudo_daily_interp_subs
@@ -279,21 +279,21 @@ do
 
     ! loop over lons and lats
     write (*,'(a)') "Interpolating (if necessary) and aggregating..."
-    !!$omp parallel do
     do j=1,nlon !
-        write(*,'(i5)', advance='no') j; if (mod(j,25).eq.0) write (*,'(" ")')
+        write(*,'(i5,$)') j; if (mod(j,25).eq.0) write (*,'(" ")')
         if (trim(time_freq) .eq.'day') xdh(:,:) = var3d_in(j,:,:)
         !$omp parallel do
         do k=1,nlat
             !write (*,'(2i5)') j,k
             ! unless the input data is daily, do pseudo-daily interpolation of the monthly input data
             if (trim(time_freq) .ne. 'day') then
+                ! interpolate to pseudo-daily values
                 call mon_to_day_ts(nt, imonlen_0ka_ts, dble(var3d_in(j,k,:)), dble(vfill), &
                     no_negatives, smooth, restore, ndtot, nw_tmp, nsw_tmp, xdh(k,:))
-                ! reaggregate daily data using correct calendar
+                ! reaggregate daily values using appropriate calendar
                 call day_to_mon_ts(ny,ndays,rmonbeg,rmonend,ndtot,xdh(k,:),dble(vfill),var3d_adj(k,:))
             else
-                ! reaggregate daily data using correct calendar
+                ! input data were daily values, so just reaggregate using appropriate calendar
                 call day_to_mon_ts(ny,ndays,rmonbeg,rmonend,ndtot,xdh(k,:),dble(vfill),var3d_adj(k,:))
             end if
 
@@ -301,14 +301,6 @@ do
         end do
         !$omp end parallel do
     end do
-    !!$omp end parallel do
-    write (*,'(a)') " "
-    write (*,'(a)') "out of loop"
-
-!    where (var3d_in .eq. vfill) var3d_out = vfill
-!    write (10,'(a)') " "
-!    write (10,'(12g14.6)') var3d_out(40,80,:)
-
 
     ! write out adjusted data
     write (*,'(/a)') "Writing adjusted data..."

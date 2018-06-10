@@ -280,7 +280,7 @@ subroutine day_to_mon_ts(ny,ndays,rmonbeg,rmonend,ndtot,xd,xfill,xm_adj)
                 xdx(ndays(n)+1:ndays(n)+30) = xd(iendday+1:iendday+30)
             elseif (n .eq. ny) then
                 xdx(-29:0) = xd(ibegday-30:ibegday-1)
-                xdx(ndays(n)+1:ndays(n)) = xd(ibegday:ibegday+29)
+                xdx(ndays(n)+1:ndays(n)+30) = xd(ibegday+1:ibegday+30)
             else
                 xdx(-29:0) = xd(ibegday-30:ibegday-1)
                 xdx(ndays(n)+1:ndays(n)+30) = xd(iendday+1:iendday+30)

@@ -51,8 +51,8 @@ data monname_JanDec/'Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct',
 
 datapath = "../../PaleoCalendarAdjust/data/TraCE_example/"
 infile = "TraCE_c30r40_tas_land_monlen0ka_Jan-Dec.csv"
-!dailyfile = "TraCE_c30r40_tas_land_monlen0ka_Jan-Dec_ts_daily_v2.csv" ! uncomment to see daily data
-outfile = "TraCE_c30r40_tas_land_monlenadj_Jan-Dec_v2.csv"
+!dailyfile = "TraCE_c30r40_tas_land_monlen0ka_Jan-Dec_ts_daily.csv" ! uncomment to see daily data
+outfile = "TraCE_c30r40_tas_land_monlenadj_Jan-Dec.csv"
 
 monlenpath = "../../PaleoCalendarAdjust/data/month_lengths/"
 monfile = "tr21_cal_noleap_rmonlen.csv"
