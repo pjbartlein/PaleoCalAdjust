@@ -190,7 +190,7 @@ subroutine get_month_lengths(calendar_type, begageBP, endageBP, agestep, nages, 
     do n = 1, nages
         do i = 1, nsimyrs
             ii = ii + 1
-            if (mod(n,1000) .eq. 0) write(*,'(\,i8)') n
+            if (mod(n,1000) .eq. 0) write (*,'(i8,$)') n; if (mod(n,15000).eq.0) write (*,'(" ")')
 
             ! orbital elements for simulation age (e.g. 6 ka)
             call GISS_orbpars('BP', dble(iageBP(n)), eccen, obliq_deg, perih_deg, precc)
@@ -272,6 +272,7 @@ subroutine get_month_lengths(calendar_type, begageBP, endageBP, agestep, nages, 
 
         end do
     end do
+    write (*,'(a)') " "
 
     if (debug_write) close(22); close(11); close(12); close(13)
     if (debug_kgmonlen) close(23)

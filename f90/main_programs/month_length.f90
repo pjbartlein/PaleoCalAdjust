@@ -6,7 +6,7 @@ program month_length
 !   (Orbital-element parameter calculations are thought to be valid over the past and future 1.0 Myr)
 ! - generalization of the 360-day month-length algorithm from Kutzbach and Gallimore (1988) JGR 93(D1):803-821.
    
-! The program requires the modules month_length_xd_out.f90, GISS_orbpar_xd_out.f90 and GISS_srevents_xd_out.f90
+! The program requires the modules month_length_subs.f90, GISS_orbpar_subs.f90 and GISS_srevents_subs.f90
 
 ! An info .csv file (with an appropriate header) containing the following information is read:
 ! prefix        :: (string) a short name for the output month-length table
@@ -20,7 +20,7 @@ program month_length
 ! Author: Patrick J. Bartlein, Univ. of Oregon (bartlein@uoregon.edu), with contributions by S.L. Shafer (sshafer@usgs.gov)
 !
 ! Version: 1.0
-! Last update: 2018-xx-xx
+! Last update: 2018-06-18
 
 use month_length_subs
     
