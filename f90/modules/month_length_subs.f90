@@ -103,6 +103,18 @@ subroutine get_month_lengths(calendar_type, begageBP, endageBP, agestep, nages, 
 
     logical                 :: debug_write = .true.  ! write additional debugging info
     logical                 :: debug_kgmonlen = .true.
+    character(2048)         :: debugpath
+
+    ! debugging output
+    debugpath = "/Projects/Calendar/PaleoCalendarAdjust/data/debug_files/"  ! Windows path
+    !debugpath = "/Users/bartlein/Projects/Calendar/PaleoCalendarAdjust/data/debug_files/"  ! Mac path
+    if (debug_write) then
+        open (22,file=trim(debugpath)//trim(calendar_type)//"_monlen_debug.dat")
+        open (11,file=trim(debugpath)//trim(calendar_type)//"_cal_rmonlen_raw.dat")
+        open (12,file=trim(debugpath)//trim(calendar_type)//"_cal_rmonlen_rel.dat")
+        open (13,file=trim(debugpath)//trim(calendar_type)//"_cal_rmonlen_ratio.dat")
+    end if
+    if (debug_kgmonlen) open (23,file=trim(debugpath)//trim(calendar_type)//"_debug_kg.dat")
 
     ! check for supported calendar types
     select case (trim(calendar_type))
@@ -111,15 +123,6 @@ subroutine get_month_lengths(calendar_type, begageBP, endageBP, agestep, nages, 
     case default
         stop "Calendar type not supported"
     end select
-
-    ! debugging output
-    if (debug_write) then
-        open (22,file="/Projects/Calendar/data/work01/"//trim(calendar_type)//"_monlen_debug.dat")
-        open (11,file="/Projects/Calendar/data/work01/"//trim(calendar_type)//"_cal_rmonlen_raw.dat")
-        open (12,file="/Projects/Calendar/data/work01/"//trim(calendar_type)//"_cal_rmonlen_rel.dat")
-        open (13,file="/Projects/Calendar/data/work01/"//trim(calendar_type)//"_cal_rmonlen_ratio.dat")
-    end if
-    if (debug_kgmonlen) open (23,file="/Projects/Calendar/data/work01/"//trim(calendar_type)//"_debug_kg.dat")
 
     ! generate target years -- experiment ages (in yrs BP) and simulation years (in yrs CE)
     write (*,'(a)') "Calculating month lengths..."
@@ -186,6 +189,7 @@ subroutine get_month_lengths(calendar_type, begageBP, endageBP, agestep, nages, 
 
     ! loop over simulation ages and years
 
+    write (*,'("nages, nsimyrs, nages*nsimyrs:  ",3i8)') nages, nsimyrs, nages*nsimyrs
     ii = 0
     do n = 1, nages
         do i = 1, nsimyrs
@@ -292,7 +296,7 @@ subroutine kg_monlen_360(eccen, perih, rmonlen, ryeartot)
     real(8)     :: phi                              ! phase angle
     real(8)     :: phip                             ! phase-angle phip (such that sin(perih-phip) = -1)
     real(8)     :: diff, mindiff                    ! phase-angle difference and minimum difference
-    real(4)     :: phi_inc                          ! phase-ange estimation increment
+    real(8)     :: phi_inc                          ! phase-ange estimation increment
     integer(4)  :: nphi=360001                      ! number of phase-angle estimation steps
     integer(4)  :: imin                             ! phase-angle minimum index
 
@@ -373,7 +377,7 @@ subroutine kg_monlen(yrlen, ndyr, veqday, ipresent_monlen, eccen, perih, rmonlen
     real(8)     :: phi                              ! phase angle (degrees)
     real(8)     :: phip                             ! phase-angle phip (such that sin(perih-phip) = -1)
     real(8)     :: diff, mindiff                    ! phase-angle difference and minimum difference
-    real(4)     :: phi_inc                          ! phase-ange estimation increment
+    real(8)     :: phi_inc                          ! phase-angle estimation increment
     integer(4)  :: nphi=360001                      ! number of phase-angle estimation steps
     integer(4)  :: imin                             ! phase-angle minimum index
 

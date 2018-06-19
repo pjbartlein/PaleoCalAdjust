@@ -28,7 +28,7 @@ program cal_adjust_PMIP3
 ! Author: Patrick J. Bartlein, Univ. of Oregon (bartlein@uoregon.edu), with contributions by S.L. Shafer (sshafer@usgs.gov)
 !
 ! Version: 1.0
-! Last update: 2018-06-09 xx
+! Last update: 2018-06-19
 
 use calendar_effects_subs
 use pseudo_daily_interp_subs
@@ -117,15 +117,18 @@ max_threads = max_threads - 2 ! to be able to do other things
 call omp_set_num_threads(max_threads)
 
 ! path to netCDF folders and files (i.e. /source/*.nc (input) and /adjusted/*.nc (output))
-nc_path = "../../data/nc_files/"
+nc_path = "\Projects\Calendar\data\nc_files\" ! Windows path
+!nc_path = "/Users/bartlein/Projects/Calendar/PaleoCalendarAdjust/data/nc_files/"    ! Mac path
 
 ! debugging output files
-debugpath="../../debug_files/"
+debugpath="\Projects\Calendar\PaleoCalendarAdjust\data\debug_files\" ! Windows path
+!debugpath="/Users/bartlein/Projects/Calendar/PaleoCalendarAdjust/data/debug_files/" ! Mac path
 debugfile="debug_cal_adjust.dat"
 open (10, file=trim(debugpath)//trim(debugfile))
 
 ! info files
-infopath = "../../PaleoCalendarAdjust/data/info_files/"
+infopath = "\Projects\Calendar\PaleoCalendarAdjust\data\info_files\" ! Windows path
+!infopath = "/Users/bartlein/Projects/Calendar/PaleoCalendarAdjust/data/info_files/"  ! Mac path
 infofile = "cal_adj_info.csv"
 
 ! open the info file, and loop over specified calendar tables
@@ -140,8 +143,11 @@ do
     suffix = ""
     read (3,*,iostat=iostatus) variable, time_freq, model, experiment, ensemble, begdate, enddate, suffix, adj_name, &
         calendar_type, begageBP, endageBP, agestep, begyrCE, nsimyrs
-    write (*,'("iostatus = ",i2)') iostatus
-    if (iostatus.lt.0) exit
+    !write (*,'("iostatus = ",i2)') iostatus
+    if (iostatus.lt.0) then
+        write (*,'(a)') "*** Done ***"
+        exit
+    end if
 
     varinname = trim(variable); varoutname = varinname
     time_freq_output = trim(time_freq)
@@ -279,6 +285,8 @@ do
 
     ! loop over lons and lats
     write (*,'(a)') "Interpolating (if necessary) and aggregating..."
+    write (*,'("Longitude index (nlon = ",i4,"): ")') nlon
+    !!$omp parallel do
     do j=1,nlon !
         write(*,'(i5,$)') j; if (mod(j,25).eq.0) write (*,'(" ")')
         if (trim(time_freq) .eq.'day') xdh(:,:) = var3d_in(j,:,:)
@@ -287,13 +295,12 @@ do
             !write (*,'(2i5)') j,k
             ! unless the input data is daily, do pseudo-daily interpolation of the monthly input data
             if (trim(time_freq) .ne. 'day') then
-                ! interpolate to pseudo-daily values
                 call mon_to_day_ts(nt, imonlen_0ka_ts, dble(var3d_in(j,k,:)), dble(vfill), &
                     no_negatives, smooth, restore, ndtot, nw_tmp, nsw_tmp, xdh(k,:))
-                ! reaggregate daily values using appropriate calendar
+                ! reaggregate daily data using correct calendar
                 call day_to_mon_ts(ny,ndays,rmonbeg,rmonend,ndtot,xdh(k,:),dble(vfill),var3d_adj(k,:))
             else
-                ! input data were daily values, so just reaggregate using appropriate calendar
+                ! reaggregate daily data using correct calendar
                 call day_to_mon_ts(ny,ndays,rmonbeg,rmonend,ndtot,xdh(k,:),dble(vfill),var3d_adj(k,:))
             end if
 
@@ -301,6 +308,14 @@ do
         end do
         !$omp end parallel do
     end do
+    !!$omp end parallel do
+    write (*,'(a)') " "
+    write (*,'(a)') "out of loop"
+
+!    where (var3d_in .eq. vfill) var3d_out = vfill
+!    write (10,'(a)') " "
+!    write (10,'(12g14.6)') var3d_out(40,80,:)
+
 
     ! write out adjusted data
     write (*,'(/a)') "Writing adjusted data..."

@@ -26,7 +26,8 @@ integer(4)      :: n                ! year index
 
 character(2056) :: outpath, outfile ! output file name
 
-outpath = "/Users/bartlein/Projects/CalendarEclipse/data/GISS_orbital/"
+!outpath = "/Users/bartlein/Projects/Calendar/PaleoCalendarAdjust/data/GISS_orbital/"    ! Mac path
+outpath = "\Projects\Calendar\PaleoCalendarAdjust\data\GISS_orbital\"   ! Windows path
 outfile="orb_elt_150ka_1kyr.csv"
 write (*,'(a)') trim(outpath)//trim(outfile)
 open (1, file=trim(outpath)//trim(outfile))

@@ -236,7 +236,7 @@ subroutine midmonth_real(nm,veq_mon,veq_midmon_day,rmonlen,rmidmon,rmonbeg,rmone
     real(8), intent(in)     :: rmonlen(nm)
     real(8), intent(out)    :: rmidmon(nm),rmonbeg(nm),rmonend(nm)
     
-    integer(4)              :: m, debug_unit
+    integer(4)              :: m, debug_unit = 10
     
     logical                 :: debug_write = .false.
     
@@ -337,7 +337,6 @@ subroutine dzero(nm,nd,monlen,xm,xd0)
             if (xm(m).eq.0.0) xd0(i)=0.0          
         end do
     end do
-10  continue
     
     ! zero all negative daily values
     do i=1,nd
