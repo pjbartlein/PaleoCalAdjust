@@ -116,18 +116,18 @@ write (*,'("OMP max_threads: ",i4)') max_threads
 max_threads = max_threads - 2 ! to be able to do other things
 call omp_set_num_threads(max_threads)
 
-! path to netCDF folders and files (i.e. /source/*.nc (input) and /adjusted/*.nc (output))
-nc_path = "\Projects\Calendar\data\nc_files\" ! Windows path
+! path to netCDF folders and files (i.e. /source/*.nc (input) and /adjusted/*.nc (output)) "
+nc_path = "/Projects/Calendar/data/nc_files/" ! Windows path
 !nc_path = "/Users/bartlein/Projects/Calendar/PaleoCalendarAdjust/data/nc_files/"    ! Mac path
 
 ! debugging output files
-debugpath="\Projects\Calendar\PaleoCalendarAdjust\data\debug_files\" ! Windows path
+debugpath="/Projects/Calendar/PaleoCalendarAdjust/data/debug_files/" ! Windows path
 !debugpath="/Users/bartlein/Projects/Calendar/PaleoCalendarAdjust/data/debug_files/" ! Mac path
 debugfile="debug_cal_adjust.dat"
 open (10, file=trim(debugpath)//trim(debugfile))
 
 ! info files
-infopath = "\Projects\Calendar\PaleoCalendarAdjust\data\info_files\" ! Windows path
+infopath = "/Projects/Calendar/PaleoCalendarAdjust/data/info_files/" ! Windows path
 !infopath = "/Users/bartlein/Projects/Calendar/PaleoCalendarAdjust/data/info_files/"  ! Mac path
 infofile = "cal_adj_info.csv"
 
