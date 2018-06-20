@@ -1,0 +1,13 @@
+varname,time_freq,model,experiment,ensemble,begdate,enddate,suffix,adj_name,calendar_type,begageBP,endageBP,agestep,begyrCE,nsimyrs
+tas,Amon,CCSM4,midHolocene,r1i1p1,100001,130012,,_cal_adj,noleap,-6000,-6000,1,1000,301
+tas,Aclim,CCSM4,midHolocene,r1i1p1,100001,130012,-clim,_cal_adj,365_day,-6000,-6000,1,1000,1
+tas,Aclim,CNRM-CM5,midHolocene,r1i1p1,195001,214912,-clim,_cal_adj,standard,-6000,-6000,1,1950,1
+tas,Aclim,MPI-ESM-P,midHolocene,r1i1p1,185001,194912,-clim,_cal_adj,progreg,-6000,-6000,1,1850,1
+tas,Amon,CNRM-CM5,midHolocene,r1i1p1,205001,214912,,_cal_adj,gregorian,-6000,-6000,1,2050,100
+tas,Amon,MPI-ESM-P,midHolocene,r1i1p1,185001,194912,,_cal_adj,progreg,-6000,-6000,1,1850,100
+pr,Aclim,CCSM4,midHolocene,r1i1p1,100001,130012,-clim,_cal_adj,noleap,-6000,-6000,1,1000,1
+pr,Amon,CCSM4,midHolocene,r1i1p1,100001,130012,,_cal_adj,noleap,-6000,-6000,1,1000,301
+pr,Amon,MPI-ESM-P,midHolocene,r1i1p1,185001,194912,,_cal_adj,progreg,-6000,-6000,1,1850,100
+tas,day,CCSM4,midHolocene,r1i1p1,10000101,10491231,,_cal_adj,noleap,-6000,-6000,1,1000,50
+tas,day,CNRM-CM5,midHolocene,r1i1p1,19550101,19591231,,_cal_adj,gregorian,-6000,-6000,1,1955,5
+tas,day,MPI-ESM-P,midHolocene,r1i1p1,18500101,18591231,,_cal_adj,progreg,-6000,-6000,1,1850,10
