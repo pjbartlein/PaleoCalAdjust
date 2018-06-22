@@ -129,7 +129,7 @@ open (10, file=trim(debugpath)//trim(debugfile))
 ! info files
 infopath = "/Projects/Calendar/PaleoCalendarAdjust/data/info_files/" ! Windows path
 !infopath = "/Users/bartlein/Projects/Calendar/PaleoCalendarAdjust/data/info_files/"  ! Mac path
-infofile = "cal_adj_info.csv"
+infofile = "cal_adj_info_reanalysis.csv"
 
 ! open the info file, and loop over specified calendar tables
 open (3,file=trim(infopath)//trim(infofile))
@@ -211,8 +211,8 @@ do
             rmonmid_ts(i) = rmonmid(n,m); rmonbeg_ts(i) = rmonbeg(n,m); rmonend_ts(i) = rmonend(n,m)
             imonmid_ts(i) = imonmid(n,m); imonbeg_ts(i) = imonbeg(n,m); imonend_ts(i) = imonend(n,m)
             ndays_ts(i) = ndyr
-            write (10,'(3i6,i4,f12.6,i9,3i4)') &
-                n,m,i,imonlen_0ka_ts(i),rmonmid_ts(i),ndays_ts(i), imonmid_ts(i),imonbeg_ts(i),imonend_ts(i)
+            !write (10,'(3i6,i4,f12.6,i9,3i4)') &
+            !    n,m,i,imonlen_0ka_ts(i),rmonmid_ts(i),ndays_ts(i), imonmid_ts(i),imonbeg_ts(i),imonend_ts(i)
         end do
     end do
 
@@ -286,13 +286,12 @@ do
     ! loop over lons and lats
     write (*,'(a)') "Interpolating (if necessary) and aggregating..."
     write (*,'("Longitude index (nlon = ",i4,"): ")') nlon
-    !!$omp parallel do
     do j=1,nlon !
         write(*,'(i5,$)') j; if (mod(j,25).eq.0) write (*,'(" ")')
         if (trim(time_freq) .eq.'day') xdh(:,:) = var3d_in(j,:,:)
         !$omp parallel do
         do k=1,nlat
-            !write (*,'(2i5)') j,k
+            !write (*,'(/2i5)') j,k
             ! unless the input data is daily, do pseudo-daily interpolation of the monthly input data
             if (trim(time_freq) .ne. 'day') then
                 call mon_to_day_ts(nt, imonlen_0ka_ts, dble(var3d_in(j,k,:)), dble(vfill), &
@@ -305,10 +304,10 @@ do
             end if
 
             var3d_out(j,k,:)=sngl(var3d_adj(k,:))
+            
         end do
         !$omp end parallel do
     end do
-    !!$omp end parallel do
     write (*,'(a)') " "
     write (*,'(a)') "out of loop"
 

@@ -392,9 +392,9 @@ subroutine new_time_mon(calendar_type, ncid_in, ny, nm, nt, &
     !do i=1,400
     !    write (10,*) i,dble(i)/200.0d0, dround(dble(i)/200.0d0, 0.25d0)
     !end do
-    do n = 2,nt
-        write (10,'(i6,3f12.2)') n,time_bnds(1,n),time_bnds(2,n-1),time_bnds(1,n)-time_bnds(2,n-1)
-    end do
+    !do n = 2,nt
+    !    write (10,'(i6,3f12.2)') n,time_bnds(1,n),time_bnds(2,n-1),time_bnds(1,n)-time_bnds(2,n-1)
+    !end do
 
 end subroutine new_time_mon
 

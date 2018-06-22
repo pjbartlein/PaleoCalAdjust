@@ -5,7 +5,7 @@ implicit none
     integer             :: debug_unit=10
     integer             :: console_unit=6
     
-    logical             :: debug_write=.true.
+    logical             :: debug_write_cal_effects=.false.
 
 contains
 
@@ -34,19 +34,18 @@ subroutine mon_to_day_ts(nt,imonlen,xm_in,xfill,no_negatives,smooth,restore,ndto
     
     nyrs=nt/nm    
     
-    debug_write = .false.; debug_unit=10
-    if (debug_write) write (debug_unit,'(a)') "mon_to_day"
-    if (debug_write) write (debug_unit,*) nt,nyrs    
+    if (debug_write_cal_effects) write (debug_unit,'(a)') "mon_to_day"
+    if (debug_write_cal_effects) write (debug_unit,*) nt,nyrs    
     
     pi=4.0d0*datan(1.0d0)
-    !if (debug_write) write (*,*) pi
+    !if (debug_write_cal_effects) write (*,*) pi
     
     ! generate smoothing weights
     do j=1,nw
         jj=j-(nw/2)-1
         x=(dble(jj)/((nw-1)/2.0d0))*4.0d0
         wgt(j)=(1.0d0/2.0d0*pi)*(exp(-0.5d0*x**2))
-        !if (debug_write) write (debug_unit,*) j,jj,x,wgt(j)
+        !if (debug_write_cal_effects) write (debug_unit,*) j,jj,x,wgt(j)
     end do
        
     ! intialize output variables
@@ -63,34 +62,34 @@ subroutine mon_to_day_ts(nt,imonlen,xm_in,xfill,no_negatives,smooth,restore,ndto
             if (xm(m) .eq. xfill) nfill=nfill+1
             iml(m)=imonlen(mm)
             nd=nd+iml(m)
-            !if (debug_write) write (debug_unit, '("nn,m,mm,iml(m),nd: ",5i8)') nn,m,mm,iml(m),nd
+            !if (debug_write_cal_effects) write (debug_unit, '("nn,m,mm,iml(m),nd: ",5i8)') nn,m,mm,iml(m),nd
         end do
-        !if (debug_write) write (debug_unit,'("nfill:  ",i4)') nfill
-        !if (debug_write) write (debug_unit,'(i12,i12,i8,12g14.6)') n,nn,mm,(xm(m),m=1,nm)
-        !if (debug_write) write (debug_unit,'(24x,13i14)') (iml(m),m=1,nm),nd
+        !if (debug_write_cal_effects) write (debug_unit,'("nfill:  ",i4)') nfill
+        if (debug_write_cal_effects) write (debug_unit,'(i12,i12,i8,12g14.6)') n,nn,mm,(xm(m),m=1,nm)
+        if (debug_write_cal_effects) write (debug_unit,'(24x,13i14)') (iml(m),m=1,nm),nd
         
         ! check for fill value in any month, skip whole year if found
         if (nfill .eq. 0) then         
             ! mean-preserving daily interpolation
             call hdaily(nm,nd,xm,iml,no_negatives,xdh)           
             call monmean(nm,nd,iml,xdh,xdhmean)
-            !if (debug_write) write (debug_unit,'(32x,12f14.6)') (xdhmean(m),m=1,nm)
-            !if (debug_write) write (debug_unit,'(32x,12f14.6)') ((xm(m)-xdhmean(m)),m=1,nm)
-            !if (debug_write) write (debug_unit,'(24x,13i14)') (iml(m),m=1,nm),nd
+            !if (debug_write_cal_effects) write (debug_unit,'(32x,12f14.6)') (xdhmean(m),m=1,nm)
+            !if (debug_write_cal_effects) write (debug_unit,'(32x,12f14.6)') ((xm(m)-xdhmean(m)),m=1,nm)
+            !if (debug_write_cal_effects) write (debug_unit,'(24x,13i14)') (iml(m),m=1,nm),nd
 
             ! save daily values
             do i=1,nd
                 n=n+1
                 xd_out(n)=xdh(i)
-                !if (debug_write) write (debug_unit,'("n,i, xd_out(n) ",i9,i4,g14.6)') n,i,xd_out(n)
-                !if (debug_write) write (11,'(i9,", ",i3,", ",g14.6)') n,i,xd_out(n)
+                !if (debug_write_cal_effects) write (debug_unit,'("n,i, xd_out(n) ",i9,i4,g14.6)') n,i,xd_out(n)
+                !if (debug_write_cal_effects) write (11,'(i9,", ",i3,", ",g14.6)') n,i,xd_out(n)
             end do
         else        
             do i=1,nd
                 n=n+1
                 xd_out(n)=xfill
-                !if (debug_write) write (debug_unit,'("n,i, xd_out1(n) xfill",i9,i4,g14.6)') n,i,xd_out(n)
-                !if (debug_write) write (11,'("f1",i8,", ",i3,", ",g14.6)') n,i,xd_out(n)
+                !if (debug_write_cal_effects) write (debug_unit,'("n,i, xd_out1(n) xfill",i9,i4,g14.6)') n,i,xd_out(n)
+                !if (debug_write_cal_effects) write (11,'("f1",i8,", ",i3,", ",g14.6)') n,i,xd_out(n)
             end do      
         end if
     end do
@@ -104,18 +103,18 @@ subroutine mon_to_day_ts(nt,imonlen,xm_in,xfill,no_negatives,smooth,restore,ndto
         n=imonlen(1)+imonlen(2)+imonlen(3)+imonlen(4)+imonlen(5)+imonlen(6) &
             +imonlen(7)+imonlen(8)+imonlen(9)+imonlen(10)+imonlen(11)+imonlen(12)
         mm=12
-        if (debug_write) write (debug_unit,'("smooth:  n,mm: ",2i6)') n,mm
+        if (debug_write_cal_effects) write (debug_unit,'("smooth:  n,mm: ",2i6)') n,mm
         do nn=1,nyrs-1
             jjj=n-(nsw/2)-1
-            !if (debug_write) write (*,*) nn,mm,n,jjj,xd_out(n)        
+            !if (debug_write_cal_effects) write (*,*) nn,mm,n,jjj,xd_out(n)        
             do js=1,nsw
                 jjj=jjj+1
-                !if (debug_write) write (*,*) js,jjj,xd_out(jjj)
+                !if (debug_write_cal_effects) write (*,*) js,jjj,xd_out(jjj)
                 wsum=0.0d0; xd_out(jjj)=0.0d0
                 jj=jjj-((nw-1)/2)-1
                 do j=1,nw
                     jj=jj+1
-                    !if (debug_write) write (*,*) j,jj,wgt(j),xd_out1(jj)
+                    !if (debug_write_cal_effects) write (*,*) j,jj,wgt(j),xd_out1(jj)
                     if (xd_temp(jj) .ne. xfill) then
                         xd_out(jjj)=xd_out(jjj)+xd_temp(jj)*wgt(j)
                         wsum=wsum+wgt(j)
@@ -123,10 +122,10 @@ subroutine mon_to_day_ts(nt,imonlen,xm_in,xfill,no_negatives,smooth,restore,ndto
                 end do
                 if (wsum.ne.0.0d0) then
                     xd_out(jjj)=xd_out(jjj)/wsum
-                    !if (debug_write) write (debug_unit,'("      xd_temp, xd_out: ",2g14.6)') xd_temp(jjj),xd_out(jjj)
+                    !if (debug_write_cal_effects) write (debug_unit,'("      xd_temp, xd_out: ",2g14.6)') xd_temp(jjj),xd_out(jjj)
                 else
                     xd_out(jjj)=xfill
-                    !if (debug_write) write (debug_unit,'("xfill xd_temp, xd_out: ",2g14.6)') xd_temp(jjj),xd_out(jjj)
+                    !if (debug_write_cal_effects) write (debug_unit,'("xfill xd_temp, xd_out: ",2g14.6)') xd_temp(jjj),xd_out(jjj)
                 end if
 
             end do
@@ -141,7 +140,7 @@ subroutine mon_to_day_ts(nt,imonlen,xm_in,xfill,no_negatives,smooth,restore,ndto
     if (restore) then
     
         ! restore long-term mean
-        if (debug_write) write (debug_unit,'("restore")') 
+        if (debug_write_cal_effects) write (debug_unit,'("restore")') 
         xm_ltm=0.0d0; xd_ltm=0.0d0; monlentot=0.0d0
         if (no_negatives) then
             do mm=1,nt
@@ -173,7 +172,7 @@ subroutine mon_to_day_ts(nt,imonlen,xm_in,xfill,no_negatives,smooth,restore,ndto
                 xd_ltm=xfill
             end if
             ltmdiff=xm_ltm-xd_ltm
-            !if (debug_write) write (*,*) ndtot,nzero,xm_ltm,xd_ltm,ltmdiff
+            !if (debug_write_cal_effects) write (*,*) ndtot,nzero,xm_ltm,xd_ltm,ltmdiff
         else
             do mm=1,nt      
                 if (xm_in(mm).ne.xfill) then
@@ -200,7 +199,7 @@ subroutine mon_to_day_ts(nt,imonlen,xm_in,xfill,no_negatives,smooth,restore,ndto
                 xd_ltm=xfill
             end if
             ltmdiff=xm_ltm-xd_ltm
-            !if (debug_write) write (*,*) xm_ltm,xd_ltm,ltmdiff
+            !if (debug_write_cal_effects) write (*,*) xm_ltm,xd_ltm,ltmdiff
         end if
     
         if (no_negatives) then
@@ -226,6 +225,7 @@ subroutine mon_to_day_ts(nt,imonlen,xm_in,xfill,no_negatives,smooth,restore,ndto
     !do n=1,ndtot
     !    write (debug_unit,'(i8,3(", ",f14.6))') n,xd_out1(n),xd_out2(n),xd_out3(n)
     !end do
+    if (debug_write_cal_effects) write (10,'(10g14.6)') xdh
     
 end subroutine mon_to_day_ts
 
@@ -252,19 +252,19 @@ subroutine day_to_mon_ts(ny,ndays,rmonbeg,rmonend,ndtot,xd,xfill,xm_adj)
     
     integer(4)              :: n, m, i, nn
     
-    !debug_write = .true.
-    if (debug_write) write (10,'(a)') "day_to_mon"
-    if (debug_write) write (10,*) ny, ndtot
+    !debug_write_cal_effects = .true.
+    if (debug_write_cal_effects) write (10,'(a)') "day_to_mon"
+    if (debug_write_cal_effects) write (10,*) ny, ndtot
     
     ! loop over years, collecting daily data for each year, and getting monthly means
     iendday = 0; nn = 0
     xm_adj=0.0d0
     do n=1,ny
-        if (debug_write) write (10,'("n, ndays:", 2i5)') n,ndays(n)
+        if (debug_write_cal_effects) write (10,'("n, ndays:", 2i5)') n,ndays(n)
         ibegday = iendday + 1
         iendday = ibegday + ndays(n) - 1
-        !if (debug_write) write (*,*) n,ibegday,iendday
-        if (debug_write) write (10,*) n,ibegday,iendday
+        !if (debug_write_cal_effects) write (*,*) n,ibegday,iendday
+        if (debug_write_cal_effects) write (10,*) n,ibegday,iendday
         
         if (ny .eq. 1) then       ! single-year Aclim data  
             ! wrap the input daily data
@@ -294,9 +294,11 @@ subroutine day_to_mon_ts(ny,ndays,rmonbeg,rmonend,ndtot,xd,xfill,xm_adj)
         ! integer beginning and end of each month, and number of days in each month
         ! ndays_in_month should be equal to the integer month length + 1
         ibeg=ceiling(rmonbeg(n,:)); iend=ceiling(rmonend(n,:)); ndays_in_month=(iend-ibeg+1)
-        if (debug_write) write (10,'("ibeg:  ",12i4)') ibeg
-        if (debug_write) write (10,'("iend:  ",12i4)') iend
-        if (debug_write) write (10,'("ndays: ",13i4)') ndays_in_month, sum(ndays_in_month)
+        if (debug_write_cal_effects) write (10,'("rmonbeg:  ",12f14.8)') rmonbeg(n,:)
+        if (debug_write_cal_effects) write (10,'("rmonend:  ",12f14.8)') rmonend(n,:)
+        if (debug_write_cal_effects) write (10,'("ibeg:  ",12i4)') ibeg
+        if (debug_write_cal_effects) write (10,'("iend:  ",12i4)') iend
+        if (debug_write_cal_effects) write (10,'("ndays: ",13i4)') ndays_in_month, sum(ndays_in_month)
  
         ! monthly means
         do m=1,nm
@@ -304,12 +306,12 @@ subroutine day_to_mon_ts(ny,ndays,rmonbeg,rmonend,ndtot,xd,xfill,xm_adj)
             nfill = 0; wgt=1.0d0; wsum=0.0d0
             wgt(ibeg(m))=abs(rmonbeg(n,m)-dble(ibeg(m)))
             wgt(iend(m))=abs(rmonend(n,m)-dble(iend(m)-1))
-            !if (debug_write) write (10,'("m, ibeg, iend, wgt_beg, wgt_end: ",3i4,2f12.6)') m,ibeg(m),iend(m),wgt(ibeg(m)),wgt(iend(m))
+            !if (debug_write_cal_effects) write (10,'("m, ibeg, iend, wgt_beg, wgt_end: ",3i4,2f12.6)') m,ibeg(m),iend(m),wgt(ibeg(m)),wgt(iend(m))
             do i=ibeg(m),iend(m)
                 if (xdx(i) .ne. xfill) then
                     xm_adj(nn)=xm_adj(nn)+xdx(i)*wgt(i)
                     wsum=wsum+wgt(i)
-                    !if (debug_write) write (10,'("m, i, xd(i), xm_adj(nn), wgt(i), wsum: ",2i4,2f12.6,2f12.6)') &
+                    !if (debug_write_cal_effects) write (10,'("m, i, xd(i), xm_adj(nn), wgt(i), wsum: ",2i4,2f12.6,2f12.6)') &
                     !    m,i,xdx(i),xm_adj(nn),wgt(i),wsum
                 else
                     nfill = nfill + 1
@@ -320,10 +322,10 @@ subroutine day_to_mon_ts(ny,ndays,rmonbeg,rmonend,ndtot,xd,xfill,xm_adj)
             else
                 xm_adj(nn)=xfill
             end if
-            if (debug_write) write(10,'("m, xm_adj(nn): ",i4,2f12.6)') m,xm_adj(nn),sngl(xm_adj(nn))
+            if (debug_write_cal_effects) write(10,'("m, xm_adj(nn): ",i4,2f12.6)') m,xm_adj(nn),sngl(xm_adj(nn))
         end do
     end do 
-    if (debug_write) write (10,'(12g14.6)') xm_adj
+    if (debug_write_cal_effects) write (10,'(12g14.6)') xm_adj
 
 end subroutine day_to_mon_ts
 
