@@ -322,7 +322,7 @@ subroutine day_to_mon_ts(ny,ndays,rmonbeg,rmonend,ndtot,xd,xfill,xm_adj)
             else
                 xm_adj(nn)=xfill
             end if
-            if (debug_write_cal_effects) write(10,'("m, xm_adj(nn): ",i4,2f12.6)') m,xm_adj(nn),sngl(xm_adj(nn))
+            !if (debug_write_cal_effects) write(10,'("m, xm_adj(nn): ",i4,2f12.6)') m,xm_adj(nn),sngl(xm_adj(nn))
         end do
     end do 
     if (debug_write_cal_effects) write (10,'(12g14.6)') xm_adj
