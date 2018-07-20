@@ -22,7 +22,7 @@ subroutine GISS_srevents(year_type, iyear, EDAYzY, veqday, perihelion, aphelion,
 ! SREVENTS.FOR    Solar EVENTS each year    2012/05/29
 ! https://data.giss.nasa.gov/ar5/SOLAR/SREVENTS.FOR downloaded 2017-09-12
 
-    use giss_orbital_subs
+    use giss_orbpar_subs
 
     implicit none
 

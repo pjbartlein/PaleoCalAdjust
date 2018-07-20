@@ -37,7 +37,7 @@ contains
 subroutine get_month_lengths(calendar_type, begageBP, endageBP, agestep, nages, begyrCE, nsimyrs, &
     iageBP, iyearCE, imonlen, imonmid, imonbeg, imonend, rmonlen, rmonmid, rmonbeg, rmonend, VE_day, ndays)
 
-    use GISS_orbital_subs
+    use GISS_orbpar_subs
     use GISS_srevents_subs
 
     implicit none

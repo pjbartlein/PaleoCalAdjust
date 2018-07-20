@@ -1,4 +1,4 @@
-module giss_orbital_subs
+module giss_orbpar_subs
     
 contains
     
@@ -291,4 +291,4 @@ subroutine orbpar(year, eccen, obliq, omegvp)   ! year should be YearCE
 
 end subroutine orbpar
 
-end module giss_orbital_subs
+end module giss_orbpar_subs
