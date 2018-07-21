@@ -1,4 +1,5 @@
 Figure Captions
+---------------
 
 Figure 1: Variations over the past 150 kyr in the beginning and ending days of fixed-angular months for a 365-day "noleap" calendar, shown for 1 kyr intervals beginning at 0 ka (1950 CE). The left side of each bar shows the beginning day while the right side shows the ending day of a particular month and time. The month-length "anomalies" or differences from the present-day are shown by shading, with individual paleo months that are shorter than those at present indicated by green and those that are longer indicated by blue. The day that perihelion occurs for each time is indicated by a magenta dot, and the overall pattern of month-length anomalies cab be seen to follow the day of perihelion.
 
@@ -15,6 +16,7 @@ Figure 6: Calendar effects on precipitation rate for 6 ka (upper left) 97 ka (up
 Figure 7: Time series of original and month-length-adjusted area averages of TraCE-21k data (Liu et al., 2009), expressed as difference from the 1961-1989 long-term mean. The original or unadjusted data are plotted in gray and black, and the adjusted data in colors. The area averages are grid-cell area-weighted values for land grid points in each region, and the smoother curves are locally weighted regression curves with a window (half) width of 100 years.
 
 Supplemental Figure Captions
+----------------------------
 
 Figure S1: Orbital parameter variations at 1 kyr intervals over the past 150 kyr.
 
