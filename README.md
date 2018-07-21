@@ -82,6 +82,14 @@ The approach we describe here for adjusting model output reported either as mont
 
 ### Month-length calculation
 
+
+What does code look like?
+
+	! Fortran code
+	stop "dave"
+
+In-line code `month_lengths_subs.f90` is a subroutine.
+
 ### Pseudo-daily interpolation
 
 It turns out that the most common way of producing pseudo-daily values, linear interpolation be-tween monthly means, is not mean preserving; the monthly means of the interpolated daily values will generally not match the original values. Here we use the mean-preserving "harmonic" interpolation method of Epstein (1991, J. Climate 4:365-368) to gauge this mismatch, and compare it with the calendar-effect adjustment (which itself is sensitive to the daily interpolation method).
