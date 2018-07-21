@@ -67,10 +67,10 @@ integer(4)              :: iostatus ! IOSTAT value
 
 data monname /'Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'/
 
-outpath = "\Projects\Calendar\PaleoCalendarAdjust\data\month_lengths\"  ! Windows path
-infopath = "\Projects\Calendar\PaleoCalendarAdjust\data\info_files\"    ! Windows path
-!outpath = "/Users/bartlein/Projects/Calendar/PaleoCalendarAdjust/data/month_lengths/"  ! Mac path
-!infopath = "/Users/bartlein/Projects/Calendar/PaleoCalendarAdjust/data/info_files/"    ! Mac path
+!outpath = "\Projects\Calendar\PaleoCalendarAdjust\data\month_lengths\"  ! Windows path
+!infopath = "\Projects\Calendar\PaleoCalendarAdjust\data\info_files\"    ! Windows path
+outpath = "/Users/bartlein/Projects/Calendar/PaleoCalendarAdjust/data/month_lengths/"  ! Mac path
+infopath = "/Users/bartlein/Projects/Calendar/PaleoCalendarAdjust/data/info_files/"    ! Mac path
 infofile = "month_length_info.csv"
 
 ! open the info file, and loop over specified calendar tables

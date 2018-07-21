@@ -5,7 +5,7 @@ program srevents
     
 ! NOTE:  Year CE/AD = 0 is assumed to exist, and is equivalent to 1950 BP (-1950)
     
-use GISS_orbpar_subs
+use GISS_orbital_subs
 use GISS_srevents_subs
       
 implicit none
