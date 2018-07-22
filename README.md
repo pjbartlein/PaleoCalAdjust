@@ -82,7 +82,7 @@ The approach we describe here for adjusting model output reported either as mont
 
 ### Month-length calculations
 
-Calculation of the length (in decimal days), and the beginning, middle and ending days of months as they vary over time is based on the algorithm described by Kutzbach and Gallimore (1988). Application of this algorithm to a 360-day year requires as input eccentricity and the longitude of perihelion (in degrees) relative to the vernal equinox, and the generalization of the approach to other calendars, such as the "proleptic Gregorian" calendar (that includes leap years) (<http://cfconventions.org>) requires also the date of the vernal equinox. Month lengths are calculated in a subroutine, `get_month_lengths()`, contained in a Fortran module called ```month_length_subs.f90```. The subroutines uses two other modules, GISS_orbpar_subs.f90 and
+Calculation of the length (in decimal days), and the beginning, middle and ending days of months as they vary over time is based on the algorithm described by Kutzbach and Gallimore (1988). Application of this algorithm to a 360-day year requires as input eccentricity and the longitude of perihelion (in degrees) relative to the vernal equinox, and the generalization of the approach to other calendars, such as the "proleptic Gregorian" calendar (that includes leap years) (<http://cfconventions.org>) requires also the date of the vernal equinox. Month lengths are calculated in a subroutine, `get_month_lengths(...)`, contained in a Fortran module called `month_length_subs.f90`. The subroutines uses two other modules, `GISS_orbpar_subs.f90` and
 
 #### Simulation ages and simulation years
 
