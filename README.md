@@ -78,17 +78,57 @@ The time-series expression of the latitudinally reversing calendar effect on pre
 Methods
 -------
 
-The approach we describe here for adjusting model output reported either as monthly data (using fixed-length definitions of months) or as daily data to reflect the calendar effect (i.e. to make month-length corrections) has two fundamental steps: 1) pseudo-daily interpolation of the data on a fixed-month-length calendar (which when actual daily data are available is not necessary), followed by 2) aggregation of those data to fixed-angular months defined for the particular time of the simulations. The second step obviously requires the calculation of the beginning and ending days of each month as they vary over ("geological") time, which in turn depends on the orbital parameters. The definition of the beginning and ending days of a month in a "leap-year," "Gregorian," or "proleptic Gregorian" calendar additionally depends on timing of the (northern) vernal equinox, which varies from year to year. To calculate the orbital parameters using the Berger (1978) solution, and the timing of the (northern) vernal equinox (as well as insolation itself) we adapted a set of programs provided by National Aeronautics and Space Administration, Goddard Institute for Space Studies (<https://data.giss.nasa.gov/ar5/solar.html>). For clarity, the month-length calculations will be described first, followed by the a discussion of pseudo-daily interpolation methods. Then the calendar-program will be described, along with a few demonstration programs that exercise some of the individual procedures.
+The approach we describe here for adjusting model output reported either as monthly data (using fixed-length definitions of months) or as daily data to reflect the calendar effect (i.e. to make month-length adjustments) has two fundamental steps: 1) pseudo-daily interpolation of the data on a fixed-month-length calendar (which when actual daily data are available is not necessary), followed by 2) aggregation of those data to fixed-angular months defined for the particular time of the simulations. The second step obviously requires the calculation of the beginning and ending days of each month as they vary over ("geological") time, which in turn depends on the orbital parameters. The definition of the beginning and ending days of a month in a "leap-year," "Gregorian," or "proleptic Gregorian" calendar (<http://cfconventions.org>) additionally depends on timing of the (northern) vernal equinox, which varies from year to year. For clarity, the month-length calculations will be described first, followed by a discussion of pseudo-daily interpolation methods. Then the calendar-adjustment program will be described, along with a few demonstration programs that exercise some of the individual procedures.
 
 ### Month-length calculations
 
-Calculation of the length (in decimal days), and the beginning, middle and ending days of months as they vary over time is based on the algorithm described by Kutzbach and Gallimore (1988). Application of this algorithm to a 360-day year requires as input eccentricity and the longitude of perihelion (in degrees) relative to the vernal equinox, and the generalization of the approach to other calendars, such as the "proleptic Gregorian" calendar (that includes leap years) (<http://cfconventions.org>) requires also the date of the vernal equinox.
+Calculation of the length (in decimal days), and the beginning, middle and ending days of months at a particular time is based on the algorithm described by Kutzbach and Gallimore (1988). Application of this algorithm to a 360-day year requires as input eccentricity and the longitude of perihelion (in degrees) relative to the vernal equinox, and the generalization of the approach to other calendars, such as the "proleptic Gregorian" calendar (that includes leap years, <http://cfconventions.org>) also requires also the date of the vernal equinox. To calculate the orbital parameters using the Berger (1978) solution, and the timing of the (northern) vernal equinox (as well as insolation itself) we adapted a set of programs provided by National Aeronautics and Space Administration, Goddard Institute for Space Studies (<https://data.giss.nasa.gov/ar5/solar.html>).
 
 #### Simulation ages and simulation years
 
 Inspection shows that different models employ different starting dates in their output files for both present-day (*piControl*) and paleo (e.g. *midHolocene*) simulations. For models that use a noleap (constant 365-day year) calendar, such as CCSM4, the starting date is not an issue, but for MPI-ESM-P, which has a proleptic Gregorian calendar, and CNRM-CM5, with a "standard" (i.e. mixed Julian/Gregorian) calendar, the specific starting date influences the date of the vernal equinox through the occurrence of individual leap years. For example, in the CMIP5/PMIP4 *midHolocene* simulations, output from MPI-ESM-P starts in 1850 CE, and that from CNRM-CM5 in 1950 CE (and it can be verified that leap years in the output files occur in a fashion consistent with the "modern" calendar). Consequently, we make a distinction between two notions of "date" here: 1) the simulation age, expressed in (negative) years BP 1950 CE, and 2) the simulation year, expressed in years CE. The simulation age controls the orbital parameter values, while the simulation year, along with the specification of the CF-compliant calendar attribute, controls the date of the vernal equinox.
 
-Month lengths are calculated in a subroutine, `get_month_lengths(...)`, contained in a Fortran module called `month_length_subs.f90`. The subroutine uses two other modules, `GISS_orbpar_subs.f90` and `GISS_orbpar_subs.f90` (based on programs downloaded from GISS) to get the orbital parameters and vernal equinox dates.
+#### Month-length subprograms
+
+Month lengths are calculated in a subroutine, `get_month_lengths(...)`, contained in a Fortran module named `month_length_subs.f90` that in turn calls a subroutine named `kg_monlen(...)` to get real-valued month lengths for a particular simulation age and year. The subroutine `get_month_lengths(...)`, can be exercised to produce tables of month lengths, beginning, middle and ending days of the kind used to produce Figs. 1-3 and S2-S7) using a driver program named `month_length.f90` The subroutine uses two other modules, `GISS_orbpar_subs.f90` and `GISS_orbpar_subs.f90` (based on programs downloaded from GISS) to get the orbital parameters and vernal equinox dates, and the module can be exercised to produce tables of month lengths, beginning, middle and ending days of the kind used to produce Figs. 1-3 and S2-S7).
+
+The specific tasks involved in calculating either a single year's set of month lengths, or a series of month lengths involve the following steps:
+
+-   generating a set of "target" dates based on the simulation ages and simulation years;
+
+-   obtaining the orbital parameters for the simulation ages, and the day of the vernal equinox for each simulation year;
+
+-   calculating real-valued month lengths for an appropriate calendar
+
+-   adjusting those month length values to a particular reference year (e.g. 1950 CE) and conventional set of month definitions so that, for example, January will have 31 days, February 28 or 29 days, etc. in that reference year.
+
+-   calculation of real- and integer-valued beginning, middle and end days.
+
+`subroutine get_month_lengths(...)`
+
+`kg_monlen(...)`
+
+`kg_monlen_360(...)`
+
+`subroutine adjust_to_reference(...)`
+
+`subroutine adjust_to_yeartot(...)`
+
+`subroutine integer_monlen(...)
+
+`subroutine imon_begmidend(...)`
+
+`subroutine rmon_begmidend(...)`
+
+`subroutine compare_monthdefs(...)`
+
+`function degrees(...)`
+
+`function radians(...)`
+
+`function_yearlen_BP(...)`
+
+`function_yearlen_CE(...)`
 
 ### Pseudo-daily interpolation
 
