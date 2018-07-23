@@ -124,7 +124,7 @@ subroutine get_month_lengths(calendar_type, begageBP, endageBP, agestep, nages, 
         stop "Calendar type not supported"
     end select
 
-    ! generate target years -- experiment ages (in yrs BP) and simulation years (in yrs CE)
+    ! Step 1:  generate target years -- experiment ages (in yrs BP) and simulation years (in yrs CE)
     write (*,'(a)') "Calculating month lengths..."
     write (*,'("begageBP, endageBP, agestep, nages, begyrCE, nsimyrs: ",6i7)') &
         begageBP, endageBP, agestep, nages, begyrCE, nsimyrs
@@ -149,8 +149,8 @@ subroutine get_month_lengths(calendar_type, begageBP, endageBP, agestep, nages, 
 
     ! ===================================================================================================================
 
-    ! get 0 ka (1950CE) calculated month lengths, which will be used to restore all other calculated month lengths
-    ! to nominal present-day values
+    ! Step 2:  get 0 ka (1950CE) calculated month lengths, which will be used to adjust all other calculated month lengths
+    ! to nominal "present-day" values
 
     ! orbital elements for 0 ka
     write (*,'(a)') "0 ka orbital elements..."
@@ -159,7 +159,7 @@ subroutine get_month_lengths(calendar_type, begageBP, endageBP, agestep, nages, 
     if (debug_write) write (22,'("ageBP, eccen, obliq_deg, perih_deg, precc: ",f10.1,4f17.12)') &
         ageBP, eccen, obliq_deg, perih_deg, precc
 
-    ! 0 ka calculated month lengths, following Kutzbach and Gallimore (1988), also set subroutine arguments
+    ! Step 3:  0 ka calculated month lengths, following Kutzbach and Gallimore (1988), also set subroutine arguments
     write (*,'(a)') "0 ka month lengths..."
     select case (trim(calendar_type))
     case ('360_day')
@@ -196,11 +196,12 @@ subroutine get_month_lengths(calendar_type, begageBP, endageBP, agestep, nages, 
             ii = ii + 1
             if (mod(n,1000) .eq. 0) write (*,'(i8,$)') n; if (mod(n,15000).eq.0) write (*,'(" ")')
 
-            ! orbital elements for simulation age (e.g. 6 ka)
+            ! Step 4:  orbital elements for simulation age (e.g. 6 ka)
             call GISS_orbpars('BP', dble(iageBP(n)), eccen, obliq_deg, perih_deg, precc)
             !if (debug_write) write (22,'("ageBP, eccen, obliq_deg, perih_deg, precc: ",f10.1,4f17.12)') &
             !    ageBP, eccen, obliq_deg, perih_deg, precc
-
+            
+            ! Steps 5&6:  real-valued month lengths for different calendars
             ! proleptic_gregorian-like calendars
             select case (trim(calendar_type))
             case ('proleptic_gregorian','progreg','gregorian','standard')
@@ -229,10 +230,10 @@ subroutine get_month_lengths(calendar_type, begageBP, endageBP, agestep, nages, 
             if (debug_write) write (22,'("ageBP, rmonlength:        ",i8,13f12.6)') iageBP(ii),rmonlen(ii,1:nm),ryeartot(ii)
             if (debug_write) write (11,'(2i8,13f12.6)') iageBP(ii),iyearCE(ii),rmonlen(ii,1:nm),ryeartot(ii) ! raw month lengths
 
-            ! require the sum of month lengths each year to equal the year length
+            ! Step 7:  require the sum of month lengths each year to exactly equal the year length
             call adjust_to_yeartot(rmonlen(ii,:), yrlen, ryeartot(ii))
 
-            ! integer month lengths
+            ! Step 8:  integer month lengths
             call integer_monlen(rmonlen(ii,:), ndyr, imonlen(ii,:), iyeartot(ii))
 
             ! various month-length statistics
@@ -241,7 +242,7 @@ subroutine get_month_lengths(calendar_type, begageBP, endageBP, agestep, nages, 
                 rmonlen_ratio(m) = rmonlen(ii,m)/present_monlen(m)
             end do
 
-            ! get mid-March day
+            ! Step 9: get mid-March day
             select case (trim(calendar_type))
             case ('360_day')
                 midMarch = veqday_360 - (5.0d0/30.0d0) * rmonlen(ii,3)
@@ -260,6 +261,7 @@ subroutine get_month_lengths(calendar_type, begageBP, endageBP, agestep, nages, 
                 stop "paleo calendar type not defined"
             end select
 
+            ! Step 10:  real- and integer-valued middle, beginning and ending days
             ! real-value mid-month, beginning and ending days
             call rmon_midbegend(rmonlen(ii,:), midMarch, rmonmid(ii,:), rmonbeg(ii,:), rmonend(ii,:))
 
@@ -308,14 +310,14 @@ subroutine kg_monlen_360(eccen, perih, rmonlen, ryeartot)
 
     verneq_angle=0.0d0; rmonlen=0.0d0
 
-    ! set day numbers (day(0) is the day before Jan 1) and angular difference from vernal equinox
+    ! Step 1:  set day numbers (day(0) is the day before Jan 1) and angular difference from vernal equinox
     do i=0,nd_360
         day(i) = i
         verneq_angle(i) = (-1.0d0*veqday_360)+dble(i)
         write (23,'("i,day,verneq_angle: ",i4,i4,f10.3)') i,day(i),verneq_angle(i)
     end do
 
-    ! find phip (such that sin(perih-phip) = -1)
+    ! Step 2:  find phip (such that sin(perih-phip) = -1)
     phi_inc = 360.0d0 / dble(nphi - 1)
     mindiff = 99999.0d0; phip = 0.0d0; imin = 99999
     do i=0,nphi+1
@@ -330,12 +332,12 @@ subroutine kg_monlen_360(eccen, perih, rmonlen, ryeartot)
     end do
     write (23,'("perih,phip,mindiff,imin: ",3g14.6,i6)') perih,phip,mindiff,imin
 
-    ! calculate t (traverse time since vernal equinox) (K&G Eqn A2)
+    ! Step 3:  calculate t (traverse time since vernal equinox) (K&G Eqn A2)
     do i=0,nd_360
         t(i) = verneq_angle(i)-2.0d0*eccen*degrees(dcos(radians(verneq_angle(i)-phip)) - dcos(radians(phip)))
     end do
 
-    ! relative length of each day
+    ! Step 4:  relative length of each day
     day_length(0) = t(0) - (t(nd_360-1) - 360.0d0)
     ryeartot = 0.0d0
     write (23, '("i, t(0), day_length(i), ryeartot:   0",3f12.6)') t(0), day_length(0), ryeartot
@@ -345,7 +347,7 @@ subroutine kg_monlen_360(eccen, perih, rmonlen, ryeartot)
         write (23, '("i, t(i), day_length(i), ryeartot: ",i3,3f12.6)') i, t(i), day_length(i), ryeartot
     end do
 
-    ! length of each month -- total daylength in 1/12 = daysinmonth360 / 360 proportion of year
+    ! Step 5:  length of each "month" -- total daylength in 1/12 = daysinmonth360 / 360 proportion of year
     i=0; ryeartot = 0.0d0
     do m=1,nm
         do ii=1,daysinmonth360
@@ -392,14 +394,14 @@ subroutine kg_monlen(yrlen, ndyr, veqday, ipresent_monlen, eccen, perih, rmonlen
 
     verneq_angle=0.0d0; rmonlen=0.0d0
 
-    ! set day numbers (day(0) is the day before Jan 1) and angular differences (in degrees) from vernal equinox
+    ! Step 1:  set day numbers (day(0) is the day before Jan 1) and angular differences (in degrees) from vernal equinox
     do i=0,ndyr
         day(i) = i
         verneq_angle(i) = ((-1.0d0*veqday)+dble(i))*(360.0d0/dble(ndyr))
         write (23,'("i,day,verneq_angle: ",i4,i4,f12.6)') i,day(i),verneq_angle(i)
     end do
 
-    ! find phip (in degrees) such that sin((2 * pi/yrlen)*(perih-phip)) = -1
+    ! Step 2:  find phip (in degrees) such that sin((2 * pi/yrlen)*(perih-phip)) = -1
     phi_inc = 360.0d0 / dble(nphi - 1)
     mindiff = 99999.0d0; phip = 0.0d0; imin = 99999
     do i=0,nphi+1
@@ -414,13 +416,13 @@ subroutine kg_monlen(yrlen, ndyr, veqday, ipresent_monlen, eccen, perih, rmonlen
     end do
     write (23,'("perih,phip,mindiff,imin: ",3g14.6,i6)') perih,phip,mindiff,imin
 
-    ! calculate t (traverse time) from vernal equinox for each day (K&G Eqn A2)
+    ! Step 3:  calculate t (traverse time) from vernal equinox for each day (K&G Eqn A2)
     do i=0,ndyr
         t(i) = (verneq_angle(i)-2.0d0*eccen*degrees(dcos(radians(verneq_angle(i)-phip)) &
             - dcos(radians(phip)))) * (dble(yrlen)/360.0d0)
     end do
 
-    ! relative length of each day
+    ! Step 4:  relative length of each day
     day_length(0) = (t(ndyr) - t(ndyr-1))
     ryeartot = 0.0d0
     write (23, '("i, t(0), day_length(i), ryeartot:   0",3f12.6)') t(0), day_length(0), ryeartot
@@ -430,7 +432,7 @@ subroutine kg_monlen(yrlen, ndyr, veqday, ipresent_monlen, eccen, perih, rmonlen
         write (23, '("i, t(i), day_length(i), ryeartot: ",i3,3f12.6)') i, t(i), day_length(i), ryeartot
     end do
 
-    ! length of each month -- total relative day length in ipresent_monlen(m)/ndyr proportion of year
+    ! step 5:  length of each month -- total relative day length in ipresent_monlen(m)/ndyr proportion of year
     i=0; ryeartot = 0.0d0
     do m=1,nm
         do ii=1,ipresent_monlen(m)
@@ -636,7 +638,6 @@ subroutine compare_monthdefs(nyrs, imondef, rmondef)
 end subroutine compare_monthdefs
 
 integer(4) function yearlen_BP(ageBP)
-
 ! gets number of days in a BP year -- no year zero or Gregorian-Julian adjustment
 
     implicit none
@@ -654,7 +655,6 @@ integer(4) function yearlen_BP(ageBP)
 end function yearlen_BP
 
 integer(4) function yearlen_CE(yearCE)
-
 ! gets number of days in a CE year -- no year zero or Gregorian-Julian adjustment
 
     implicit none

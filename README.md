@@ -104,23 +104,29 @@ Inspection shows that different models employ different starting dates in their 
 
 #### Month-length programs and subprograms
 
-Month lengths are calculated in a subroutine, `get_month_lengths(...)`, contained in a Fortran module named `month_length_subs.f90` that in turn calls a subroutine named `kg_monlen(...)` to get real-valued month lengths for a particular simulation age and year. The subroutine `get_month_lengths(...)`, can be exercised to produce tables of month lengths, beginning, middle and ending days of the kind used to produce Figs. 1-3 and S2-S7) using a driver program named `month_length.f90` The subroutine `get_month_lengths(...)` uses two other modules, `GISS_orbpar_subs.f90` and `GISS_orbpar_subs.f90` (based on programs downloaded from GISS) to get the orbital parameters and vernal equinox dates.
+Month lengths are calculated in a subroutine, `get_month_lengths(...)` (contained in a Fortran module named `month_length_subs.f90`), that in turn calls a subroutine named `kg_monlen(...)` to get real-valued month lengths for a particular simulation age and year. (The subroutine `get_month_lengths(...)`, can be exercised to produce tables of month lengths, beginning, middle and ending days of the kind used to produce Figs. 1-3 and S2-S7) using a driver program named `month_length.f90`.) The subroutine `get_month_lengths(...)` uses two other modules, `GISS_orbpar_subs.f90` and `GISS_orbpar_subs.f90` (based on programs downloaded from GISS) to get the orbital parameters and vernal equinox dates.
 
-The specific tasks involved in calculating either a single year's set of month lengths, or a series of month lengths involve the following steps:
+The specific tasks involved in calculating either a single year's set of month lengths, or a series of month lengths involve the following steps, implemented in `get_month_lengths(...):
 
--   generating a set of "target" dates based on the simulation ages and simulation years;
+1.  generate a set of "target" dates based on the simulation ages and simulation years;
 
--   obtaining the orbital parameters for the simulation ages, and the day of the vernal equinox for each simulation year using the subroutines `GISS_orbpars(...)` and `GISS_srevents(...)`;
+2.  obtain the orbital parameters for 0 ka (1950 CE), which will be used to adjust the calculated month-length values to the nominal calendar for a reference year (e.g. 1950 CE);
 
--   calculating real-valued month lengths for an appropriate calendar using `kg_monlen(...)`;
+3.  obtain the present-day (i.e. 1950 CE) month lengths for different calendars;
 
--   adjusting those month length values to a particular reference year (e.g. 1950 CE) and conventional set of month definitions so that, for example, January will have 31 days, February 28 or 29 days, etc. in that reference year using `adjust_to_reference(...)`;
+4.  obtain the orbital parameters for each simulation age, using the subroutine `GISS_orbpars;
 
--   further adjusting those values to ensure that the individual monthly values will sum exactly to the year length in days using `adust_to_yeartot(...)`;
+5.  calculate real-valued month lengths for an appropriate calendar using `kg_monlen(...)`;
 
--   conversion of real-valued month lengths to integers using `integer_monlen(...)` (These are not used anywhere, but are less alarming than the idea of months including fractional days);
+6.  adjusting those month length values to a particular reference year (e.g. 1950 CE) and conventional set of month definitions so that, for example, January will have 31 days, February 28 or 29 days, etc. in that reference year using `adjust_to_reference(...)`;
 
--   calculation of real- and integer-valued beginning, middle and end days using `imon_begmidend(...)` and `rmon_begmidend(...)`
+7.  further adjusting those values to ensure that the individual monthly values will sum exactly to the year length in days using `adjust_to_yeartot(...)`;
+
+8.  conversion of real-valued month lengths to integers using `integer_monlen(...)` (These are not used anywhere, but are less alarming than the idea of months including fractional days);
+
+9.  Step 9: determine the mid-March day, using `GISS_srevents(...) to get the vernal equinox date for calendars in which it varies;
+
+10. calculation of real- and integer-valued beginning, middle and end days using `imon_midbegend(...)` and `rmon_midbegend(...)`
 
 #### Month-length tables and time series
 
