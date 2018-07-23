@@ -82,11 +82,11 @@ The approach we describe here for adjusting model output reported either as mont
 
 ### Month-length calculations
 
-Calculation of the length (in decimal days), and the beginning, middle and ending days of months at a particular time is based on the algorithm described by Kutzbach and Gallimore (1988). Application of this algorithm to a 360-day year requires as input eccentricity and the longitude of perihelion (in degrees) relative to the vernal equinox, and the generalization of the approach to other calendars, such as the "proleptic Gregorian" calendar (that includes leap years, <http://cfconventions.org>) also requires also the date of the vernal equinox. To calculate the orbital parameters using the Berger (1978) solution, and the timing of the (northern) vernal equinox (as well as insolation itself) we adapted a set of programs provided by National Aeronautics and Space Administration, Goddard Institute for Space Studies (<https://data.giss.nasa.gov/ar5/solar.html>).
+Calculation of the length (in decimal days), and the beginning, middle and ending days of months at a particular time is based on the algorithm described by Kutzbach and Gallimore (1988). Application of this algorithm to a 360-day year requires as input eccentricity and the longitude of perihelion (in degrees) relative to the vernal equinox, and the generalization of the approach to other calendars, such as the "proleptic Gregorian" calendar (that includes leap years, <http://cfconventions.org>) also requires the date of the vernal equinox. To calculate the orbital parameters using the Berger (1978) solution, and the timing of the (northern) vernal equinox (as well as insolation itself) we adapted a set of programs provided by National Aeronautics and Space Administration, Goddard Institute for Space Studies (<https://data.giss.nasa.gov/ar5/solar.html>).
 
-The approach adopted by Kutzbach and Gallimore is based on an approximation that describes the rate of change in celestial longitude, *ϕ*, with time (over the year), which depends on eccentricity and the date of perihelion (expressed as a phase angle, *ϕ<sub>p</sub>*, defined so that sin((2π/360)(*ϕ - ϕ<sub>p</sub>*)) = -1 at the celestial longitude of perihelion), their equation A1. After *ϕ<sub>p</sub>* has been determined, the amount of time (in decimal days) required to traverse a given number of degrees of celestial longitude from the vernal equinox can be determined by an integration of A1 (their equation A2).
+The approach adopted by Kutzbach and Gallimore is based on an approximation that describes the rate of change in celestial longitude, *ϕ*, with time (over the year), which depends on eccentricity and the date of perihelion, expressed as a phase angle, *ϕ<sub>p</sub>*, defined so that sin((2π/360)(*ϕ - ϕ<sub>p</sub>*)) = ‑1 at the celestial longitude of perihelion (their equation A1). After *ϕ<sub>p</sub>* has been determined, the amount of time (in decimal days) required to traverse a given number of degrees of celestial longitude from the vernal equinox can be determined by an integration of A1 (their equation A2).
 
-We implemented this approach in the subroutine `kg_monlen_360(...)` in the Fortran module named `month_length_subs.f90`. (This subroutine is not actually used in practice because it can handle only 360-day year calendars, but it illustrates the basic ideas.) After initializing a set of day numbers and angular differences from the vernal equinox (assumed to be fixed at 80 days after the beginning of the year) (Step 1 in `kg_monlen_360(...)`), we determine *ϕ<sub>p</sub>* by advancing along the orbit at 0.001-day increments from the vernal equinox, and selecting *ϕ<sub>p</sub>* as the value that minimizes -1 - sin((2π/360)(*ϕ - ϕ<sub>p</sub>*)) (Step 2). Then the traverse time since the vernal equinox is calculated for each day using Kutzbach and Gallimore's equation A2 (Step 3), and this is used to get the relative length of each day through simple differencing (Step 4). Finally, the length of each month (in decimal days), is determined by accumulation (Step 5).
+We implemented this approach in the subroutine `kg_monlen_360(...)` in the Fortran module named `month_length_subs.f90`. (This subroutine is not actually used in practice because it can handle only 360-day year calendars, but it illustrates the basic ideas.) After initializing a set of day numbers and angular differences from the vernal equinox (assumed to be fixed at 80 days after the beginning of the year) (Step 1 in `kg_monlen_360(...)`), we determine *ϕ<sub>p</sub>* by advancing along the orbit at 0.001-day increments from the vernal equinox, and selecting *ϕ<sub>p</sub>* as the value that minimizes ‑1 ‑ sin((2π/360)(*ϕ - ϕ<sub>p</sub>*)) (Step 2). Then the traverse time since the vernal equinox is calculated for each day using Kutzbach and Gallimore's equation A2 (Step 3), and this is used to get the relative length of each day through simple differencing (Step 4). Finally, the length of each month (in decimal days), is determined by accumulation (Step 5).
 
 #### Simulation ages and simulation years
 
@@ -100,7 +100,7 @@ The specific tasks involved in calculating either a single year's set of month l
 
 -   generating a set of "target" dates based on the simulation ages and simulation years;
 
--   obtaining the orbital parameters for the simulation ages, and the day of the vernal equinox for each simulation year using the subroutines `GISS_orbpars(...)` and `GISS_srevents(...);
+-   obtaining the orbital parameters for the simulation ages, and the day of the vernal equinox for each simulation year using the subroutines `GISS_orbpars(...)` and `GISS_srevents(...)`;
 
 -   calculating real-valued month lengths for an appropriate calendar using `kg_monlen(...)`;
 
@@ -108,7 +108,7 @@ The specific tasks involved in calculating either a single year's set of month l
 
 -   further adjusting those values to ensure that the individual monthly values will sum exactly to the year length in days using `adust_to_yeartot(...)`;
 
--   conversion of real-valued month lengths to integers using `integer_monlen(...)`;
+-   conversion of real-valued month lengths to integers using `integer_monlen(...)` (These are not used anywhere, but are less alarming than the idea of months including fractional days);
 
 -   calculation of real- and integer-valued beginning, middle and end days using `imon_begmidend(...)` and `rmon_begmidend(...)`
 
