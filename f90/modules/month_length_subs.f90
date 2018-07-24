@@ -286,6 +286,9 @@ subroutine get_month_lengths(calendar_type, begageBP, endageBP, agestep, nages, 
 end subroutine get_month_lengths
 
 subroutine kg_monlen_360(eccen, perih, rmonlen, ryeartot)
+! calculate month lengths for a particular orbital configuration in a 360-day year
+! Note:  this subroutine is never called, but is provided to illustrate the basic impletation of the
+! Kutzbach & Gallimore (1988) Appendix 1 approach
 
     implicit none
 
@@ -362,13 +365,14 @@ subroutine kg_monlen_360(eccen, perih, rmonlen, ryeartot)
 end subroutine kg_monlen_360
 
 subroutine kg_monlen(yrlen, ndyr, veqday, ipresent_monlen, eccen, perih, rmonlen, ryeartot)
+! calculate month lenghts for a particular orbital configuration, calendar and vernal equinox day
 
     implicit none
 
     real(8), intent(in)     :: yrlen                ! total length of year (days)
     integer(4), intent(in)  :: ndyr                 ! number of days in year
     real(8), intent(in)     :: veqday               ! vernal equinox day
-    integer(4), intent(in)  :: ipresent_monlen(nm)  ! number of days in month at present
+    integer(4), intent(in)  :: ipresent_monlen(nm)  ! number of days in each month at present (calendar dependent)
     real(8), intent(in)     :: eccen, perih         ! orbital parameters
 
     real(8), intent(out)    :: rmonlen(nm)          ! real month lengths

@@ -28,7 +28,7 @@ program cal_adjust_PMIP3
 ! Author: Patrick J. Bartlein, Univ. of Oregon (bartlein@uoregon.edu), with contributions by S.L. Shafer (sshafer@usgs.gov)
 !
 ! Version: 1.0
-! Last update: 2018-06-19
+! Last update: 2018-07-22
 
 use calendar_effects_subs
 use pseudo_daily_interp_subs
@@ -129,7 +129,7 @@ open (10, file=trim(debugpath)//trim(debugfile))
 ! info files
 infopath = "/Projects/Calendar/PaleoCalendarAdjust/data/info_files/" ! Windows path
 !infopath = "/Users/bartlein/Projects/Calendar/PaleoCalendarAdjust/data/info_files/"  ! Mac path
-infofile = "cal_adj_info_reanalysis.csv"
+infofile = "cal_adj_info.csv"
 
 ! open the info file, and loop over specified calendar tables
 open (3,file=trim(infopath)//trim(infofile))
