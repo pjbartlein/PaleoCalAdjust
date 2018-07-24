@@ -6,7 +6,7 @@ PaleoCalendarAdjust
 The Paleo Calendar Effect
 -------------------------
 
-The material below describes the "paleo calendar effect" \-- the common expression for the impact that the changes in the length of months or seasons over time, related to the changes in the eccentricity of Earth's orbit and to precession, has on summarization of paleoclimatic model output. This is followed by a description of an approach implemented in Fortran programs (and modules), that can be used to determine the changing length of months (on various calendars) over time, and to adjust existing data sets in the "CMIP5" format to an appropriate paleo calendar.
+The material below describes the "paleo calendar effect" -- the common expression for the impact that the changes in the length of months or seasons over time, related to the changes in the eccentricity of Earth's orbit and to precession, has on summarization of paleoclimatic model output. This is followed by a description of an approach implemented in Fortran programs (and modules), that can be used to determine the changing length of months (on various calendars) over time, and to adjust existing data sets in the "CMIP5" format to an appropriate paleo calendar.
 
 ### Introduction
 
@@ -88,15 +88,15 @@ The linear and mean-preserving interpolation methods can be compared using the C
 
 The map patterns of the interpolation errors (the differences between the original monthly values and those recalculated using the pseudo-daily interpolated values) appear in Fig. S9. (Note the differing scales for the linear-interpolation errors and the mean-preserving-interpolation errors.) The linear interpolation errors are quite large, with absolute values exceeding 1ºC and 1 mm d-1 and have distinct seasonal and spatial patterns: underpredictions of temperature in summers (and overpredictions in winter, and underpredictions of precipitation in the wet season and locations (and overpredictions in the dry season and locations). The magnitude and patterns of these effects again rival those we attempt to infer or interpret in the paleo record. The mean-preserving interpolation errors for temperature are very small, and show only vague spatial patterns (note the differing scales). The errors for precipitation area also quite small, but can be locally larger, as in the pathological case illustrated above. However, the map patterns of the interpolation errors strongly suggest that those cases are not practically important.
 
-The mean-preserving interpolation method is implemented in the module named \`pseudo\_daily\_interp\_subs.f90\` The subroutine named \`hdaily(...)\` manages the interpolation, first getting the harmonic coefficients (Eq. 6 of Epstein, 1991) using the subroutine names \`harmonic\_coeffs(...)\` and then applying these in the subroutine \`xdhat(...)\` to get the interpolated values.
+The mean-preserving interpolation method is implemented in the module named `pseudo_daily_interp_subs.f90` The subroutine named `hdaily(...)` manages the interpolation, first getting the harmonic coefficients (Eq. 6 of Epstein, 1991) using the subroutine names `harmonic_coeffs(...)` and then applying these in the subroutine `xdhat(...)` to get the interpolated values.
 
 ### Month-length calculations
 
 Calculation of the length (in decimal days), and the beginning, middle and ending days of months at a particular time is based on the algorithm described by Kutzbach and Gallimore (1988). Application of this algorithm to a 360-day year requires as input eccentricity and the longitude of perihelion (in degrees) relative to the vernal equinox, and the generalization of the approach to other calendars, such as the "proleptic Gregorian" calendar (that includes leap years, <http://cfconventions.org>) also requires the date of the vernal equinox. To calculate the orbital parameters using the Berger (1978) solution, and the timing of the (northern) vernal equinox (as well as insolation itself) we adapted a set of programs provided by National Aeronautics and Space Administration, Goddard Institute for Space Studies (<https://data.giss.nasa.gov/ar5/solar.html>).
 
-The approach adopted by Kutzbach and Gallimore is based on an approximation that describes the rate of change in celestial longitude, *ϕ*, with time (over the year), which depends on eccentricity and the date of perihelion, expressed as a phase angle, *ϕ\<sub\>p\</sub\>*, defined so that sin((2π/360)(*ϕ - ϕ\<sub\>p\</sub\>*)) = ‑1 at the celestial longitude of perihelion (their equation A1). After *ϕ\<sub\>p\</sub\>* has been determined, the amount of time (in decimal days) required to traverse a given number of degrees of celestial longitude from the vernal equinox can be determined by an integration of A1 (their equation A2).
+The approach adopted by Kutzbach and Gallimore is based on an approximation that describes the rate of change in celestial longitude, *ϕ*, with time (over the year), which depends on eccentricity and the date of perihelion, expressed as a phase angle, *ϕ<sub>p</sub>*, defined so that sin((2π/360)(*ϕ - ϕ<sub>p</sub>*)) = ‑1 at the celestial longitude of perihelion (their equation A1). After *ϕ<sub>p</sub>* has been determined, the amount of time (in decimal days) required to traverse a given number of degrees of celestial longitude from the vernal equinox can be determined by an integration of A1 (their equation A2).
 
-We implemented this approach in the subroutine \`kg\_monlen\_360(...)\` in the Fortran module named \`month\_length\_subs.f90\`. (This subroutine is not actually used in practice because it can handle only 360-day year calendars, but it illustrates the basic ideas.) After initializing a set of day numbers and angular differences from the vernal equinox (assumed to be fixed at 80 days after the beginning of the year) (Step 1 in \`kg\_monlen\_360(...)\`), we determine *ϕ\<sub\>p\</sub\>* by advancing along the orbit at 0.001-day increments from the vernal equinox, and selecting *ϕ\<sub\>p\</sub\>* as the value that minimizes ‑1 ‑sin((2π/360)(*ϕ - ϕ\<sub\>p\</sub\>*)) (Step 2). Then the traverse time since the vernal equinox is calculated for each day using Kutzbach and Gallimore's equation A2 (Step 3), and this is used to get the relative length of each day through simple differencing (Step 4). Finally, the length of each month (in decimal days), is determined by accumulation (Step 5).
+We implemented this approach in the subroutine `kg_monlen_360(...)` in the Fortran module named `month_length_subs.f90`. (This subroutine is not actually used in practice because it can handle only 360-day year calendars, but it illustrates the basic ideas.) After initializing a set of day numbers and angular differences from the vernal equinox (assumed to be fixed at 80 days after the beginning of the year) (Step 1 in `kg_monlen_360(...)`), we determine *ϕ<sub>p</sub>* by advancing along the orbit at 0.001-day increments from the vernal equinox, and selecting *ϕ<sub>p</sub>* as the value that minimizes ‑1 ‑sin((2π/360)(*ϕ - ϕ<sub>p</sub>*)) (Step 2). Then the traverse time since the vernal equinox is calculated for each day using Kutzbach and Gallimore's equation A2 (Step 3), and this is used to get the relative length of each day through simple differencing (Step 4). Finally, the length of each month (in decimal days), is determined by accumulation (Step 5).
 
 #### Simulation ages and simulation years
 
@@ -104,9 +104,9 @@ Inspection shows that different models employ different starting dates in their 
 
 #### Month-length programs and subprograms
 
-Month lengths are calculated in a subroutine, \`get\_month\_lengths(...)\` (contained in a Fortran module named \`month\_length\_subs.f90\`), that in turn calls a subroutine named \`kg\_monlen(...)\` to get real-valued month lengths for a particular simulation age and year. (The subroutine \`get\_month\_lengths(...)\`, can be exercised to produce tables of month lengths, beginning, middle and ending days of the kind used to produce Figs. 1-3 and S2-S7) using a driver program named \`month\_length.f90\`.) The subroutine \`get\_month\_lengths(...)\` uses two other modules, \`GISS\_orbpar\_subs.f90\` and \`GISS\_orbpar\_subs.f90\` (based on programs downloaded from GISS) to get the orbital parameters and vernal equinox dates.
+Month lengths are calculated in a subroutine, `get_month_lengths(...)` (contained in a Fortran module named `month_length_subs.f90`), that in turn calls a subroutine named `kg_monlen(...)` to get real-valued month lengths for a particular simulation age and year. (The subroutine `get_month_lengths(...)`, can be exercised to produce tables of month lengths, beginning, middle and ending days of the kind used to produce Figs. 1-3 and S2-S7) using a driver program named `month_length.f90`.) The subroutine `get_month_lengths(...)` uses two other modules, `GISS_orbpar_subs.f90` and `GISS_orbpar_subs.f90` (based on programs downloaded from GISS) to get the orbital parameters and vernal equinox dates.
 
-The specific tasks involved in the calculation of either a single year's set of month lengths, or a series of month lengths for multiple years, include the following steps, implemented in \`get\_month\_lengths(...)\`:
+The specific tasks involved in the calculation of either a single year's set of month lengths, or a series of month lengths for multiple years, include the following steps, implemented in `get_month_lengths(...)`:
 
 1.  generate a set of "target" dates based on the simulation ages and simulation years;
 
@@ -116,23 +116,23 @@ The specific tasks involved in the calculation of either a single year's set of 
 
 Then loop over the simulation ages and simulation years, and for each combination:
 
-4.  obtain the orbital parameters for each simulation age, using the subroutine \`GISS\_orbpars\`;
+4.  obtain the orbital parameters for each simulation age, using the subroutine `GISS_orbpars`;
 
-5.  calculate real-valued month lengths for the appropriate calendar using \`kg\_monlen(...)\`;
+5.  calculate real-valued month lengths for the appropriate calendar using `kg_monlen(...)`;
 
-6.  adjust (using the subroutine \`adjust\_to\_reference(...)\`) those month length values to the reference year (e.g. 1950 CE) and its conventional set of month-length definitions so that, for example, January will have 31 days, February 28 or 29 days, etc. in that reference year;
+6.  adjust (using the subroutine `adjust_to_reference(...)`) those month length values to the reference year (e.g. 1950 CE) and its conventional set of month-length definitions so that, for example, January will have 31 days, February 28 or 29 days, etc. in that reference year;
 
-7.  further adjust the month-length values to ensure that the individual monthly values will sum exactly to the year length in days using \`adjust\_to\_yeartot(...)\`;
+7.  further adjust the month-length values to ensure that the individual monthly values will sum exactly to the year length in days using `adjust_to_yeartot(...)`;
 
-8.  convert real-valued month lengths to integers using \`integer\_monlen(...)\` (These are not used anywhere, but are less alarming than the idea of months including fractional days.);
+8.  convert real-valued month lengths to integers using `integer_monlen(...)` (These are not used anywhere, but are less alarming than the idea of months including fractional days.);
 
-9.  determine the mid-March day, using \`GISS\_srevents(...)\` to get the vernal equinox date for calendars in which it varies;
+9.  determine the mid-March day, using `GISS_srevents(...)` to get the vernal equinox date for calendars in which it varies;
 
-10. calculate real- and integer-valued beginning, middle and ending days using \`imon\_midbegend(...)\` and \`rmon\_midbegend(...)\` for integer- and real-number definitions of the months.
+10. calculate real- and integer-valued beginning, middle and ending days using `imon_midbegend(...)` and `rmon_midbegend(...)` for integer- and real-number definitions of the months.
 
 #### Month-length tables and time series
 
-Tables and time series of month lengths, beginning, middle and ending days, and dates of the vernal equinox can be calculated using the program \`month\_length.f90\`. This program reads and "info file" (\`month\_length\_info.csv\`) consisting of an identifying output file name prefix, the calendar type, the beginning and ending simulation age (in years BP), and the age step, and the beginning simulation year (in years CE) and the number of simulation years.
+Tables and time series of month lengths, beginning, middle and ending days, and dates of the vernal equinox can be calculated using the program `month_length.f90`. This program reads and "info file" (`month_length_info.csv`) consisting of an identifying output file name prefix, the calendar type, the beginning and ending simulation age (in years BP), and the age step, and the beginning simulation year (in years CE) and the number of simulation years.
 
 ### Paleo calendar adjustments
 
