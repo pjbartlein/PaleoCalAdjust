@@ -6,7 +6,7 @@ PaleoCalendarAdjust
 The Paleo Calendar Effect
 -------------------------
 
-The material below describes the "paleo calendar effect" \-- the common expression for the impact that the changes in the length of months or seasons over time, related to the changes in the eccentricity of Earth's orbit and to precession, has on summarization of paleoclimatic model output. This is followed by a description of an approach implemented in Fortran programs (and modules), that can be used to determine the changing length of months (on various calendars) over time, and to adjust existing data sets in the "CMIP5" format to an appropriate paleo calendar.
+The material below describes the "paleo calendar effect" -- the common expression for the impact that the changes in the length of months or seasons over time, related to the changes in the eccentricity of Earth's orbit and to precession, has on summarization of paleoclimatic model output. This is followed by a description of an approach implemented in Fortran programs (and modules), that can be used to determine the changing length of months (on various calendars) over time, and to adjust existing data sets in the "CMIP5" format to an appropriate paleo calendar.
 
 ### Introduction
 
@@ -100,33 +100,35 @@ We implemented this approach in the subroutine `kg_monlen_360(...)` in the Fortr
 
 #### Simulation ages and simulation years
 
-Inspection shows that different models employ different starting dates in their output files for both present-day (*piControl*) and paleo (e.g. *midHolocene*) simulations. For models that use a noleap (constant 365-day year) calendar, such as CCSM4, the starting date is not an issue, but for MPI-ESM-P, which has a proleptic Gregorian calendar, or CNRM-CM5, with a "standard" (i.e. mixed Julian/Gregorian) calendar as examples, the specific starting date influences the date of the vernal equinox through the occurrence of individual leap years. For example, in the CMIP5/PMIP4 *midHolocene* simulations, output from MPI-ESM-P starts in 1850 CE, and that from CNRM-CM5 in 1950 CE (and it can be verified that leap years in the output files occur in a fashion consistent with the "modern" calendar). Consequently, we make a distinction between two notions of "date" here: 1) the simulation age, expressed in (negative) years BP 1950 CE, and 2) the simulation year, expressed in years CE. The simulation age controls the orbital parameter values, while the simulation year, along with the specification of the CF-compliant calendar attribute, controls the date of the vernal equinox.
+Inspection shows that different models employ different starting dates in their output files for both present-day (*piControl*) and paleo (e.g. *midHolocene*) simulations. For models that use a noleap (constant 365-day year) calendar, such as CCSM4, the starting date is not an issue, but for MPI-ESM-P, which has a proleptic Gregorian calendar, or CNRM-CM5, with a "standard" (i.e. mixed Julian/Gregorian) calendar as examples, the specific starting date influences the date of the vernal equinox through the occurrence of individual leap years. For example, in the CMIP5/PMIP4 *midHolocene* simulations, output from MPI-ESM-P starts in 1850 CE, and that from CNRM-CM5 in 1950 CE (and it can be verified that leap years in the output files occur in a fashion consistent with the "modern" calendar). Consequently, we make a distinction between two notions of time here: 1) the simulation age, expressed in (negative) years BP 1950 CE, and 2) the simulation year, expressed in years CE. The simulation age controls the orbital parameter values, while the simulation year, along with the specification of the CF-compliant calendar attribute, controls the date of the vernal equinox.
 
 #### Month-length programs and subprograms
 
 Month lengths are calculated in a subroutine, `get_month_lengths(...)` (contained in a Fortran module named `month_length_subs.f90`), that in turn calls a subroutine named `kg_monlen(...)` to get real-valued month lengths for a particular simulation age and year. (The subroutine `get_month_lengths(...)`, can be exercised to produce tables of month lengths, beginning, middle and ending days of the kind used to produce Figs. 1-3 and S2-S7) using a driver program named `month_length.f90`.) The subroutine `get_month_lengths(...)` uses two other modules, `GISS_orbpar_subs.f90` and `GISS_orbpar_subs.f90` (based on programs downloaded from GISS) to get the orbital parameters and vernal equinox dates.
 
-The specific tasks involved in calculating either a single year's set of month lengths, or a series of month lengths involve the following steps, implemented in `get_month_lengths(...):
+The specific tasks involved in the calculation of either a single year's set of month lengths, or a series of month lengths for multiple years, include the following steps, implemented in `get_month_lengths(...)`:
 
 1.  generate a set of "target" dates based on the simulation ages and simulation years;
 
-2.  obtain the orbital parameters for 0 ka (1950 CE), which will be used to adjust the calculated month-length values to the nominal calendar for a reference year (e.g. 1950 CE);
+2.  obtain the orbital parameters for 0 ka (1950 CE), which will be used to adjust the calculated month-length values to the nominal calendar for 1950 CE as the reference year;
 
-3.  obtain the present-day (i.e. 1950 CE) month lengths for different calendars;
+3.  obtain the present-day (i.e. 1950 CE) month lengths for different calendars
+
+Then loop over the simulation ages and simulation years, and:
 
 4.  obtain the orbital parameters for each simulation age, using the subroutine `GISS_orbpars;
 
 5.  calculate real-valued month lengths for an appropriate calendar using `kg_monlen(...)`;
 
-6.  adjusting those month length values to a particular reference year (e.g. 1950 CE) and conventional set of month definitions so that, for example, January will have 31 days, February 28 or 29 days, etc. in that reference year using `adjust_to_reference(...)`;
+6.  adjust using the subroutine `adjust_to_reference(...)` those month length values to the reference year (e.g. 1950 CE) and a conventional set of month-length definitions so that, for example, January will have 31 days, February 28 or 29 days, etc. in the reference year;
 
-7.  further adjusting those values to ensure that the individual monthly values will sum exactly to the year length in days using `adjust_to_yeartot(...)`;
+7.  further adjust the month-length values to ensure that the individual monthly values will sum exactly to the year length in days using `adjust_to_yeartot(...)`;
 
-8.  conversion of real-valued month lengths to integers using `integer_monlen(...)` (These are not used anywhere, but are less alarming than the idea of months including fractional days);
+8.  convert real-valued month lengths to integers using `integer_monlen(...)` (These are not used anywhere, but are less alarming than the idea of months including fractional days);
 
-9.  Step 9: determine the mid-March day, using `GISS_srevents(...) to get the vernal equinox date for calendars in which it varies;
+9.  determine the mid-March day, using `GISS_srevents(...) to get the vernal equinox date for calendars in which it varies;
 
-10. calculation of real- and integer-valued beginning, middle and end days using `imon_midbegend(...)` and `rmon_midbegend(...)`
+10. calculate real- and integer-valued beginning, middle and end days using `imon_midbegend(...)` and `rmon_midbegend(...)`
 
 #### Month-length tables and time series
 
