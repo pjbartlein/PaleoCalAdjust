@@ -100,7 +100,7 @@ We implemented this approach in the subroutine `kg_monlen_360(...)` in the Fortr
 
 #### Simulation ages and simulation years
 
-Inspection shows that different models employ different starting dates in their output files for both present-day (*piControl*) and paleo (e.g. *midHolocene*) simulations. For models that use a noleap (constant 365-day year) calendar, such as CCSM4, the starting date is not an issue, but for MPI-ESM-P, which has a proleptic Gregorian calendar, or CNRM-CM5, with a "standard" (i.e. mixed Julian/Gregorian) calendar as examples, the specific starting date influences the date of the vernal equinox through the occurrence of individual leap years. For example, in the CMIP5/PMIP4 *midHolocene* simulations, output from MPI-ESM-P starts in 1850 CE, and that from CNRM-CM5 in 1950 CE (and it can be verified that leap years in the output files occur in a fashion consistent with the "modern" calendar). Consequently, we make a distinction between two notions of time here: 1) the simulation age, expressed in (negative) years BP 1950 CE, and 2) the simulation year, expressed in years CE. The simulation age controls the orbital parameter values, while the simulation year, along with the specification of the CF-compliant calendar attribute, controls the date of the vernal equinox.
+Inspection shows that different models employ different starting dates in their output files for both present-day (*piControl*) and paleo (e.g. *midHolocene*) simulations. For models that use a noleap (constant 365-day year) calendar, such as CCSM4, the starting date is not an issue, but for MPI-ESM-P, which has a proleptic Gregorian calendar, or CNRM-CM5, with a "standard" (i.e. mixed Julian/Gregorian) calendar as examples, the specific starting date influences the date of the vernal equinox through the occurrence of individual leap years. For example, in the CMIP5/PMIP4 *midHolocene* simulations, output from MPI-ESM-P starts in 1850 CE, and that from CNRM-CM5 in 2050 CE (and it can be verified that leap years in the output files occur in a fashion consistent with the "modern" calendar). Consequently, we make a distinction between two notions of time here: 1) the simulation age, expressed in (negative) years BP 1950 CE, and 2) the simulation year, expressed in years CE. The simulation age controls the orbital parameter values, while the simulation year, along with the specification of the CF-compliant calendar attribute, controls the date of the vernal equinox.
 
 #### Month-length programs and subprograms
 
@@ -124,7 +124,7 @@ Then loop over the simulation ages and simulation years, and for each combinatio
 
 7.  further adjust the month-length values to ensure that the individual monthly values will sum exactly to the year length in days using `adjust_to_yeartot(...)`;
 
-8.  convert real-valued month lengths to integers using `integer_monlen(...)` (These are not used anywhere, but are less alarming than the idea of months including fractional days.);
+8.  convert real-valued month lengths to integers using `integer_monlen(...)` (These are not used anywhere, but may be useful in conceptualizing the pattern of month-length variations over time.);
 
 9.  determine the mid-March day, using `GISS_srevents(...)` to get the vernal equinox date for calendars in which it varies;
 
@@ -132,8 +132,30 @@ Then loop over the simulation ages and simulation years, and for each combinatio
 
 #### Month-length tables and time series
 
-Tables and time series of month lengths, beginning, middle and ending days, and dates of the vernal equinox can be calculated using the program `month_length.f90`. This program reads and "info file" (`month_length_info.csv`) consisting of an identifying output file name prefix, the calendar type, the beginning and ending simulation age (in years BP), and the age step, and the beginning simulation year (in years CE) and the number of simulation years.
+Tables and time series of month lengths, beginning, middle and ending days, and dates of the vernal equinox can be calculated using the program `month_length.f90`. This program reads an "info file" (`month_length_info.csv`) consisting of an identifying output file name prefix, the calendar type, the beginning and ending simulation age (in years BP), and the age step, and the beginning simulation year (in years CE) and the number of simulation years.
 
 ### Paleo calendar adjustments
+
+The objective of the principle calendar-adjustment program `cal_adjust_PMIP3.f90` is to read and clone a "CMIP5/PMIP3" formatted netCDF file, replacing the original monthly or daily data with calendar-adjusted data, i.e. data aggregated using a fixed-angular calendar appropriate for a particular paleo experiment. At present, the program reads an "info file" that provides file and variable names, simulation ages, etc., and this will be easily modified to accommodate "CMIP6/PMIP4" formatted files (<http://goo.gl/v1drZl>) when they become available. In the case of monthly input data, either climatological long-term means or monthly time-series, the data are first interpolated to a daily time step, and then reaggregated to a monthly time step using an appropriate paleo calendar. In the case of daily input data, the interpolation step is obviously unneeded, and so the data are simply aggregated to a monthly time step. In both cases, new time-coordinate variables are created (consistent with the paleo calendar), and all other dimension information, coordinate variables and global attributes are copied, and augmented by other attribute data that indicate that the data have been adjusted. The reading and rewriting of the netCDF file is handled by subroutines in a module named `CMIP5_netCDF_subs.f90` and the pseudo-daily interpolation is done using two subroutines `mon_to_day_ts(...)` `day_to_mon_ts(...)` in the module `calendar_effects_subs.f90`. Various modules and subprograms for month-length calculations are also used here.
+
+The fields in the info file include for each netCDF file, the variable (e.g. "tas", "pr"), the "realm plus time frequency" type ( (e.g. "Amon", "Aclim", ...), the model name, (e.g. "midHolocene"), the ensemble member (e.g. "r1i1p1"), and the simulation year beginning date and ending date (as a YYYYMM or YYYMMDD string). An input filename "suffix" field is also read (which is usually blank, or "-clim" for Aclim-type files), as is an output filename "suffix" field (e.g. "cal_adj"), which is added to the output filename to indicate that it has been modified from the original. The info file also contains the simulation age beginning and end (in years BP), the increment between simulation ages (usually 1 in the application here, the simulation year (years CE) and the number of simulation years. This information could also be gotten by parsing the netCDF file name, reading the calendar attribute, and the time-coordinate variable, but that would add to the complexity of the program.
+
+`cal_adjust_PMIP3.f90`
+
+1.  read the info file, construct various file names, allocate month-length variables;
+
+2.  generate month lengths using the subroutine `get_month_lengths(....)`;
+
+3.  open input and output netCDF files;
+
+4.  redefine the time-coordinate variable as appropriate using the subroutines `new_time_day(...)` and 'new_time_month(...)' in the module `CMIP5_netCDF_subs.f90`;
+
+5.  create the new netCDF file, copy the dimension and global attributes from the input file using the subroutine `copy_dims_and_glatts(...)`, define the output variable using the subroutine `define_outvar(...)`
+
+6.  get the input variable to be adjusted;
+
+7.  for each model grid point, get calendar-adjusted values as described above;
+
+8.  write out the adjusted data, and close the output file.
 
 ### Further examples

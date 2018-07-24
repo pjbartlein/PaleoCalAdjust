@@ -10,8 +10,9 @@ implicit none
 contains
 
 subroutine mon_to_day_ts(nt,imonlen,xm_in,xfill,no_negatives,smooth,restore,ndtot,nw,nsw,xd_out)
-! daily interpolation of a monthly time series
-! this version makes one pass over the input times series, and optionally smooths and restores the long-term mean
+! Daily interpolation of a monthly time series
+! Interpolation is done one year at a time, and so there can be small discontinuities between years.
+! This version makes one pass over the input time series, and optionally smooths and restores the long-term mean.
 
     use pseudo_daily_interp_subs
 
@@ -72,7 +73,7 @@ subroutine mon_to_day_ts(nt,imonlen,xm_in,xfill,no_negatives,smooth,restore,ndto
         if (nfill .eq. 0) then         
             ! mean-preserving daily interpolation
             call hdaily(nm,nd,xm,iml,no_negatives,xdh)           
-            call monmean(nm,nd,iml,xdh,xdhmean)
+            !call monmean(nm,nd,iml,xdh,xdhmean)
             !if (debug_write_cal_effects) write (debug_unit,'(32x,12f14.6)') (xdhmean(m),m=1,nm)
             !if (debug_write_cal_effects) write (debug_unit,'(32x,12f14.6)') ((xm(m)-xdhmean(m)),m=1,nm)
             !if (debug_write_cal_effects) write (debug_unit,'(24x,13i14)') (iml(m),m=1,nm),nd

@@ -136,8 +136,11 @@ open (3,file=trim(infopath)//trim(infofile))
 write (*,'(a)') trim(infopath)//trim(infofile)
 read (3,'(a)') csvheader
 
+! main loop (over individual model output files)
 iostatus = 1
 do
+    ! Step 1:  Read info file, construct variable and file names, allocate month-length arrays, etc.
+    
     ! read a line from the info file, and construct netCDF file names
     write (*,'(125("="))')
     suffix = ""
@@ -185,7 +188,7 @@ do
     allocate (imonmid_ts(nt), imonbeg_ts(nt),imonend_ts(nt), rmonmid_ts(nt), rmonbeg_ts(nt), rmonend_ts(nt))
     allocate (mon_time(nt), mon_time_bnds(2,nt))
 
-    ! get month lengths
+    ! Step 2:  get month lengths
 
     ! 0 ka month lengths (used in pseudo-daily interpolation)
     if (trim(time_freq) .ne. 'day') then
@@ -223,6 +226,8 @@ do
         !write (10,'(2i6,f12.6,2i8)') iageBP(n),iyearCE(n),VE_day(n),ndays(n),ndtot
     end do
     write (*,'("ny, nt, ndtot: ",4i8)') ny, nt, ndtot, ndtot_0ka
+    
+    ! Step 3:  Open input and output netCDF files
 
     ! input netCDF file
     nc_fname = trim(nc_path)//"source/"//trim(ncfile_in)
@@ -235,8 +240,10 @@ do
     print '(" nc_fname (out) = ",a)', trim(nc_fname)
     call check( nf90_create(nc_fname, 0, ncid_out) )
     if (nc_print) print '("  ncid_put = ",i8)', ncid_out
+    
+    ! Step 4:  Redifine the time-coordinate variable
 
-    ! redefine the time variables
+    ! redefine the time coordinate
     if (trim(time_freq) .eq. 'day') then
         time_comment = "paleo monthly mid, beginning and ending dates from original daily values"
         call new_time_day(ncid_in, ny, nm, nt, ndtot, &
@@ -246,12 +253,14 @@ do
         call new_time_mon(calendar_type, ncid_in, ny, nm, nt, &
             rmonmid_ts, rmonbeg_ts, rmonend_ts, ndays_ts, mon_time, mon_time_bnds)
     end if
+    
+    ! Step 5:  Create the new netCDF file
 
     ! create a new netCDF file, and copy dimension variables and global attributes
     call current_time(current)
     addglattname = "paleo_calendar_adjustment"
     addglatt = trim(current)//" paleo calendar adjustment by cal_adjust_PMIP3.f90"
-    call copy_dims_and_glatts_redef_time(ncid_in, ncid_out, addglattname, addglatt, nt, &
+    call copy_dims_and_glatts(ncid_in, ncid_out, addglattname, addglatt, nt, &
         mon_time, mon_time_bnds, time_comment, varid_out)
 
     ! define the output (adjusted) variable, and copy attributes
@@ -267,6 +276,8 @@ do
 
     call define_outvar(ncid_in, ncid_out, varinname, varid_out, varoutname, addvarattname, addvaratt, varid_in, nlon, nlat, nt)
 
+    ! Step 6:  Get the input variable to be adjusted
+    
     ! allocate variables
     if (trim(time_freq) .eq. 'day') then
         allocate(var3d_in(nlon,nlat,ndtot))
@@ -275,13 +286,15 @@ do
     end if
     allocate(xdh(nlat,ndtot), var3d_adj(nlat,nt), var3d_out(nlon,nlat,nt))
 
-    ! get input data to be adjusted
+    ! get input data
     write (*,'(a)') "Reading input data..."
     call check( nf90_get_var(ncid_in, varid_in, var3d_in) )
 
     ! get _FillValue
     call check( nf90_get_att(ncid_in, varid_in, '_FillValue', vfill) )
     write (*,'("_FillValue:", g14.6)') vfill
+    
+    ! Step 7:  Get calendar-adjusted values
 
     ! loop over lons and lats
     write (*,'(a)') "Interpolating (if necessary) and aggregating..."
@@ -299,7 +312,7 @@ do
                 ! reaggregate daily data using correct calendar
                 call day_to_mon_ts(ny,ndays,rmonbeg,rmonend,ndtot,xdh(k,:),dble(vfill),var3d_adj(k,:))
             else
-                ! reaggregate daily data using correct calendar
+                ! input data is daily, just reaggregate using correct calendar
                 call day_to_mon_ts(ny,ndays,rmonbeg,rmonend,ndtot,xdh(k,:),dble(vfill),var3d_adj(k,:))
             end if
 
@@ -315,7 +328,8 @@ do
 !    write (10,'(a)') " "
 !    write (10,'(12g14.6)') var3d_out(40,80,:)
 
-
+    ! Step 8:  Write out the adjusted data, and close the output netCDF file.
+    
     ! write out adjusted data
     write (*,'(/a)') "Writing adjusted data..."
     call check( nf90_put_var(ncid_out, varid_out, var3d_out) )
