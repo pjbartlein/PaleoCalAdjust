@@ -3,8 +3,8 @@ PaleoCalendarAdjust
 
 **Work-in-progress versions of programs for calculating orbitally determined paleo month lengths, and using these to adjust CMIP5/PMIP3-formatted paleo simulation files that were created by summarizing data using a fixed modern calendar.**
 
-The Paleo Calendar Effect
--------------------------
+The paleo calendar effect in PMIP4 time-slice and transient experiments: overall impact and strategies for data analysis
+------------------------------------------------------------------------------------------------------------------------
 
 The material below describes the "paleo calendar effect" -- the common expression for the impact that the changes in the length of months or seasons over time, related to the changes in the eccentricity of Earth's orbit and to precession, has on summarization of paleoclimatic model output. This is followed by a description of an approach implemented in Fortran programs (and modules), that can be used to determine the changing length of months (on various calendars) over time, and to adjust existing data sets in the "CMIP5" format to an appropriate paleo calendar.
 
@@ -134,13 +134,25 @@ Then loop over the simulation ages and simulation years, and for each combinatio
 
 Tables and time series of month lengths, beginning, middle and ending days, and dates of the vernal equinox can be calculated using the program `month_length.f90`. This program reads an "info file" (`month_length_info.csv`) consisting of an identifying output file name prefix, the calendar type, the beginning and ending simulation age (in years BP), and the age step, and the beginning simulation year (in years CE) and the number of simulation years.
 
-### Paleo calendar adjustments
+### Paleo calendar adjustment
 
-The objective of the principle calendar-adjustment program `cal_adjust_PMIP3.f90` is to read and clone a "CMIP5/PMIP3" formatted netCDF file, replacing the original monthly or daily data with calendar-adjusted data, i.e. data aggregated using a fixed-angular calendar appropriate for a particular paleo experiment. At present, the program reads an "info file" that provides file and variable names, simulation ages, etc., and this will be easily modified to accommodate "CMIP6/PMIP4" formatted files (<http://goo.gl/v1drZl>) when they become available. In the case of monthly input data, either climatological long-term means or monthly time-series, the data are first interpolated to a daily time step, and then reaggregated to a monthly time step using an appropriate paleo calendar. In the case of daily input data, the interpolation step is obviously unneeded, and so the data are simply aggregated to a monthly time step. In both cases, new time-coordinate variables are created (consistent with the paleo calendar), and all other dimension information, coordinate variables and global attributes are copied, and augmented by other attribute data that indicate that the data have been adjusted. The reading and rewriting of the netCDF file is handled by subroutines in a module named `CMIP5_netCDF_subs.f90` and the pseudo-daily interpolation is done using two subroutines `mon_to_day_ts(...)` `day_to_mon_ts(...)` in the module `calendar_effects_subs.f90`. Various modules and subprograms for month-length calculations are also used here.
+The objective of the principle calendar-adjustment program `cal_adjust_PMIP3.f90` is to read and clone a "CMIP5/PMIP3" formatted netCDF file, replacing the original monthly or daily data with calendar-adjusted data, i.e. data aggregated using a fixed-angular calendar appropriate for a particular paleo experiment. In the case of monthly input data, either climatological long-term means or monthly time-series, the data are first interpolated to a daily time step, and then reaggregated to a monthly time-step mean valuses using an appropriate paleo calendar. In the case of daily input data, the interpolation step is obviously unneeded, and so the data are simply aggregated to the monthly time step. In both cases, new time-coordinate variables are created (consistent with the paleo calendar), and all other dimension information, coordinate variables and global attributes are copied, and augmented by other attribute data that indicate that the data have been adjusted. The reading and rewriting of the netCDF file is handled by subroutines in a module named `CMIP5_netCDF_subs.f90` and various modules and subprograms for month-length calculations described above are also used here.
 
-The fields in the info file include for each netCDF file, the variable (e.g. "tas", "pr"), the "realm plus time frequency" type ( (e.g. "Amon", "Aclim", ...), the model name, (e.g. "midHolocene"), the ensemble member (e.g. "r1i1p1"), and the simulation year beginning date and ending date (as a YYYYMM or YYYMMDD string). An input filename "suffix" field is also read (which is usually blank, or "-clim" for Aclim-type files), as is an output filename "suffix" field (e.g. "cal_adj"), which is added to the output filename to indicate that it has been modified from the original. The info file also contains the simulation age beginning and end (in years BP), the increment between simulation ages (usually 1 in the application here, the simulation year (years CE) and the number of simulation years. This information could also be gotten by parsing the netCDF file name, reading the calendar attribute, and the time-coordinate variable, but that would add to the complexity of the program.
+#### Interpolation and (re)aggregation
 
-`cal_adjust_PMIP3.f90`
+The pseudo-daily interpolation and (re)aggregation is done using two subroutines `mon_to_day_ts(...)` and `day_to_mon_ts(...)` in the module `calendar_effects_subs.f90`. The pseudo-daily interpolation is done a year at a time, creating slight discontinuities between one year and the next. The subroutine `mon_to_day_ts(...)` has options for smoothing those discontinuities, and restoring the long-term mean of the interpolated daily data to that of the original monthly data.
+
+The (re)aggregation of the daily data is done a year at a time by collecting the daily data for a particular year, and "padding" it at the beginning and end with data from the previous and following year (to accommodate the fact that under some orbital configurations the first day of the year may occur in the previous year, or the last day in the following year (Fig. 1). For example, at 6 ka, the changes in the shape of the orbit and the consequently longer months from January through March (32.5, 29.5 and 32.4 dats, respectively) displace the beginning of January four days into the previous year, with the last day of December consequently falling just before day 361 in a 365-day year. In the case of long-term mean "climatological" data ("Aclim" data), the padding is done with ending and beginning days of the single year of pseudo-daily data.
+
+The (re)aggregation of the daily data to a monthly mean is done by calculating a weighted average of the days that overlap with a particular month as defined by the (real) valued beginning and ending days of that month (from the subroutine `get_month_lengths(...)`, with each whole day in that interval getting a weight of 1.0, and each partial day getting a weight proportional to its part of a whole day.
+
+#### Processing individual netCDF files
+
+At present, the program reads an "info file" that provides file and variable names, simulation ages, etc., and this will be easily modified to accommodate "CMIP6/PMIP4" formatted files (<https://pcmdi.llnl.gov/CMIP6/Guide/modelers.html#5-model-output-requirements>) when they become available. The fields in the info file include for each netCDF file, the variable (e.g. "tas", "pr"), the "realm plus time frequency" type ( (e.g. "Amon", "Aclim", ...), the model name, (e.g. "midHolocene"), the ensemble member (e.g. "r1i1p1"), and the simulation year beginning date and ending date (as a YYYYMM or YYYMMDD string). An input filename "suffix" field is also read (which is usually blank, or "-clim" for Aclim-type files), as is an output filename "suffix" field (e.g. "cal_adj"), which is added to the output filename to indicate that it has been modified from the original. The info file also contains the simulation age beginning and end (in years BP), the increment between simulation ages (usually 1 in the application here, the simulation year (years CE) and the number of simulation years. This information could also be gotten by parsing the netCDF file name, reading the calendar attribute, and the time-coordinate variable, but that would add to the complexity of the program.
+
+The output netCDF files have the string "`_cal_adj`" appended to the end of the filename. In the case of monthly time series (e.g. "Amon") or long-term means (e.g. "Aclim") the file names are otherwise the same as the input data. In the case of the daily input data, with "day" as the "realm plus time frequency" string, that string is changed to "Amon2"
+
+Carrying out the adjustment of a file using `cal_adjust_PMIP3.f90` include the following steps:
 
 1.  read the info file, construct various file names, allocate month-length variables;
 
@@ -154,8 +166,18 @@ The fields in the info file include for each netCDF file, the variable (e.g. "ta
 
 6.  get the input variable to be adjusted;
 
-7.  for each model grid point, get calendar-adjusted values as described above;
+7.  for each model grid point, get calendar-adjusted values as described above using the subroutines `mon_to_day_ts(...)` and `day_to_mon_ts(...)`;
 
 8.  write out the adjusted data, and close the output file.
 
 ### Further examples
+
+Five other main programs that serve as "drivers" for some of the subroutines or that demonstrate particular aspects of procedures used here are included in the GitHub repository:
+
+-   `GISS_orbpar_driver.f90` and `GISS_srevents_driver.f90`
+
+-   `demo_01_pseudo_daily_interp.f90`
+
+-   `demo_02_adjust_1yr.f90`
+
+-   `demo_03_adjust_TraCE_ts.f90`
