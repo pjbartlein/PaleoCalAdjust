@@ -49,15 +49,15 @@ character(1)            :: header_in
 data imonlen_00 /31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31/
 data monname_JanDec/'Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'/
 
-datapath = "../../PaleoCalendarAdjust/data/TraCE_example/"
+datapath = "/Projects/Calendar/PaleoCalendarAdjust/data/TraCE_example/"
 infile = "TraCE_c30r40_tas_land_monlen0ka_Jan-Dec.csv"
 !dailyfile = "TraCE_c30r40_tas_land_monlen0ka_Jan-Dec_ts_daily.csv" ! uncomment to see daily data
 outfile = "TraCE_c30r40_tas_land_monlenadj_Jan-Dec.csv"
 
-monlenpath = "../../PaleoCalendarAdjust/data/month_lengths/"
+monlenpath = "/Projects/Calendar/PaleoCalendarAdjust/data/month_lengths/"
 monfile = "tr21_cal_noleap_rmonlen.csv"
 
-debugpath="../../debug_files/"
+debugpath="/Projects/Calendar/PaleoCalendarAdjust/data/debug_files/"
 debugfile="debug_demo_03_c30r40_v2.dat"
 
 ! open output files and write headers

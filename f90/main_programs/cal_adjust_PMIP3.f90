@@ -13,13 +13,13 @@ program cal_adjust_PMIP3
 ! model         :: (string) CMIP5/PMIP3 model name
 ! experiment    :: (string) CMIP5/PMIP3 experiment name (e.g. "midHolocene")
 ! ensemble      :: (string) CMIP5/PMIP3 ensemble member code (e.g. "r1i1p1")
-! begdate       :: (string) beginning date of simulation as YYYYMM or YYYMMDD string
-! enddate       :: (string) ending date of simulation as YYYYMM or YYYMMDD string
+! begdate       :: (string) beginning date of simulation as YYYYMM or YYYYMMDD string
+! enddate       :: (string) ending date of simulation as YYYYMM or YYYYMMDD string
 ! suffix        :: (string) filename suffix (usually blank, or "-clim" for Aclim-type files)
 ! adj_name      :: (string) filename suffix for adjusted netCDF file (e.g. "_cal_adj")
 ! calendar_type :: (string) calendar type (e.g. "noleap", "proleptic_gregorian", etc.)
-! begageBP      :: (integer) beginning age of the table (e.g. 21000 (= 21 ka)
-! endageBP      :: (integer) ending age of the table (e.g. 0 (= 0ka)
+! begageBP      :: (integer) beginning simulation age (year BP) (e.g. 21000 (= 21 ka)
+! endageBP      :: (integer) ending simulation age (year BP) 
 ! agestep       :: (integer) interval between age calculations
 ! begyrCE       :: (integer) beginning calendar year of simulation for multi-year simulations at each agedd
 ! nsimyrs       :: (integer) number of calendar years

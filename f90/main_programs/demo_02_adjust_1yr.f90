@@ -51,12 +51,12 @@ write (out_unit,'(a)') "Paleo calendar adjustment of monthly means:"
 
 write (out_unit,'(/a)') "Input data (monthly mean tas on 0 ka 365-day noleaps calendar):"
 write (out_unit,'("   xm_0ka_cal: ",12f9.3)') xm_0ka_cal
+
 ! weighted annual mean of monthly input
 call ann_wmean(nm, xm_0ka_cal, rmonlen_00, xann_0ka_cal)
 write (out_unit,'("Weighted annual mean of input data: ", f12.6)') xann_0ka_cal
 
 ! interpolate monthly data to pseudo-daily values
-!call hdaily(nm, nd, xm_0ka_cal, int(rmonlen_00), no_negatives, xdh)
 call mon_to_day_ts(nm, int(rmonlen_00), xm_0ka_cal, vfill, no_negatives, smooth, restore, nd, nw_tmp, nsw_tmp, xdh)
 
 ! reaggregate pseudo-daily values to new calendar
@@ -64,6 +64,7 @@ call mon_to_day_ts(nm, int(rmonlen_00), xm_0ka_cal, vfill, no_negatives, smooth,
 call day_to_mon_ts(ny, ndays, rmonbeg_06, rmonend_06, nd, xdh, vfill, xm_adj_cal)
 write (out_unit,'(/a)') "Paleo month-length adjusted values on 6ka calendar:"
 write (out_unit,'("   xm_adj_cal: ",12f9.3)') xm_adj_cal
+
 ! weighted annual mean of adjusted data
 call ann_wmean(nm, xm_adj_cal, rmonlen_06, xann_adj_cal)
 write (out_unit,'("Weighted annual mean of adjusted data: ", f12.6)') xann_adj_cal

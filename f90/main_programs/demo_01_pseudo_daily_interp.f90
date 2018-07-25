@@ -45,8 +45,8 @@ write (out_unit,'("   difference: ",12f9.3)') xm_linear-xm
 call ann_mean(nd, xd_linear, xann_linear)
 write (out_unit,'("Annual mean of interpolated data: ", f12.6, "    Difference:", f12.6)') xann_linear, xann-xann_linear
 
-! harmonic (Epstein, 1991) interpolation  mean preserving)
-write (out_unit,'(/a)') "Harmonic (Epstein, 1991) interpolation (mean preserving):"
+! mean-preserving (harmonic) interpolation (Epstein, 1991) 
+write (out_unit,'(/a)') "Mean-preserving (harmoninc) interpolation (Epstein, 1991):"
 no_negatives = .false.
 call  hdaily(nm, nd, xm, imonlen, no_negatives, xd_harmonic)
 call monmean(nm, nd, imonlen, xd_harmonic, xm_harmonic)
@@ -55,7 +55,6 @@ write (out_unit,'("  xm_harmonic: ",12f9.3)') xm_harmonic(1:nm)
 write (out_unit,'("   difference: ",12f9.3)') xm_harmonic-xm
 call ann_mean(nd, xd_harmonic, xann_harmonic)
 write (out_unit,'("Annual mean of interpolated data: ", f12.6, "    Difference:", f12.6)') xann_harmonic, xann-xann_harmonic
-stop
 
 ! Example 2: linear and harmonic (Epstein, 1991) interpolation
 ! example input data with zeros (e.g. pre)
