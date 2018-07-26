@@ -2,13 +2,13 @@
 
 Main programs, including `month_lenth.f90` and `cal_adjust_PMIP3.f90`, plus additional driver and demonstration programs are in the folder `/main_programs`:
 
-	month_length.f90
-	cal_adjust_PMIP3.f90
-	GISS_orbpar_driver.f90
-	GISS_srevents_driver.f90
-	demo_01_pseudo_daily_interp.f90
-	demo_02_adjust_1yr.f90
-	demo_03_adjust_TraCE_ts.f90
+	month_length.f90					! month-length tables
+	cal_adjust_PMIP3.f90				! paleo calendar adjustment
+	GISS_orbpar_driver.f90				! orbital parameters (eccentricity, climatic precession)
+	GISS_srevents_driver.f90			! equinox, solstice, perihelion dates
+	demo_01_pseudo_daily_interp.f90		! demo of pseudo-daily interpolation
+	demo_02_adjust_1yr.f90				! demo of paleo calendar adjustment
+	demo_03_adjust_TraCE_ts.f90			! demo of transient simulation adjustment
 
 The `/modules` folder contains the following:
 

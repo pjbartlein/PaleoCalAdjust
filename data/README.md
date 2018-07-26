@@ -1,5 +1,6 @@
-## Data files and program input and output ##
+## Data folders and files and program input and output ##
 
+Data folders:
 
 	/GISS_orbital	! orbital parameters
 	/info_files	! info files
