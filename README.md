@@ -96,7 +96,7 @@ We implemented this approach in the subroutine `kg_monlen_360(...)` in the Fortr
 
 #### 4.3 Simulation ages and simulation years
 
-Inspection shows that different models employ different starting dates in their output files for both present-day (*piControl*) and paleo (e.g. *midHolocene*) simulations. For models that use a noleap (constant 365-day year) calendar, such as CCSM4, the starting date is not an issue, but for MPI-ESM-P, which has a proleptic Gregorian calendar, or CNRM-CM5, with a "standard" (i.e. mixed Julian/Gregorian) calendar as examples, the specific starting date influences the date of the vernal equinox through the occurrence of individual leap years. For example, in the CMIP5/PMIP4 *midHolocene* simulations, output from MPI-ESM-P starts in 1850 CE, and that from CNRM-CM5 in 2050 CE (and it can be verified that leap years in the output files occur in a fashion consistent with the "modern" calendar). Consequently, we make a distinction between two notions of time here: 1) the simulation age, expressed in (negative) years BP 1950 CE, and 2) the simulation year, expressed in years CE. The simulation age controls the orbital parameter values, while the simulation year, along with the specification of the CF-compliant calendar attribute, controls the date of the vernal equinox.
+Inspection shows that different models employ different starting dates in their output files for both present-day (*piControl*) and paleo (e.g. *midHolocene*) simulations. For models that use a noleap (constant 365-day year) calendar, such as CCSM4, the starting date is not an issue, but for MPI-ESM-P, which has a proleptic Gregorian calendar, or CNRM-CM5, with a "standard" (i.e. mixed Julian/Gregorian) calendar as examples, the specific starting date influences the date of the vernal equinox through the occurrence of individual leap years. For example, in the CMIP5/PMIP4 *midHolocene* simulations, output from MPI-ESM-P starts in 1850 CE, and that from CNRM-CM5 in 2050 CE (and it can be verified that leap years in those output files occur in a fashion consistent with the "modern" calendar). Consequently, we make a distinction between two notions of time here: 1) the simulation age, expressed in (negative) years BP 1950 CE, and 2) the simulation year, expressed in years CE. The simulation age controls the orbital parameter values, while the simulation year, along with the specification of the CF-compliant calendar attribute, controls the date of the vernal equinox.
 
 #### 4.4 Month-length programs and subprograms
 
@@ -182,7 +182,7 @@ Five other main programs that serve as "drivers" for some of the subroutines or 
 
 *Code and data availability*
 
-All data used here is available for download at the URLs cited in the text. The GitHub repository for the code is at <https://github.com/pjbartlein/PaleoCalendarAdjust>.
+The GitHub repository for the code is at <https://github.com/pjbartlein/PaleoCalendarAdjust>. All data used here are available for download at the URLs cited in the text.
 
 *Acknowledgements*
 
@@ -194,26 +194,26 @@ The NCAR Command Language (Version 6.4.0) [Software]. (2017). Boulder, Colorado:
 
 ### References
 
-Berger, A. L.: Long-term variations of daily insolation and Quaternary climatic changes, Journal of the Atmospheric Sciences, 35, 2362-2367, 1978. doi: 10.1175/1520-0469(1978)
+Berger, A. L.: Long-term variations of daily insolation and Quaternary climatic changes, Journal of the Atmospheric Sciences, 35, 2362-2367, https://doi.org/10.1175/1520-0469(1978),1978.
 
-Chen, G.-S., Kutzbach, J. E., Gallimore, R., and Liu, Z.: Calendar effect on phase study in paleoclimate transient simulation with orbital forcing, Climate Dynamics, 37, 1949-1960, 2011. doi: 10.1007/s00382-010-0944-6
+Chen, G.-S., Kutzbach, J. E., Gallimore, R., and Liu, Z.: Calendar effect on phase study in paleoclimate transient simulation with orbital forcing, Climate Dynamics, 37, 1949-1960, <https://doi.org/10.1007/s00382-010-0944-6>, 2011.
 
-Epstein, E. S.: On obtaining daily climatological values from monthly means, Journal of Climate, 4, 365-368, 1991. doi: 0.1175/1520-0442(1991)
+Epstein, E. S.: On obtaining daily climatological values from monthly means, Journal of Climate, 4, 365-368, <https://doi.org/0.1175/1520-0442(1991)>, 1991.
 
-Joussaume, S. and Braconnot, P.: Sensitivity of paleoclimate simulation results to season definitions, Journal of Geophysical Research-Atmospheres, 102, 1943-1956, 1997. doi: 10.1029/96JD01989
+Joussaume, S. and Braconnot, P.: Sensitivity of paleoclimate simulation results to season definitions, Journal of Geophysical Research-Atmospheres, 102, 1943-1956, https://doi.org/10.1029/96JD01989, 1997.
 
-Kutzbach, J. E. and Gallimore, R. G.: Sensitivity of a coupled atmosphere/mixed layer ocean model to changes in orbital forcing at 9000 years B.P, Journal of Geophysical Research: Atmospheres, 93, 803-821, 1988. doi: 10.1029/JD093iD01p00803
+Kutzbach, J. E. and Gallimore, R. G.: Sensitivity of a coupled atmosphere/mixed layer ocean model to changes in orbital forcing at 9000 years B.P, Journal of Geophysical Research: Atmospheres, 93, 803-821, <https://doi.org/10.1029/JD093iD01p00803>, 1988.
 
-Kutzbach, J. E. and Otto-Bliesner, B. L.: The sensitivity of the African-Asian monsoonal climate to orbital parameter changes for 9000 years b.p. in a low-resolution general circulation model, Journal of the Atmospheric Sciences, 39, 1177-1188, 1982. doi: https://doi.org/10.1175/1520-0469(1982)
+Kutzbach, J. E. and Otto-Bliesner, B. L.: The sensitivity of the African-Asian monsoonal climate to orbital parameter changes for 9000 years b.p. in a low-resolution general circulation model, Journal of the Atmospheric Sciences, 39, 1177-1188, <https://doi.org/10.1175/1520-0469(1982)>, 1982.
 
-Marsicek, J., Shuman, B. N., Bartlein, P. J., Shafer, S. L., and Brewer, S.: Reconciling divergent trends and millennial variations in Holocene temperatures, Nature, 554, 92, 2018. doi: 10.1038/nature25464
+Marsicek, J., Shuman, B. N., Bartlein, P. J., Shafer, S. L., and Brewer, S.: Reconciling divergent trends and millennial variations in Holocene temperatures, Nature, 554, 92, <https://doi.org/10.1038/nature25464>, 2018.
 
-Otto-Bliesner, B. L., Braconnot, P., Harrison, S. P., Lunt, D. J., Abe-Ouchi, A., Albani, S., Bartlein, P. J., Capron, E., Carlson, A. E., Dutton, A., Fischer, H., Goelzer, H., Govin, A., Haywood, A., Joos, F., LeGrande, A. N., Lipscomb, W. H., Lohmann, G., Mahowald, N., Nehrbass-Ahles, C., Pausata, F. S. R., Peterschmitt, J. Y., Phipps, S. J., Renssen, H., and Zhang, Q.: The PMIP4 contribution to CMIP6 -- Part 2: Two interglacials, scientific objective and experimental design for Holocene and Last Interglacial simulations, Geosci. Model Dev., 10, 3979-4003, 2017. doi: 10.5194/gmd-10-3979-2017
+Otto-Bliesner, B. L., Braconnot, P., Harrison, S. P., Lunt, D. J., Abe-Ouchi, A., Albani, S., Bartlein, P. J., Capron, E., Carlson, A. E., Dutton, A., Fischer, H., Goelzer, H., Govin, A., Haywood, A., Joos, F., LeGrande, A. N., Lipscomb, W. H., Lohmann, G., Mahowald, N., Nehrbass-Ahles, C., Pausata, F. S. R., Peterschmitt, J. Y., Phipps, S. J., Renssen, H., and Zhang, Q.: The PMIP4 contribution to CMIP6 -- Part 2: Two interglacials, scientific objective and experimental design for Holocene and Last Interglacial simulations, Geosci. Model Dev., 10, 3979-4003, <https://doi.org/10.5194/gmd-10-3979-2017>, 2017.
 
-Pollard, D. and Reusch, D. B.: A calendar conversion method for monthly mean paleoclimate model output with orbital forcing, Journal of Geophysical Research: Atmospheres, 107, ACL 3-1-ACL 3-7, 2002. doi: 10.1029/2002JD002126
+Pollard, D. and Reusch, D. B.: A calendar conversion method for monthly mean paleoclimate model output with orbital forcing, Journal of Geophysical Research: Atmospheres, 107, ACL 3-1-ACL 3-7, <https://doi.org/10.1029/2002JD002126>, 2002.
 
-Saha, S., Moorthi, S., Pan, H.-L., Wu, X., Wang, J., Nadiga, S., Tripp, P., Kistler, R., Woollen, J., Behringer, D., Liu, H., Stokes, D., Grumbine, R., Gayno, G., Wang, J., Hou, Y.-T., Chuang, H.-y., Juang, H.-M. H., Sela, J., Iredell, M., Treadon, R., Kleist, D., Delst, P. V., Keyser, D., Derber, J., Ek, M., Meng, J., Wei, H., Yang, R., Lord, S., Dool, H. v. d., Kumar, A., Wang, W., Long, C., Chelliah, M., Xue, Y., Huang, B., Schemm, J.-K., Ebisuzaki, W., Lin, R., Xie, P., Chen, M., Zhou, S., Higgins, W., Zou, C.-Z., Liu, Q., Chen, Y., Han, Y., Cucurull, L., Reynolds, R. W., Rutledge, G., and Goldberg, M.: The NCEP Climate Forecast System Reanalysis, Bulletin of the American Meteorological Society, 91, 1015-1058, 2010. doi: 10.1175/2010BAMS3001.1.
+Saha, S., Moorthi, S., Pan, H.-L., Wu, X., Wang, J., Nadiga, S., Tripp, P., Kistler, R., Woollen, J., Behringer, D., Liu, H., Stokes, D., Grumbine, R., Gayno, G., Wang, J., Hou, Y.-T., Chuang, H.-y., Juang, H.-M. H., Sela, J., Iredell, M., Treadon, R., Kleist, D., Delst, P. V., Keyser, D., Derber, J., Ek, M., Meng, J., Wei, H., Yang, R., Lord, S., Dool, H. v. d., Kumar, A., Wang, W., Long, C., Chelliah, M., Xue, Y., Huang, B., Schemm, J.-K., Ebisuzaki, W., Lin, R., Xie, P., Chen, M., Zhou, S., Higgins, W., Zou, C.-Z., Liu, Q., Chen, Y., Han, Y., Cucurull, L., Reynolds, R. W., Rutledge, G., and Goldberg, M.: The NCEP Climate Forecast System Reanalysis, Bulletin of the American Meteorological Society, 91, 1015-1058 <https://doi.org/10.1175/2010BAMS3001.1>, 2010.
 
-Timm, O., Timmermann, A., Abe-Ouchi, A., Saito, F., and Segawa, T.: On the definition of seasons in paleoclimate simulations with orbital forcing, Paleoceanography, 23, 2008. doi: 10.1029/2007PA001461
+Timm, O., Timmermann, A., Abe-Ouchi, A., Saito, F., and Segawa, T.: On the definition of seasons in paleoclimate simulations with orbital forcing, Paleoceanography, 23, <https://doi.org/10.1029/2007PA001461>, 2008.
 
-Xie, P. and Arkin, P. A.: Global Precipitation: A 17-Year Monthly Analysis Based on Gauge Observations, Satellite Estimates, and Numerical Model Outputs, Bulletin of the American Meteorological Society, 78, 2539-2558, 1997. doi: 10.1175/1520-0477(1997).
+Xie, P. and Arkin, P. A.: Global Precipitation: A 17-Year Monthly Analysis Based on Gauge Observations, Satellite Estimates, and Numerical Model Outputs, Bulletin of the American Meteorological Society, 78, 2539-2558, <https://doi.org/10.1175/1520-0477(1997)>, 1997.
