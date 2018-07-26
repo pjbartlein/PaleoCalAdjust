@@ -1,12 +1,12 @@
 ## Data files and program input and output ##
 
 
-	/GISS_orbital	  ! orbital parameters
-	/info_files		! info files
-	/month_lengths	 ! month-length tables 
-	/nc_files		  ! download instructions for example netCDF files
-	/TraCE_example	 ! time series of TraCE-21k data for two example grid cells
-	/debug_files	   ! used for debugging
+	/GISS_orbital	! orbital parameters
+	/info_files	! info files
+	/month_lengths	! month-length tables 
+	/nc_files	! download instructions for example netCDF files
+	/TraCE_example	! time series of TraCE-21k data for two example grid cells
+	/debug_files	! used for debugging
 
 The folders are used as follows:
 
