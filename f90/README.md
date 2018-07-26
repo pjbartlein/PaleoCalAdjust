@@ -31,5 +31,5 @@ All programs write progress information to the console.
 
 With the exception of directory paths, the same code compiles and runs on the following systems:
 
-- Windows 10: Intel Parallel Studio XE 2018 Update 3 Composer Edition for Fortran Windows, with netCDF version 4.3.1, using the Visual Studio 2015 IDE; 
+- Windows 10: Intel Parallel Studio XE 2018 Update 3 Composer Edition for Fortran Windows, with netCDF version 4.1.3, using the Visual Studio 2015 IDE; 
 - MacOS: gfortran version 8.1.0, with netCDF version 4.6.1 (from Homebrew), using the Eclipse Oxygen.3a Release (4.7.3a) IDE, and Eclipse for Parallel Application Developers, Version: 9.1.4.201802282054.
