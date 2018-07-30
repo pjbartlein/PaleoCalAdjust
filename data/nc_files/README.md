@@ -1,4 +1,6 @@
-## Download example netCDF files ##
+## Download netCDF files ##
+
+### Example source and adjusted CMIP5/PMIP3 netCDF files
 
 Example CMIP5/PMIP3-formatted netCDF source files and resulting month-length adjusted files can be downloaded using the following URLs:
 
@@ -41,4 +43,20 @@ There are two folders:
 
 Note that daily output files, e.g. "`tas_day_CCSM4_midHolocene_r1i1p1_10000101-10491231.nc`" are renamed to e.g. "`tas_Amon2_CCSM4_midHolocene_r1i1p1_10000101-10491231_cal_adj.nc`" after aggregating to monthly time-step data, using the file-name element `Amon2` to distinguish such files from standard monthly time-step files with the file-name element of `Amon`.
 
+### netCDF files for calendar-effects figures ###
 
+Data files used to create Figs. 4, 5, 6, S4, and S9.
+
+**Dropbox:  [[https://www.dropbox.com/sh/8xkjnbe8f1qua1j/AADm1cabGd2Xc9WtTZDtLC2Qa?dl=0]](https://www.dropbox.com/sh/8xkjnbe8f1qua1j/AADm1cabGd2Xc9WtTZDtLC2Qa?dl=0)**
+- 
+
+		CFSR_xm_gdd5_txn_cal_effects_006ka_04.nc
+		CFSR_xm_gdd5_txn_cal_effects_097ka_04.nc
+		CFSR_xm_gdd5_txn_cal_effects_116ka_04.nc
+		CFSR_xm_gdd5_txn_cal_effects_127ka_04.nc
+		CMAP_xm_cal_effects_006ka_04.nc
+		CMAP_xm_cal_effects_097ka_04.nc
+		CMAP_xm_cal_effects_116ka_04.nc
+		CMAP_xm_cal_effects_127ka_04.nc
+		enhanced.precip.mon.ltm.nc
+		tas_Aclim_CFSR_reanalysis_ana4mips_198101-201012-clim.nc
