@@ -1,4 +1,4 @@
-## Data folders and files and program input and output ##
+## Data folders and files, and program input and output ##
 
 Data folders:
 
@@ -8,7 +8,7 @@ Data folders:
 	/month_lengths	! month-length tables 
 	/nc_files	! download instructions for netCDF files
 	/TraCE_example	! time series of TraCE-21k data for two example grid cells
-	/debug_files	! used for debugging
+	/debug_files	! used for debugging -- not included here
 
 The folders are used as follows:
 
