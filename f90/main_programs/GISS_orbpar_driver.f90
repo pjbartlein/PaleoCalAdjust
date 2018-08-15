@@ -3,7 +3,7 @@ program giss_orbpar
 ! using Berger (1978) JAS 35:2362-2367 algorithm and tables
 ! https://data.giss.nasa.gov/ar5/SOLAR/ORBPAR.FOR downloCEed 2017-09-04 17:17
 
-use GISS_orbital_subs
+use GISS_orbpar_subs
 
 implicit none
 
@@ -26,8 +26,8 @@ integer(4)      :: n                ! year index
 
 character(2056) :: outpath, outfile ! output file name
 
-!outpath = "/Users/bartlein/Projects/Calendar/PaleoCalendarAdjust/data/GISS_orbital/"    ! Mac path
-outpath = "/Projects/Calendar/PaleoCalendarAdjust/data/GISS_orbital/"   ! Windows path
+outpath = "/Users/bartlein/Projects/Calendar/PaleoCalendarAdjust/data/GISS_orbital/"    ! Mac path
+!outpath = "/Projects/Calendar/PaleoCalendarAdjust/data/GISS_orbital/"   ! Windows path
 outfile="orb_elt_150ka_1kyr.csv"
 write (*,'(a)') trim(outpath)//trim(outfile)
 open (1, file=trim(outpath)//trim(outfile))
