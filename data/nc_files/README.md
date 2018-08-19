@@ -11,7 +11,7 @@ Example CMIP5/PMIP3-formatted netCDF source files and resulting month-length adj
 
 There are two folders:  
 
-- `/data/nc_files/source/` (which contains some typical CMIP5/PMIP3 netCDF files, including long-term means (`Aclim`) files, monthly time series (`Amon` files), and daily time series (`day`) files):
+- `/data/nc_files/PMIP#_source/` (which contains some typical CMIP5/PMIP3 netCDF files, including long-term means (`Aclim`) files, monthly time series (`Amon` files), and daily time series (`day`) files):
 	
 		tas_Aclim_CCSM4_midHolocene_r1i1p1_100001-130012-clim.nc 
 		tas_Aclim_CNRM-CM5_midHolocene_r1i1p1_195001-214912-clim.nc 
@@ -26,7 +26,7 @@ There are two folders:
 		pr_Amon_CCSM4_midHolocene_r1i1p1_100001-130012.nc
 		pr_Amon_MPI-ESM-P_midHolocene_r1i1p1_185001-194912.nc 
 
-- `/data/nc_files/adjusted/` (which contains month-length-adjusted files created by `cal_adjust_PMIP.f90`):
+- `/data/nc_files/PMIP3/adjusted/` (which contains month-length-adjusted files created by `cal_adjust_PMIP.f90`):
 
 		tas_Aclim_CCSM4_midHolocene_r1i1p1_100001-130012-clim_cal_adj.nc
 		tas_Aclim_CNRM-CM5_midHolocene_r1i1p1_195001-214912-clim_cal_adj.nc
@@ -61,5 +61,13 @@ Data files used to create Figs. 4, 5, 6, S4, and S9.
 		CMAP_xm_cal_effects_097ka_04.nc
 		CMAP_xm_cal_effects_116ka_04.nc
 		CMAP_xm_cal_effects_127ka_04.nc
+
+Source data for calendar-effects figures:
+
+- `/data/nc_files/CFSR_and_CMAP_data/`
+	
 		enhanced.precip.mon.ltm.nc
 		tas_Aclim_CFSR_reanalysis_ana4mips_198101-201012-clim.nc
+		ana4mips_URL.txt
+		cdo_ltm.txt
+		ESRL-PSD_CMAP_URL.txt
