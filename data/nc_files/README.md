@@ -1,13 +1,12 @@
 ## Download netCDF files ##
 
-### Example source and adjusted CMIP5/PMIP3 netCDF files
-
-Example CMIP5/PMIP3-formatted netCDF source files and resulting month-length adjusted files can be downloaded using the following URLs:
+Example CMIP5/PMIP3-formatted netCDF source files (and resulting month-length adjusted files), along with the source data and files used to create the calendar-effects figures can be downloaded using the following URLs:
 
 **Dropbox:  [[https://www.dropbox.com/sh/hromb9qagzqk9kl/AAAcItqBRJzTnjW5VhjkSMOOa?dl=0]](https://www.dropbox.com/sh/hromb9qagzqk9kl/AAAcItqBRJzTnjW5VhjkSMOOa?dl=0)**
 
 **Globus:  [[https://www.globus.org/app/transfer?origin_id=d74454ce-e6b4-11e7-80f5-0a208f818180&origin_path=%2FPaleoCalendarAdjust%2F]](https://www.globus.org/app/transfer?origin_id=d74454ce-e6b4-11e7-80f5-0a208f818180&origin_path=%2FPaleoCalendarAdjust%2F)**
 
+### Example source and adjusted CMIP5/PMIP3 netCDF files
 
 There are two folders:  
 
@@ -45,11 +44,7 @@ Note that daily output files, e.g. "`tas_day_CCSM4_midHolocene_r1i1p1_10000101-1
 
 ### netCDF files for calendar-effects figures ###
 
-Data files used to create Figs. 4, 5, 6, S4, and S9.
-
-**Dropbox:  [[https://www.dropbox.com/sh/hromb9qagzqk9kl/AAAcItqBRJzTnjW5VhjkSMOOa?dl=0]](https://www.dropbox.com/sh/hromb9qagzqk9kl/AAAcItqBRJzTnjW5VhjkSMOOa?dl=0)**
-
-**Globus: [https://www.globus.org/app/transfer?origin_id=d74454ce-e6b4-11e7-80f5-0a208f818180&origin_path=%2FPaleoCalendarAdjust%2F]**
+Data files used to create Figs. 4, 5, 6, S4, and S9:
 
 - `data/nc_files/cal_effects_nc_files/`
 
