@@ -28,7 +28,7 @@ program cal_adjust_PMIP3
 ! Author: Patrick J. Bartlein, Univ. of Oregon (bartlein@uoregon.edu), with contributions by S.L. Shafer (sshafer@usgs.gov)
 !
 ! Version: 1.0
-! Last update: 2018-07-22
+! Last update: 2018-08-19
 
 use calendar_effects_subs
 use pseudo_daily_interp_subs
@@ -117,18 +117,18 @@ max_threads = max_threads - 2 ! to be able to do other things
 call omp_set_num_threads(max_threads)
 
 ! path to netCDF folders and files (i.e. /source/*.nc (input) and /adjusted/*.nc (output)) "
-!nc_path = "/Projects/Calendar/data/nc_files/" ! Windows path
-nc_path = "/Users/bartlein/Projects/Calendar/PaleoCalendarAdjust/data/nc_files/"    ! Mac path
+nc_path = "/Projects/Calendar/data/nc_files/" ! Windows path
+!nc_path = "/Users/bartlein/Projects/Calendar/PaleoCalendarAdjust/data/nc_files/"    ! Mac path
 
 ! debugging output files
-!debugpath="/Projects/Calendar/PaleoCalendarAdjust/data/debug_files/" ! Windows path
-debugpath="/Users/bartlein/Projects/Calendar/PaleoCalendarAdjust/data/debug_files/" ! Mac path
+debugpath="/Projects/Calendar/PaleoCalendarAdjust/data/debug_files/" ! Windows path
+!debugpath="/Users/bartlein/Projects/Calendar/PaleoCalendarAdjust/data/debug_files/" ! Mac path
 debugfile="debug_cal_adjust.dat"
 open (10, file=trim(debugpath)//trim(debugfile))
 
 ! info files
-!infopath = "/Projects/Calendar/PaleoCalendarAdjust/data/info_files/" ! Windows path
-infopath = "/Users/bartlein/Projects/Calendar/PaleoCalendarAdjust/data/info_files/"  ! Mac path
+infopath = "/Projects/Calendar/PaleoCalendarAdjust/data/info_files/" ! Windows path
+!infopath = "/Users/bartlein/Projects/Calendar/PaleoCalendarAdjust/data/info_files/"  ! Mac path
 infofile = "cal_adj_info.csv"
 
 ! open the info file, and loop over specified calendar tables
@@ -146,7 +146,6 @@ do
     suffix = ""
     read (3,*,iostat=iostatus) variable, time_freq, model, experiment, ensemble, begdate, enddate, suffix, adj_name, &
         calendar_type, begageBP, endageBP, agestep, begyrCE, nsimyrs
-    !write (*,'("iostatus = ",i2)') iostatus
     if (iostatus.lt.0) then
         write (*,'(a)') "*** Done ***"
         exit
@@ -214,8 +213,6 @@ do
             rmonmid_ts(i) = rmonmid(n,m); rmonbeg_ts(i) = rmonbeg(n,m); rmonend_ts(i) = rmonend(n,m)
             imonmid_ts(i) = imonmid(n,m); imonbeg_ts(i) = imonbeg(n,m); imonend_ts(i) = imonend(n,m)
             ndays_ts(i) = ndyr
-            !write (10,'(3i6,i4,f12.6,i9,3i4)') &
-            !    n,m,i,imonlen_0ka_ts(i),rmonmid_ts(i),ndays_ts(i), imonmid_ts(i),imonbeg_ts(i),imonend_ts(i)
         end do
     end do
 
@@ -230,13 +227,13 @@ do
     ! Step 3:  Open input and output netCDF files
 
     ! input netCDF file
-    nc_fname = trim(nc_path)//"source/"//trim(ncfile_in)
+    nc_fname = trim(nc_path)//"PMIP3_source/"//trim(ncfile_in)
     print '(" nc_fname (in) = ",a)', trim(nc_fname)
     call check( nf90_open(nc_fname, nf90_nowrite, ncid_in) )
     if (nc_print) print '("  ncid_in = ",i8)', ncid_in
 
     ! output netCDF file
-    nc_fname = trim(nc_path)//"adjusted/"//trim(ncfile_out)
+    nc_fname = trim(nc_path)//"PMIP3_adjusted/"//trim(ncfile_out)
     print '(" nc_fname (out) = ",a)', trim(nc_fname)
     call check( nf90_create(nc_fname, 0, ncid_out) )
     if (nc_print) print '("  ncid_put = ",i8)', ncid_out
@@ -307,6 +304,7 @@ do
             !write (*,'(/2i5)') j,k
             ! unless the input data is daily, do pseudo-daily interpolation of the monthly input data
             if (trim(time_freq) .ne. 'day') then
+                ! interpolate
                 call mon_to_day_ts(nt, imonlen_0ka_ts, dble(var3d_in(j,k,:)), dble(vfill), &
                     no_negatives, smooth, restore, ndtot, nw_tmp, nsw_tmp, xdh(k,:))
                 ! reaggregate daily data using correct calendar
@@ -323,10 +321,6 @@ do
     end do
     write (*,'(a)') " "
     write (*,'(a)') "out of loop"
-
-!    where (var3d_in .eq. vfill) var3d_out = vfill
-!    write (10,'(a)') " "
-!    write (10,'(12g14.6)') var3d_out(40,80,:)
 
     ! Step 8:  Write out the adjusted data, and close the output netCDF file.
     

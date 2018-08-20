@@ -67,10 +67,10 @@ integer(4)              :: iostatus ! IOSTAT value
 
 data monname /'Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'/
 
-!outpath = "\Projects\Calendar\PaleoCalendarAdjust\data\month_lengths\"  ! Windows path
-!infopath = "\Projects\Calendar\PaleoCalendarAdjust\data\info_files\"    ! Windows path
-outpath = "/Users/bartlein/Projects/Calendar/PaleoCalendarAdjust/data/month_lengths/"  ! Mac path
-infopath = "/Users/bartlein/Projects/Calendar/PaleoCalendarAdjust/data/info_files/"    ! Mac path
+outpath = "\Projects\Calendar\PaleoCalendarAdjust\data\month_lengths\"  ! Windows path
+infopath = "\Projects\Calendar\PaleoCalendarAdjust\data\info_files\"    ! Windows path
+!outpath = "/Users/bartlein/Projects/Calendar/PaleoCalendarAdjust/data/month_lengths/"  ! Mac path
+!infopath = "/Users/bartlein/Projects/Calendar/PaleoCalendarAdjust/data/info_files/"    ! Mac path
 infofile = "month_length_info.csv"
 
 ! open the info file, and loop over specified calendar tables
@@ -88,8 +88,9 @@ do
         exit
     end if
     write (*,'(125("="))')   
-    write (*,'(a)') trim(prefix)
-    write (*,'(a16, 5i7)') adjustl(calendar_type), begageBP, endageBP, agestep, begyrCE, nsimyrs
+    write (*,'("prefix: ", a)') trim(prefix)
+    write (*,'("begageBP, endageBP, agestep, begyrCE, nsimyrs, calendar_type: ", 5i7, 2x, a)') &
+        begageBP, endageBP, agestep, begyrCE, nsimyrs, trim(adjustl(calendar_type))
 
     ! output files
     ! generate file headers

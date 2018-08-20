@@ -133,7 +133,7 @@ subroutine copy_dims_and_glatts(ncid_in, ncid_out, addglattname, addglatt, nt, t
             case (0)
                 if (nc_print) print '("  i: nvardims(i): ", 2i6, 1x, a)', i,nvardims(i),trim(varname(i))
                 call check( nf90_get_var(ncid_in, varid_in, var0d) )
-                !write (*,*) var0d
+                
                 ! if variable is time, replace the existing values with new ones
                 if (varname(i) .eq. 'time') var1d=time
                 call check( nf90_put_var(ncid_out, varid_out, var0d) )
@@ -142,7 +142,7 @@ subroutine copy_dims_and_glatts(ncid_in, ncid_out, addglattname, addglatt, nt, t
                     i, nvardims(i), vardimids(i,1), dimlen(vardimids(i,1)),trim(varname(i))
                 allocate(var1d(dimlen(vardimids(i,1))))
                 call check( nf90_get_var(ncid_in, varid_in, var1d) )
-                !write (*,*) var1d
+                
                 ! if variable is time, replace the existing values with new ones
                 if (varname(i) .eq. 'time') var1d=time
                 call check( nf90_put_var(ncid_out, varid_out, var1d) )
@@ -152,7 +152,7 @@ subroutine copy_dims_and_glatts(ncid_in, ncid_out, addglattname, addglatt, nt, t
                     i, nvardims(i), vardimids(i,1), vardimids(i,2), dimlen(vardimids(i,1)), dimlen(vardimids(i,1)), trim(varname(i))
                 allocate(var2d(dimlen(vardimids(i,1)), dimlen(vardimids(i,2))))
                 call check( nf90_get_var(ncid_in, varid_in, var2d) )
-                !write (*,*) var2d
+                
                 ! if variable is time_bnds or climatology_bouns, replace the existing values with new ones
                 if (varname(i) .eq. 'time_bnds') var2d=time_bnds
                 if (varname(i) .eq. 'climatology_bnds') var2d=time_bnds
@@ -205,14 +205,12 @@ subroutine new_time_day(ncid_in, ny, nm, nt, ndtot, &
     time(1) = day_time(imid)
     time_bnds(1,1) = day_time(ibeg)
     time_bnds(2,1) = day_time(iend)
-    !write (*,'(i8,3f10.1,4i6)') 1, time(1), time_bnds(1,1), time_bnds(2,1), imid, ibeg, iend, 0
     do n = 2,nt
         ndyr = ndays_ts(n) - ndays_ts(1)
         imid = imonmid_ts(n); ibeg = imonbeg_ts(n); iend = imonend_ts(n)
         time(n) = day_time(imid + ndyr)
         time_bnds(1,n) = time_bnds(2,n-1)
         time_bnds(2,n) = day_time(iend + ndyr)
-        !write (*,'(i8,3f10.1,4i6)') n, time(n), time_bnds(1,n), time_bnds(2,n), imid, ibeg, iend, ndyr
     end do
 
 end subroutine new_time_day
@@ -246,7 +244,6 @@ subroutine new_time_mon(calendar_type, ncid_in, ny, nm, nt, &
     ! get the existing monthly time values
     call check ( nf90_inq_varid(ncid_in, 'time', timeid) )
     call check ( nf90_get_var(ncid_in, timeid, mon_time) )
-    !write (*,'(12f12.4)') mon_time
 
     ! new time variables -- calculate appropriate monthly values
     if (trim(calendar_type) .eq. '360_day') then
@@ -254,29 +251,17 @@ subroutine new_time_mon(calendar_type, ncid_in, ny, nm, nt, &
     else
         ref_time = mon_time(1) - 15.5
     end if
-    !write (*,*) ref_time
 
-    !time(1) = dround(rmonmid_ts(1) + ref_time, 0.25d0)
     time(1) = rmonmid_ts(1) + ref_time
-    time_bnds(1,1) = rmonbeg_ts(1) + ref_time !dround(rmonbeg_ts(1) + ref_time, 0.25d0)
-    time_bnds(2,1) = rmonend_ts(1) + ref_time !dround(rmonend_ts(1) + ref_time, 0.250d0)
-    !write (*,'(i8,3f12.4,i6)') 1, time(1), time_bnds(1,1), time_bnds(2,1),0
+    time_bnds(1,1) = rmonbeg_ts(1) + ref_time 
+    time_bnds(2,1) = rmonend_ts(1) + ref_time 
 
     do n = 2,nt
         ndyr = ndays_ts(n) - ndays_ts(1)
-        !time(n) = dround(rmonmid_ts(n) + ref_time + dble(ndyr), 0.25d0)
         time(n) = rmonmid_ts(n) + ref_time + dble(ndyr)
         time_bnds(1,n) = time_bnds(2,n-1)
-        time_bnds(2,n) = rmonend_ts(n) + ref_time + dble(ndyr) !dround(rmonend_ts(n) + ref_time + dble(ndyr), 0.250d0)
-        !write (*,'(i8,3f12.4,i6)') n, time(n), time_bnds(1,n), time_bnds(2,n),ndyr
+        time_bnds(2,n) = rmonend_ts(n) + ref_time + dble(ndyr)
     end do
-
-    !do i=1,400
-    !    write (10,*) i,dble(i)/200.0d0, dround(dble(i)/200.0d0, 0.25d0)
-    !end do
-    !do n = 2,nt
-    !    write (10,'(i6,3f12.2)') n,time_bnds(1,n),time_bnds(2,n-1),time_bnds(1,n)-time_bnds(2,n-1)
-    !end do
 
 end subroutine new_time_mon
 
@@ -358,16 +343,5 @@ subroutine current_time(current)
         ctime(1:2)//":"//ctime(3:4)//":"//ctime(5:6)
 
 end subroutine current_time
-
-real(8) function dround(d, dnearest)
-! round to nearest dnearest value
-
-    implicit none
-
-    real(8) d, dnearest
-    dround = dnint(d * (1.0d0 / dnearest)) / (1.0d0 / dnearest)
-
-end function dround
-
 
 end module CMIP5_netCDF_subs

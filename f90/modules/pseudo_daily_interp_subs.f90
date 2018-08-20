@@ -160,9 +160,6 @@ subroutine dayinterp(nm,nd,monlen,zm,zd)
     midmon2(1:nm)=midmon
     midmon2(0)=1-(nd-midmon(nm))-2
     midmon2(nm1)=nd+midmon(1)   
-    !do m=1,nm1
-    !    write (debug_unit,*) m,midmon2(m-1),midmon2(m),zm2(m-1),zm2(m)
-    !end do
     
     ! linear pseudo-daily interpolation
     do i=1,nd
@@ -170,7 +167,6 @@ subroutine dayinterp(nm,nd,monlen,zm,zd)
         do m=1,nm+1
             if (i.gt.midmon2(m-1) .and. i.le.midmon2(m)) exit
         end do   
-        ! write (debug_unit,*) i,m !,midmon2(m-1),midmon2(m)
         zd(i)=(dble(i-midmon2(m-1))/dble(midmon2(m)-midmon2(m-1)))*(zm2(m)-zm2(m-1))+zm2(m-1)       
     end do
     
@@ -216,11 +212,9 @@ subroutine midmonth_int(nm,monlen,midmon)
     m=1
     midmon(m)=ceiling(dble(monlen(m))/2.0d0)
     endday(m)=monlen(m)
-    !write (debug_unit,*) m,monlen(m),endday(m),midmon(m)
     do m=2,nm
         midmon(m)=ceiling(dble(monlen(m))/2.0d0)+endday(m-1)
         endday(m)=endday(m-1)+monlen(m)
-        !write (debug_unit,*) m,monlen(m),endday(m),midmon(m)
     end do
     
 end subroutine midmonth_int
@@ -311,8 +305,6 @@ subroutine dzero(nm,nd,monlen,xm,xd0)
           xdm(m)=xdm(m)/dble(monlen(m))
           diff=dabs((xm(m)-xdm(m)))
           totaldiff=totaldiff+diff
-          !write (11,'("l,m,monlen,nonzero,xm,xdm,diff,totaldiff: ",3i4,i3,4f14.6)') &
-          !  l,m,monlen(m),nonzero(m),xm(m),xdm(m),diff,totaldiff
       end do
       if (totaldiff.le.0.0001) exit
     
@@ -341,7 +333,6 @@ subroutine dzero(nm,nd,monlen,xm,xd0)
     ! zero all negative daily values
     do i=1,nd
         if (xd0(i).le.0.0) xd0(i)=0.0
-        !write (11,'(i4,f14.6)') i,xd0(i)
     end do
     
 end subroutine dzero
@@ -363,10 +354,8 @@ subroutine monmean(nm,nd,monlen,xd,xm)
         do j=1,monlen(m)
             i=i+1
             xm(m)=xm(m)+xd(i)
-            !write (10,*) m,j,i,xd(i)
         end do
         xm(m)=xm(m)/dble(monlen(m))
-        !write (10,*) m,xm(m)
     end do
 
 end subroutine monmean

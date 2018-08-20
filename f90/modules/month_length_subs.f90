@@ -101,8 +101,8 @@ subroutine get_month_lengths(calendar_type, begageBP, endageBP, agestep, nages, 
     integer(4)              :: ii       ! age and year index
     integer(4)              :: m        ! month index
 
-    logical                 :: debug_write = .true.  ! write additional debugging info
-    logical                 :: debug_kgmonlen = .true.
+    logical                 :: debug_write = .false.  ! write additional diagnostic/debugging info
+    logical                 :: debug_kgmonlen = .false.
     character(2048)         :: debugpath
 
     ! debugging output
@@ -125,8 +125,8 @@ subroutine get_month_lengths(calendar_type, begageBP, endageBP, agestep, nages, 
     end select
 
     ! Step 1:  generate target years -- experiment ages (in yrs BP) and simulation years (in yrs CE)
-    write (*,'(a)') "Calculating month lengths..."
-    write (*,'("begageBP, endageBP, agestep, nages, begyrCE, nsimyrs: ",6i7)') &
+    write (*,'(a)') "Generating target years..."
+    if (debug_write) write (*,'("begageBP, endageBP, agestep, nages, begyrCE, nsimyrs: ",6i7)') &
         begageBP, endageBP, agestep, nages, begyrCE, nsimyrs
     if (debug_write) write (22,'("begageBP, endageBP, agestep, nages, begyrCE, nsimyrs: ",6i7)') &
             begageBP, endageBP, agestep, nages, begyrCE, nsimyrs
@@ -153,14 +153,14 @@ subroutine get_month_lengths(calendar_type, begageBP, endageBP, agestep, nages, 
     ! to nominal "present-day" values
 
     ! orbital elements for 0 ka
-    write (*,'(a)') "0 ka orbital elements..."
+    write (*,'(a)') " 0 ka orbital elements..."
     ageBP = 0.0d0
     call GISS_orbpars('BP', ageBP, eccen, obliq_deg, perih_deg, precc)
     if (debug_write) write (22,'("ageBP, eccen, obliq_deg, perih_deg, precc: ",f10.1,4f17.12)') &
         ageBP, eccen, obliq_deg, perih_deg, precc
 
     ! Step 3:  0 ka calculated month lengths, following Kutzbach and Gallimore (1988), also set subroutine arguments
-    write (*,'(a)') "0 ka month lengths..."
+    write (*,'(a)') " 0 ka month lengths..."
     select case (trim(calendar_type))
     case ('360_day')
         yrlen = dble(nd_360); ndyr = nd_360; veqday = veqday_360; present_monlen = present_mon_360
@@ -189,7 +189,8 @@ subroutine get_month_lengths(calendar_type, begageBP, endageBP, agestep, nages, 
 
     ! loop over simulation ages and years
 
-    write (*,'("nages, nsimyrs, nages*nsimyrs:  ",3i8)') nages, nsimyrs, nages*nsimyrs
+    write (*,'(a)') "Looping over ages and years..."
+    if (debug_write) write (*,'("nages, nsimyrs, nages*nsimyrs:  ",3i8)') nages, nsimyrs, nages*nsimyrs
     ii = 0
     do n = 1, nages
         do i = 1, nsimyrs
