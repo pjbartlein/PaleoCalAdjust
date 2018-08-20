@@ -11,7 +11,7 @@ Example CMIP5/PMIP3-formatted netCDF source files and resulting month-length adj
 
 There are two folders:  
 
-- `/data/nc_files/PMIP#_source/` (which contains some typical CMIP5/PMIP3 netCDF files, including long-term means (`Aclim`) files, monthly time series (`Amon` files), and daily time series (`day`) files):
+- `/data/nc_files/PMIP3_source/` (which contains some typical CMIP5/PMIP3 netCDF files, including long-term means (`Aclim`) files, monthly time series (`Amon` files), and daily time series (`day`) files):
 	
 		tas_Aclim_CCSM4_midHolocene_r1i1p1_100001-130012-clim.nc 
 		tas_Aclim_CNRM-CM5_midHolocene_r1i1p1_195001-214912-clim.nc 
