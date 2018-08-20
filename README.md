@@ -14,9 +14,9 @@ Patrick J. Bartlein (1), Sarah L. Shafer (2)
 
 (2) Geosciences and Environmental Change Science Center, U.S. Geological Survey, Corvallis, OR, USA
 
-*Correspondence to*: Patrick J. Bartlein (bartlein@uoregon.edu)
+*Correspondence to*: Patrick J. Bartlein (<bartlein@uoregon.edu>)
 
-Abstract
+### Abstract
 
 The "paleo calendar effect" is a common expression for the impact that the changes in the length of months or seasons over time, related to changes in the eccentricity of Earth's orbit and precession, have on the summarization of climate-model output. This effect can have significant implications for paleoclimate analyses. In particular, using a "fixed-length" definition of months (i.e. defined by a fixed number of days), as opposed to a "fixed-angular" definition (i.e. defined by a fixed number of degrees of the Earth's orbit), leads to comparisons of data from different positions along the Earth's orbit when comparing paleo with modern simulations. This effect can impart characteristic spatial patterns or "signals" in comparisons of time-slice simulations that otherwise might be interpreted in terms of specific paleoclimatic mechanisms, and we provide examples for 6, 97, 116, and 127 ka. The calendar effect is exacerbated in transient climate simulations, where, in addition to spatial "map-pattern" effects, it can influence the apparent timing of extrema in individual time series and the characterization of phase relationships among series. We outline an approach for "adjusting" paleo simulations that have been summarized using a modern fixed-length definition of months and that can also be used for summarizing and comparing data archived as daily data. We describe the implementation of this approach in a set of Fortran 90 programs and modules.
 
