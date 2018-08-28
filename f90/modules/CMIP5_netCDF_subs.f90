@@ -215,7 +215,7 @@ subroutine new_time_day(ncid_in, ny, nm, nt, ndtot, &
 
 end subroutine new_time_day
 
-subroutine new_time_mon(calendar_type, ncid_in, ny, nm, nt, &
+subroutine new_time_month(calendar_type, ncid_in, ny, nm, nt, &
      rmonmid_ts, rmonbeg_ts, rmonend_ts, ndays_ts, time, time_bnds)
 
     ! redefines monthly time variables
@@ -263,7 +263,7 @@ subroutine new_time_mon(calendar_type, ncid_in, ny, nm, nt, &
         time_bnds(2,n) = rmonend_ts(n) + ref_time + dble(ndyr)
     end do
 
-end subroutine new_time_mon
+end subroutine new_time_month
 
 subroutine define_outvar(ncid_in, ncid_out, varinname, varid_out, varoutname, addvarattname, addvaratt, varid_in, nlon, nlat, nt)
 

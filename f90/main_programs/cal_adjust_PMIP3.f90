@@ -247,7 +247,7 @@ do
             imonmid_ts, imonbeg_ts, imonend_ts, ndays_ts, mon_time, mon_time_bnds)
     else
         time_comment = "paleo monthly values from get_month_lengths()"
-        call new_time_mon(calendar_type, ncid_in, ny, nm, nt, &
+        call new_time_month(calendar_type, ncid_in, ny, nm, nt, &
             rmonmid_ts, rmonbeg_ts, rmonend_ts, ndays_ts, mon_time, mon_time_bnds)
     end if
     

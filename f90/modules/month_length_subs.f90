@@ -199,8 +199,8 @@ subroutine get_month_lengths(calendar_type, begageBP, endageBP, agestep, nages, 
 
             ! Step 4:  orbital elements for simulation age (e.g. 6 ka)
             call GISS_orbpars('BP', dble(iageBP(n)), eccen, obliq_deg, perih_deg, precc)
-            !if (debug_write) write (22,'("ageBP, eccen, obliq_deg, perih_deg, precc: ",f10.1,4f17.12)') &
-            !    ageBP, eccen, obliq_deg, perih_deg, precc
+            if (debug_write) write (22,'("ageBP, eccen, obliq_deg, perih_deg, precc: ",f10.1,4f17.12)') &
+                ageBP, eccen, obliq_deg, perih_deg, precc
             
             ! Steps 5&6:  real-valued month lengths for different calendars
             ! proleptic_gregorian-like calendars
