@@ -147,8 +147,6 @@ subroutine get_month_lengths(calendar_type, begageBP, endageBP, agestep, nages, 
     VE_day = 0.0d0; ndays = 0
     ryeartot = 0.0d0; iyeartot = 0
 
-    ! ===================================================================================================================
-
     ! Step 2:  get 0 ka (1950CE) calculated month lengths, which will be used to adjust all other calculated month lengths
     ! to nominal "present-day" values
 

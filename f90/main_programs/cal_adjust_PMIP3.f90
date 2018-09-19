@@ -44,7 +44,7 @@ integer(4)              :: begageBP             ! beginning year (BP) (negative,
 integer(4)              :: endageBP             ! ending year (BP)
 integer(4)              :: agestep              ! age step size
 integer(4)              :: nages                ! number of simulation ages
-integer(4), allocatable :: iageBP(:)            ! year BP 1950 (negative, e.g. 1900 CE = -50.0d0 BP)
+integer(4), allocatable :: iageBP(:)            ! year BP 1950 (negative, e.g. 1900 CE = -50 years BP 1950)
 
 ! simulation year-related variables (controls of VE_day and leap-year status)
 integer(4)              :: begyrCE              ! beginning (pseudo-) year of individual model simulation
