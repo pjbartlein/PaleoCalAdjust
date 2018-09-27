@@ -19,6 +19,8 @@ The `/modules` folder contains the following:
 	month_length_subs.f90
 	pseudo_daily_interp_subs.f90
 
+The `/projects` folder contains a set of subfolders, one for each main program, containing GNU Make makefiles for the individual main programs.
+
 The programs are used as follows:
 
 - `GISS_orbar_driver.f90` and `GISS_srevents.f90` write orbital-parameter output to the folder `/GISS_orbital`, using specific parameter values set in the programs;
@@ -27,7 +29,7 @@ The programs are used as follows:
 - `demo_01_pseudo_daily_interp.f90` and `demo_02_adjust_1yr.f90` are stand-alone programs, writing only to the console;
 - `demo_03_adjust_TraCE_ts.f90` reads, for example, the file `TraCE_c30r40_tas_land_monlen0ka_Jan-Dec.csv` in the folder `TraCE_example` and writes a paleo calendar-adjusted output file into the same folder.
 
-All programs write progress information to the console.
+Most of the programs write progress information to the console.
 
 With the exception of directory paths, the same code compiles and runs on the following systems:
 

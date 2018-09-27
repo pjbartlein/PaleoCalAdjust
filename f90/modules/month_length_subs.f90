@@ -32,6 +32,9 @@ module month_length_subs
     real(8)     :: present_mon_365_progreg(nm) = &  ! present-day month lengths in a Gregorian year (note Feb.)
         (/ 31.0d0, 28.2425d0, 31.0d0, 30.0d0, 31.0d0, 30.0d0, 31.0d0, 31.0d0, 30.0d0, 31.0d0, 30.0d0, 31.0d0 /)
 
+    logical                 :: debug_write = .false.  ! write additional diagnostic/debugging info
+    logical                 :: debug_kgmonlen = .false.
+
 contains
 
 subroutine get_month_lengths(calendar_type, begageBP, endageBP, agestep, nages, begyrCE, nsimyrs, &
@@ -146,6 +149,8 @@ subroutine get_month_lengths(calendar_type, begageBP, endageBP, agestep, nages, 
     rmonlen = 0.0d0; rmonmid = 0.0d0; rmonbeg = 0.0d0; rmonend = 0.0d0
     VE_day = 0.0d0; ndays = 0
     ryeartot = 0.0d0; iyeartot = 0
+
+    ! ===================================================================================================================
 
     ! Step 2:  get 0 ka (1950CE) calculated month lengths, which will be used to adjust all other calculated month lengths
     ! to nominal "present-day" values
@@ -316,7 +321,7 @@ subroutine kg_monlen_360(eccen, perih, rmonlen, ryeartot)
     do i=0,nd_360
         day(i) = i
         verneq_angle(i) = (-1.0d0*veqday_360)+dble(i)
-        write (23,'("i,day,verneq_angle: ",i4,i4,f10.3)') i,day(i),verneq_angle(i)
+        if (debug_kgmonlen) write (23,'("i,day,verneq_angle: ",i4,i4,f10.3)') i,day(i),verneq_angle(i)
     end do
 
     ! Step 2:  find phip (such that sin(perih-phip) = -1)
@@ -332,7 +337,7 @@ subroutine kg_monlen_360(eccen, perih, rmonlen, ryeartot)
         end if
         ! write (23,'("i,phi,perih,diff,phip,mindiff,imin: ",i6,5f11.6,i6)') i,phi,perih,diff,phip,mindiff,imin
     end do
-    write (23,'("perih,phip,mindiff,imin: ",3g14.6,i6)') perih,phip,mindiff,imin
+    if (debug_kgmonlen) write (23,'("perih,phip,mindiff,imin: ",3g14.6,i6)') perih,phip,mindiff,imin
 
     ! Step 3:  calculate t (traverse time since vernal equinox) (K&G Eqn A2)
     do i=0,nd_360
@@ -342,11 +347,11 @@ subroutine kg_monlen_360(eccen, perih, rmonlen, ryeartot)
     ! Step 4:  relative length of each day
     day_length(0) = t(0) - (t(nd_360-1) - 360.0d0)
     ryeartot = 0.0d0
-    write (23, '("i, t(0), day_length(i), ryeartot:   0",3f12.6)') t(0), day_length(0), ryeartot
+    if (debug_kgmonlen) write (23, '("i, t(0), day_length(i), ryeartot:   0",3f12.6)') t(0), day_length(0), ryeartot
     do i=1,nd_360
         day_length(i) = t(i) - t(i-1)
         ryeartot = ryeartot + day_length(i)
-        write (23, '("i, t(i), day_length(i), ryeartot: ",i3,3f12.6)') i, t(i), day_length(i), ryeartot
+        if (debug_kgmonlen) write (23, '("i, t(i), day_length(i), ryeartot: ",i3,3f12.6)') i, t(i), day_length(i), ryeartot
     end do
 
     ! Step 5:  length of each "month" -- total daylength in 1/12 = daysinmonth360 / 360 proportion of year
@@ -355,11 +360,11 @@ subroutine kg_monlen_360(eccen, perih, rmonlen, ryeartot)
         do ii=1,daysinmonth360
             i=i+1
             rmonlen(m) = rmonlen(m) + day_length(i)
-            write (23,'("m, i, ii, day_length(i), rmonlen(m):", 3i4,2f12.6)') m,i,ii,day_length(i),rmonlen(m)
+            if (debug_kgmonlen) write (23,'("m, i, ii, day_length(i), rmonlen(m):", 3i4,2f12.6)') m,i,ii,day_length(i),rmonlen(m)
         end do
         ryeartot = ryeartot + rmonlen(m)
     end do
-    write (23,'("rmonlen: ",13f12.6)') rmonlen(1:nm), ryeartot
+    if (debug_kgmonlen) write (23,'("rmonlen: ",13f12.6)') rmonlen(1:nm), ryeartot
 
 end subroutine kg_monlen_360
 
@@ -401,7 +406,7 @@ subroutine kg_monlen(yrlen, ndyr, veqday, ipresent_monlen, eccen, perih, rmonlen
     do i=0,ndyr
         day(i) = i
         verneq_angle(i) = ((-1.0d0*veqday)+dble(i))*(360.0d0/dble(ndyr))
-        write (23,'("i,day,verneq_angle: ",i4,i4,f12.6)') i,day(i),verneq_angle(i)
+        if (debug_kgmonlen) write (23,'("i,day,verneq_angle: ",i4,i4,f12.6)') i,day(i),verneq_angle(i)
     end do
 
     ! Step 2:  find phip (in degrees) such that sin((2 * pi/yrlen)*(perih-phip)) = -1
@@ -417,7 +422,7 @@ subroutine kg_monlen(yrlen, ndyr, veqday, ipresent_monlen, eccen, perih, rmonlen
         end if
         ! write (23,'("i,phi,perih,diff,phip,mindiff,imin: ",i6,5f11.6,i6)') i,phi,perih,diff,phip,mindiff,imin
     end do
-    write (23,'("perih,phip,mindiff,imin: ",3g14.6,i6)') perih,phip,mindiff,imin
+    if (debug_kgmonlen) write (23,'("perih,phip,mindiff,imin: ",3g14.6,i6)') perih,phip,mindiff,imin
 
     ! Step 3:  calculate t (traverse time) from vernal equinox for each day (K&G Eqn A2)
     do i=0,ndyr
@@ -428,11 +433,11 @@ subroutine kg_monlen(yrlen, ndyr, veqday, ipresent_monlen, eccen, perih, rmonlen
     ! Step 4:  relative length of each day
     day_length(0) = (t(ndyr) - t(ndyr-1))
     ryeartot = 0.0d0
-    write (23, '("i, t(0), day_length(i), ryeartot:   0",3f12.6)') t(0), day_length(0), ryeartot
+    if (debug_kgmonlen) write (23, '("i, t(0), day_length(i), ryeartot:   0",3f12.6)') t(0), day_length(0), ryeartot
     do i=1,ndyr
         day_length(i) = (t(i) - t(i-1))
         ryeartot = ryeartot + day_length(i)
-        write (23, '("i, t(i), day_length(i), ryeartot: ",i3,3f12.6)') i, t(i), day_length(i), ryeartot
+        if (debug_kgmonlen) write (23, '("i, t(i), day_length(i), ryeartot: ",i3,3f12.6)') i, t(i), day_length(i), ryeartot
     end do
 
     ! step 5:  length of each month -- total relative day length in ipresent_monlen(m)/ndyr proportion of year
@@ -445,7 +450,7 @@ subroutine kg_monlen(yrlen, ndyr, veqday, ipresent_monlen, eccen, perih, rmonlen
         end do
         ryeartot = ryeartot + rmonlen(m)
     end do
-    write (23,'("rmonlen: ",13f12.6)') rmonlen(1:nm), ryeartot
+    if (debug_kgmonlen) write (23,'("rmonlen: ",13f12.6)') rmonlen(1:nm), ryeartot
 
 end subroutine kg_monlen
 
@@ -521,8 +526,8 @@ subroutine integer_monlen(rmonlen, ndtarg, imonlen, iyeartot)
     ! force integer month lengths to sum to ndtarg
     if (iyeartot.ne.ndtarg) then
 
-        write (22,'(13f12.6)') rmonlen(1:nm),ryeartot
-        write (22,'(13(i4,7x))') imonlen(1:nm),iyeartot
+        if (debug_write) write (22,'(13f12.6)') rmonlen(1:nm),ryeartot
+        if (debug_write) write (22,'(13(i4,7x))') imonlen(1:nm),iyeartot
 
         ! add (diff_sign = 1) or subtract (diff_sign = -1) a small increment to each rmonlen value
         ! iterate until iyeartot = ndtarg, incrementing small increment via i (i*inc)
@@ -545,8 +550,8 @@ subroutine integer_monlen(rmonlen, ndtarg, imonlen, iyeartot)
 
         end do
 
-        write (22,'(13(i4,7x))') imonlen(1:nm),iyeartot
-        write (22,'(a)')
+        if (debug_write) write (22,'(13(i4,7x))') imonlen(1:nm),iyeartot
+        if (debug_write) write (22,'(a)')
     end if
 
 end subroutine integer_monlen

@@ -25,7 +25,7 @@ subroutine mon_to_day_ts(nt,imonlen,xm_in,xfill,no_negatives,smooth,restore,ndto
     logical, intent(in)     :: no_negatives,smooth,restore
     real(8), intent(out)    :: xd_out(ndtot)
     
-    real(8)                 :: xm(nm),xdh(ndl),xd_temp(ndtot),xdhmean(nm)
+    real(8)                 :: xm(nm),xdh(ndl),xd_temp(ndtot)
     real(8)                 :: xm_ltm,xd_ltm,monlentot,ltmdiff
     real(8)                 :: pi,x,wgt(nw),wsum
     integer(4)              :: iml(nm),nd
