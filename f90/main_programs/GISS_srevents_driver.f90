@@ -19,8 +19,8 @@ character(2)    :: year_type
 character(2056) :: outpath
 character(64)   :: sreventsfile, VPAdayfile
 
-!outpath = "/Users/bartlein/Projects/Calendar/PaleoCalendarAdjust/data/GISS_orbital/" ! Mac Path
-outpath = "/Projects/Calendar/PaleoCalendarAdjust/data/GISS_orbital/" ! Windows path
+outpath = "/Projects/Calendar/PaleoCalAdjust/data/GISS_orbital/" ! Windows path
+!outpath = "/Users/bartlein/Projects/Calendar/PaleoCalAdjust/data/GISS_orbital/" ! Mac Path
 sreventsfile="srevents_150ka_1kyr.txt" 
 VPAdayfile="VPAday_150ka_1kyr.csv" 
 

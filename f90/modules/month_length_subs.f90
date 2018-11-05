@@ -109,8 +109,8 @@ subroutine get_month_lengths(calendar_type, begageBP, endageBP, agestep, nages, 
     character(2048)         :: debugpath
 
     ! debugging output
-    debugpath = "/Projects/Calendar/PaleoCalendarAdjust/data/debug_files/"  ! Windows path
-    !debugpath = "/Users/bartlein/Projects/Calendar/PaleoCalendarAdjust/data/debug_files/"  ! Mac path
+    debugpath = "/Projects/Calendar/PaleoCalAdjust/data/debug_files/"  ! Windows path
+    !debugpath = "/Users/bartlein/Projects/Calendar/PaleoCalAdjust/data/debug_files/"  ! Mac path
     if (debug_write) then
         open (22,file=trim(debugpath)//trim(calendar_type)//"_monlen_debug.dat")
         open (11,file=trim(debugpath)//trim(calendar_type)//"_cal_rmonlen_raw.dat")

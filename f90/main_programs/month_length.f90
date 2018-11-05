@@ -20,7 +20,7 @@ program month_length
 ! Author: Patrick J. Bartlein, Univ. of Oregon (bartlein@uoregon.edu), with contributions by S.L. Shafer (sshafer@usgs.gov)
 !
 ! Version: 1.0
-! Last update: 2018-08-20
+! Last update: 2018-11-05
 
 use month_length_subs
     
@@ -67,10 +67,10 @@ integer(4)              :: iostatus ! IOSTAT value
 
 data monname /'Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'/
 
-outpath = "\Projects\Calendar\PaleoCalendarAdjust\data\month_lengths\"  ! Windows path
-infopath = "\Projects\Calendar\PaleoCalendarAdjust\data\info_files\"    ! Windows path
-!outpath = "/Users/bartlein/Projects/Calendar/PaleoCalendarAdjust/data/month_lengths/"  ! Mac path
-!infopath = "/Users/bartlein/Projects/Calendar/PaleoCalendarAdjust/data/info_files/"    ! Mac path
+outpath = "/Projects/Calendar/PaleoCalAdjust/data/month_lengths/"  ! Windows path
+infopath = "/Projects/Calendar/PaleoCalAdjust/data/info_files/"    ! Windows path
+!outpath = "/Users/bartlein/Projects/Calendar/PaleoCalAdjust/data/month_lengths/"  ! Mac path
+!infopath = "/Users/bartlein/Projects/Calendar/PaleoCalAdjust/data/info_files/"    ! Mac path
 infofile = "month_length_info.csv"
 
 ! open the info file, and loop over specified calendar tables

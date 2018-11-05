@@ -58,6 +58,7 @@ write (out_unit,'("Weighted annual mean of input data: ", f12.6)') xann_0ka_cal
 
 ! interpolate monthly data to pseudo-daily values
 call mon_to_day_ts(nm, int(rmonlen_00), xm_0ka_cal, vfill, no_negatives, smooth, restore, nd, nw_tmp, nsw_tmp, xdh)
+write (*,*) nd,ndays(1)
 
 ! reaggregate pseudo-daily values to new calendar
 !call adjusted_monthly_means(nm, nd, xdh, rmonbeg_06, rmonend_06, xm_adj_cal)
