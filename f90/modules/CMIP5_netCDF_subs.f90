@@ -34,7 +34,7 @@ module CMIP5_netCDF_subs
 contains   
 
 subroutine copy_dims_and_glatts(ncid_in, ncid_out, addglattname, addglatt, nt, time, time_bnds, comment, varid_out)
-! copies dimensions and global attributes from and existing to a new netCDF file
+! copies dimensions and global attributes from an existing to a new netCDF file
 ! while replacing the old time values
 
     implicit none
