@@ -17,7 +17,8 @@ logical             :: debug_write=.true.
 
 debug_unit=10; out_unit=1
 if (debug_write) open (10, file="/Projects/Calendar/data/work01/debug_pseudo_daily.csv")
-open (out_unit, file="e:/Projects/Calendar/PaleoCalAdjust/data/figure_data/pseudo_daily_plots/FigS08.dat")
+open (out_unit, file="/Projects/Calendar/PaleoCalAdjust/data/figure_data/pseudo_daily_plots/FigS08.dat")
+
 write (out_unit,'(a)') "Comparison of linear and harmonic pseudo-daily interpolation"
 
 ! month length 
