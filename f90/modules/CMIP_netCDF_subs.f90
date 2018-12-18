@@ -1,4 +1,4 @@
-module CMIP5_netCDF_subs
+module CMIP_netCDF_subs
 
     use netcdf
     use typesizes
@@ -344,4 +344,4 @@ subroutine current_time(current)
 
 end subroutine current_time
 
-end module CMIP5_netCDF_subs
+end module CMIP_netCDF_subs

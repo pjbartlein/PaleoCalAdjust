@@ -3,7 +3,7 @@
 Main programs, including `month_lenth.f90` and `cal_adjust_PMIP3.f90`, plus additional driver and demonstration programs are in the folder `/main_programs`:
 
 	month_length.f90			! month-length tables
-	cal_adjust_PMIP3.f90			! paleo calendar adjustment
+	cal_adjust_PMIP.f90			! paleo calendar adjustment
 	GISS_orbpar_driver.f90			! orbital parameters (eccentricity, climatic precession)
 	GISS_srevents_driver.f90		! equinox, solstice, perihelion dates
 	demo_01_pseudo_daily_interp.f90		! demo of pseudo-daily interpolation
@@ -13,7 +13,7 @@ Main programs, including `month_lenth.f90` and `cal_adjust_PMIP3.f90`, plus addi
 The `/modules` folder contains the following:
 
 	calendar_effects_subs.f90
-	CMIP5_netCDF_subs.f90
+	CMIP_netCDF_subs.f90
 	GISS_orbpar_subs.f90
 	GISS_srevents_subs.f90
 	month_length_subs.f90
@@ -25,7 +25,7 @@ The programs are used as follows:
 
 - `GISS_orbar_driver.f90` and `GISS_srevents.f90` write orbital-parameter output to the folder `/GISS_orbital`, using specific parameter values set in the programs;
 - `month_length.f90` reads the info file `month_length_info.csv` in the folder `/info_files` and writes month-length tables to the folder `/month_lengths`;
-- `cal_adjust_PMIP3.f90` reads the info file `cal_adjust_info.csv` in the folder `/info_files`, and source netCDF files from the folder `/nc_files/source` and writes paleo calendar-adjusted netCDF files to the folder `/nc_files/adjusted`;
+- `cal_adjust_PMIP.f90` reads the info file `cal_adjust_info.csv` in the folder `/info_files`, and source netCDF files from the folder `/nc_files/source` and writes paleo calendar-adjusted netCDF files to the folder `/nc_files/adjusted`;
 - `demo_01_pseudo_daily_interp.f90` and `demo_02_adjust_1yr.f90` are stand-alone programs, writing only to the console;
 - `demo_03_adjust_TraCE_ts.f90` reads, for example, the file `TraCE_c30r40_tas_land_monlen0ka_Jan-Dec.csv` in the folder `TraCE_example` and writes a paleo calendar-adjusted output file into the same folder.
 

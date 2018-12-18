@@ -6,9 +6,9 @@ Example CMIP5/PMIP3-formatted netCDF source files (and resulting month-length ad
 
 **Globus:  [[https://www.globus.org/app/transfer?origin_id=d74454ce-e6b4-11e7-80f5-0a208f818180&origin_path=%2FPaleoCalendarAdjust%2F]](https://www.globus.org/app/transfer?origin_id=d74454ce-e6b4-11e7-80f5-0a208f818180&origin_path=%2FPaleoCalendarAdjust%2F)**
 
-### Example source and adjusted CMIP5/PMIP3 netCDF files
+### Example source and adjusted CMIP5/PMIP3 and CMIP6/PMIP4 netCDF files
 
-There are two folders:  
+There are four folders:  
 
 - `/data/nc_files/PMIP3_source/` (which contains some typical CMIP5/PMIP3 netCDF files, including long-term means (`Aclim`) files, monthly time series (`Amon` files), and daily time series (`day`) files):
 	
@@ -40,11 +40,21 @@ There are two folders:
 		pr_Amon_CCSM4_midHolocene_r1i1p1_100001-130012_cal_adj.nc
 		pr_Amon_MPI-ESM-P_midHolocene_r1i1p1_185001-194912_cal_adj.nc
 
+- ` /data/nc_files/PMIP4/source/` (which contains two example CMIP6/PMIP4 files):
+
+		tas_Amon_IPSL-CM6A-LR_lig127k_r1i1p1f1_gr_185001-194912.nc
+		tas_Amon_IPSL-CM6A-LR_midHolocene_r1i1p1f1_gr_185001-204912.nc	
+
+- ` /data/nc_files/PMIP4/adjusted/` (which contains month-length-adjusted CMIP6/PMIP4 files):
+
+		tas_Amon_IPSL-CM6A-LR_lig127k_r1i1p1f1_gr_185001-194912_cal_adj.nc
+		tas_Amon_IPSL-CM6A-LR_midHolocene_r1i1p1f2_gr_185001-204912_cal_adj.nc
+
 Note that daily output files, e.g. "`tas_day_CCSM4_midHolocene_r1i1p1_10000101-10491231.nc`" are renamed to e.g. "`tas_Amon2_CCSM4_midHolocene_r1i1p1_10000101-10491231_cal_adj.nc`" after aggregating to monthly time-step data, using the file-name element `Amon2` to distinguish such files from standard monthly time-step files with the file-name element of `Amon`.
 
 ### netCDF files for calendar-effects figures ###
 
-Data files used to create Figs. 4, 5, 6, S4, and S9:
+Data files used to create Figs. 10-12 and 16:
 
 - `data/nc_files/cal_effects_nc_files/`
 

@@ -1,5 +1,5 @@
 program cal_adjust_PMIP3
-! Calculates calendar (month-leghth) adjustments of data in a CMIP5/PMIP3-formatted netCDF file.
+! Calculates calendar (month-leghth) adjustments of data in a CMIP/PMIP-formatted netCDF file.
 ! Creates a new netCDF file by copying dimension variables and global attributes from the input file.
 ! This version supports 3-D (longitude, latitude, time) long-term mean (AClim), monthly (Amon) or daily input files.
 
@@ -8,32 +8,37 @@ program cal_adjust_PMIP3
 ! The program must be compiled with local netCDF support, and it will use OpenMP if available
 
 ! An info .csv file (with an appropriate header) containing the following information is read:
-! variable      :: (string) CMIP5/PMIP3 variable name (e.g. "tas", "pr")
-! time_freq     :: (string) CMIP5/PMIP3 output time-frequency type (e.g. "Amon", "Aclim",'...)
-! model         :: (string) CMIP5/PMIP3 model name
-! experiment    :: (string) CMIP5/PMIP3 experiment name (e.g. "midHolocene")
-! ensemble      :: (string) CMIP5/PMIP3 ensemble member code (e.g. "r1i1p1")
+! activity      :: (string) PMIP3 or PMIP4
+! variable      :: (string) CMIP/PMIP variable name (e.g. "tas", "pr")
+! time_freq     :: (string) CMIP/PMIP output time-frequency type (e.g. "Amon", "Aclim",'...)
+! model         :: (string) CMIP/PMIP model name
+! experiment    :: (string) CMIP/PMIP experiment name (e.g. "midHolocene")
+! ensemble      :: (string) CMIP/PMIP ensemble member code (e.g. "r1i1p1")
+! grid_label    :: (string) CMIP6/PMIP4 grid label (blank if CMIP5/PMIP3)
 ! begdate       :: (string) beginning date of simulation as YYYYMM or YYYYMMDD string
 ! enddate       :: (string) ending date of simulation as YYYYMM or YYYYMMDD string
-! suffix        :: (string) filename suffix (usually blank, or "-clim" for Aclim-type files)
-! adj_name      :: (string) filename suffix for adjusted netCDF file (e.g. "_cal_adj")
+! suffix        :: (string) input filename suffix (usually blank, or "clim" for Aclim-type files)
+! adj_name      :: (string) output filename suffix for adjusted netCDF file (e.g. "_cal_adj")
 ! calendar_type :: (string) calendar type (e.g. "noleap", "proleptic_gregorian", etc.)
 ! begageBP      :: (integer) beginning simulation age (year BP) (e.g. 21000 (= 21 ka)
 ! endageBP      :: (integer) ending simulation age (year BP) 
 ! agestep       :: (integer) interval between age calculations
 ! begyrCE       :: (integer) beginning calendar year of simulation for multi-year simulations at each agedd
 ! nsimyrs       :: (integer) number of calendar years
+! source_path   :: (string) path to (input) source files (enclosed in quotation marks)
+! adjusted_path :: (string) path to (output) adjusted files (enclosed in quotation marks)
+
 ! (The above information could also be gotten by parsing the netCDF file name, and reading the calendar attribute.)
 
 ! Author: Patrick J. Bartlein, Univ. of Oregon (bartlein@uoregon.edu), with contributions by S.L. Shafer (sshafer@usgs.gov)
 !
-! Version: 1.0
-! Last update: 2018-11-05
+! Version: 1.1
+! Last update: 2018-12-18
 
 use calendar_effects_subs
 use pseudo_daily_interp_subs
 use month_length_subs
-use CMIP5_netCDF_subs
+use CMIP_netCDF_subs
 use omp_lib
 
 implicit none
@@ -77,12 +82,14 @@ real(8), allocatable    :: mon_time_bnds(:,:)           ! new monthly time-bound
 character(32)           :: calendar_type                ! calendar type
 
 ! components of file names
+character(8)            :: activity                     ! PMIP version (PMIP3 or PMIP4)
 character(64)           :: variable                     ! variable name
-character(8)            :: time_freq                    ! type of CMIP5/PMIP3 time frequency (e.g. Aclim, Amon, day, etc.)
+character(8)            :: time_freq                    ! type of CMIP/PMIP time frequency (e.g. Aclim, Amon, day, etc.)
 character(8)            :: time_freq_output             ! time_freq output label
 character(64)           :: model                        ! model name
 character(64)           :: experiment                   ! experiment name
 character(16)           :: ensemble                     ! ensemble designator
+character(64)           :: grid_label                   ! grid type (PMIP4 only)
 character(8)            :: begdate, enddate             ! string beginning and ending dates of simulation
 character(32)           :: suffix                       ! file name suffix (e.g. "-clim")
 character(32)           :: adj_name                     ! adjustment name (e.g. "_adj")
@@ -106,7 +113,8 @@ integer(4)              :: max_threads                  ! if OpenMP enabled
 integer(4)              :: iostatus                     ! IOSTAT value
 
 ! file paths and names
-character(2048)         :: nc_path, ncfile_in, ncfile_out, nc_fname, infopath, debugpath, debugfile
+character(2048)         :: source_path, ncfile_in, adjusted_path, ncfile_out, nc_fname, infopath
+!character(2084)         :: debugpath, debugfile
 character(64)           :: infofile
 character(1)            :: csvheader                            ! info .csv file header
 
@@ -115,16 +123,6 @@ max_threads = omp_get_max_threads()
 write (*,'("OMP max_threads: ",i4)') max_threads
 max_threads = max_threads - 2 ! to be able to do other things
 call omp_set_num_threads(max_threads)
-
-! path to netCDF folders and files (i.e. /source/*.nc (input) and /adjusted/*.nc (output)) "
-nc_path = "/Projects/Calendar/data/nc_files/" ! Windows path
-!nc_path = "/Users/bartlein/Projects/Calendar/PaleoCalAdjust/data/nc_files/"    ! Mac path
-
-! debugging output files -- note:  there are further debugging files opened in month_length_subs.f90
-debugpath="/Projects/Calendar/PaleoCalAdjust/data/debug_files/" ! Windows path
-!debugpath="/Users/bartlein/Projects/Calendar/PaleoCalAdjust/data/debug_files/" ! Mac path
-debugfile="debug_cal_adjust.dat"
-open (10, file=trim(debugpath)//trim(debugfile))
 
 ! info files
 infopath = "/Projects/Calendar/PaleoCalAdjust/data/info_files/" ! Windows path
@@ -144,21 +142,35 @@ do
     ! read a line from the info file, and construct netCDF file names
     write (*,'(125("="))')
     suffix = ""
-    read (3,*,iostat=iostatus) variable, time_freq, model, experiment, ensemble, begdate, enddate, suffix, adj_name, &
-        calendar_type, begageBP, endageBP, agestep, begyrCE, nsimyrs
+    read (3,*,iostat=iostatus) activity, variable, time_freq, model, experiment, ensemble, grid_label, &
+        begdate, enddate, suffix, adj_name, calendar_type, begageBP, endageBP, agestep, begyrCE, nsimyrs, &
+        source_path, adjusted_path
     if (iostatus.lt.0) then
         write (*,'(a)') "*** Done ***"
         exit
     end if
+    write (*,'(a)') trim(activity)
+    write (*,'(a)') trim(source_path)
 
     varinname = trim(variable); varoutname = varinname
     time_freq_output = trim(time_freq)
     if (trim(time_freq_output) .eq. 'day') time_freq_output = "Amon2"
+    if (suffix .eq. 'clim') suffix = "-"//trim(suffix)
 
-    ncfile_in = trim(variable)//"_"//trim(time_freq)//"_"//trim(model)//"_"//trim(experiment)//"_"// &
-        trim(ensemble)//"_"//trim(begdate)//"-"//trim(enddate)//trim(suffix)//".nc"
-    ncfile_out = trim(variable)//"_"//trim(time_freq_output)//"_"//trim(model)//"_"//trim(experiment)//"_"// &
-        trim(ensemble)//"_"//trim(begdate)//"-"//trim(enddate)//trim(suffix)//trim(adj_name)//".nc"
+    select case (trim(activity))
+    case ('PMIP3', 'pmip3')
+        ncfile_in = trim(variable)//"_"//trim(time_freq)//"_"//trim(model)//"_"//trim(experiment)//"_"// &
+            trim(ensemble)//"_"//trim(begdate)//"-"//trim(enddate)//trim(suffix)//".nc"
+        ncfile_out = trim(variable)//"_"//trim(time_freq_output)//"_"//trim(model)//"_"//trim(experiment)//"_"// &
+            trim(ensemble)//"_"//trim(begdate)//"-"//trim(enddate)//trim(suffix)//trim(adj_name)//".nc"
+    case ('PMIP4', 'pmip4')
+        ncfile_in = trim(variable)//"_"//trim(time_freq)//"_"//trim(model)//"_"//trim(experiment)//"_"// &
+            trim(ensemble)//"_"//trim(grid_label)//"_"//trim(begdate)//"-"//trim(enddate)//trim(suffix)//".nc"
+        ncfile_out = trim(variable)//"_"//trim(time_freq_output)//"_"//trim(model)//"_"//trim(experiment)//"_"// &
+            trim(ensemble)//"_"//trim(grid_label)//"_"//trim(begdate)//"-"//trim(enddate)//trim(suffix)//trim(adj_name)//".nc"
+    case default
+        stop "activity type"
+    end select
 
     write (*,'(" ncfile_in: ",a)') trim(ncfile_in)
     write (*,'("ncfile_out: ",a)') trim(ncfile_out)
@@ -224,21 +236,26 @@ do
     end do
     write (*,'("ny, nt, ndtot: ",4i8)') ny, nt, ndtot, ndtot_0ka
     
-    ! Step 3:  Open input and output netCDF files
+    ! Step 3:  Open input and output netCDF files, and a debug file
 
     ! input netCDF file
-    nc_fname = trim(nc_path)//"PMIP3_source/"//trim(ncfile_in)
+    write (*,'(a)') trim(source_path)
+    nc_fname = trim(source_path)//trim(ncfile_in)
     print '(" nc_fname (in) = ",a)', trim(nc_fname)
     call check( nf90_open(nc_fname, nf90_nowrite, ncid_in) )
     if (nc_print) print '("  ncid_in = ",i8)', ncid_in
 
     ! output netCDF file
-    nc_fname = trim(nc_path)//"PMIP3_adjusted/"//trim(ncfile_out)
+    nc_fname = trim(adjusted_path)//trim(ncfile_out)
     print '(" nc_fname (out) = ",a)', trim(nc_fname)
     call check( nf90_create(nc_fname, 0, ncid_out) )
     if (nc_print) print '("  ncid_put = ",i8)', ncid_out
     
-    ! Step 4:  Redifine the time-coordinate variable
+    !debugpath=trim(adjusted_path)
+    !debugfile=trim(model)//"_"//trim(experiment)//"_debug_cal_adjust.dat"
+    !open (10, file=trim(debugpath)//trim(debugfile))
+    
+    ! Step 4:  Redefine the time-coordinate variable
 
     ! redefine the time coordinate
     if (trim(time_freq) .eq. 'day') then
@@ -256,7 +273,7 @@ do
     ! create a new netCDF file, and copy dimension variables and global attributes
     call current_time(current)
     addglattname = "paleo_calendar_adjustment"
-    addglatt = trim(current)//" paleo calendar adjustment by cal_adjust_PMIP3.f90"
+    addglatt = trim(current)//" paleo calendar adjustment by cal_adjust_PMIP.f90"
     call copy_dims_and_glatts(ncid_in, ncid_out, addglattname, addglatt, nt, &
         mon_time, mon_time_bnds, time_comment, varid_out)
 
@@ -330,6 +347,7 @@ do
 
     ! close the output file
     call check( nf90_close(ncid_out) )
+    !close (10)
 
     deallocate (iageBP, iyearCE)
     deallocate (imonlen_0ka,imonmid_0ka,imonbeg_0ka,imonend_0ka)

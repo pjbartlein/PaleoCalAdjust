@@ -1,4 +1,4 @@
-# cal_adjust_PMIP3
+# cal_adjust_PMIP
 
 # (relative) paths to source files -- needs localization
 prog = ../../main_programs/
@@ -14,11 +14,11 @@ FC = gfortran
 FFLAGS = -O3 -Wall
 
 # target, object and .mod files
-target = cal_adjust_PMIP3
+target = cal_adjust_PMIP
 objects = pseudo_daily_interp_subs.o calendar_effects_subs.o GISS_orbpar_subs.o \
-    GISS_srevents_subs.o month_length_subs.o cmip5_netcdf_subs.o cal_adjust_PMIP3.o
+    GISS_srevents_subs.o month_length_subs.o cmip_netcdf_subs.o cal_adjust_PMIP.o
 modules = pseudo_daily_interp_subs.mod calendar_effects_subs.mod GISS_orbpar_subs.mod \
-    GISS_srevents_subs.mod month_length_subs.mod cmip5_netcdf_subs.mod
+    GISS_srevents_subs.mod month_length_subs.mod cmip_netcdf_subs.mod
 
 $(target): $(objects) 
 	$(FC) $(FFLAGS) -L$(NCLIB) -o $(target) $(objects) $(LIBS)
@@ -38,11 +38,11 @@ GISS_srevents_subs.o: $(mod)GISS_srevents_subs.f90
 month_length_subs.o: $(mod)month_length_subs.f90
 	$(FC) $(FFLAGS) -c $(mod)month_length_subs.f90
 
-cmip5_netcdf_subs.o: $(mod)cmip5_netcdf_subs.f90 
-	$(FC) $(FFLAGS) -I$(NCINC) -c $(mod)cmip5_netcdf_subs.f90 
+cmip_netcdf_subs.o: $(mod)cmip_netcdf_subs.f90 
+	$(FC) $(FFLAGS) -I$(NCINC) -c $(mod)cmip_netcdf_subs.f90 
 
-cal_adjust_PMIP3.o: $(prog)cal_adjust_PMIP3.f90
-	$(FC) $(FFLAGS) -fopenmp -c $(prog)cal_adjust_PMIP3.f90
+cal_adjust_PMIP.o: $(prog)cal_adjust_PMIP.f90
+	$(FC) $(FFLAGS) -fopenmp -c $(prog)cal_adjust_PMIP.f90
 
 clean: 
 	rm -f $(objects)
