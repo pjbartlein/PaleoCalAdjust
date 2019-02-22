@@ -19,8 +19,8 @@ program month_length
     
 ! Author: Patrick J. Bartlein, Univ. of Oregon (bartlein@uoregon.edu), with contributions by S.L. Shafer (sshafer@usgs.gov)
 !
-! Version: 1.0
-! Last update: 2018-11-05
+! Version: 1.0c
+! Last update: 2019-02-22
 
 use month_length_subs
     
@@ -43,7 +43,8 @@ integer(4), allocatable :: imonlen(:,:),imonmid(:,:)    ! integer-value month le
 integer(4), allocatable :: imonbeg(:,:),imonend(:,:)    ! integer-value month beginning and ending days 
 real(8), allocatable    :: rmonlen(:,:),rmonmid(:,:)    ! real-value month lengths and mid days 
 real(8), allocatable    :: rmonbeg(:,:),rmonend(:,:)    ! real-value month beginning and ending days 
-real(8), allocatable    :: VE_day(:)                    ! vernal equinox day
+real(8), allocatable    :: VE_day(:)                    ! vernal equinox day in simulation year
+real(8), allocatable    :: SS_day(:)                    ! (northern) summer solstice day in simulation year
 integer(4), allocatable :: ndays(:)                     ! number of days in year
 
 ! calendar type
@@ -67,11 +68,13 @@ integer(4)              :: iostatus ! IOSTAT value
 
 data monname /'Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'/
 
-outpath = "/Projects/Calendar/PaleoCalAdjust/data/month_lengths/"  ! Windows path
-infopath = "/Projects/Calendar/PaleoCalAdjust/data/info_files/"    ! Windows path
+!outpath = "/Projects/Calendar/PaleoCalAdjust/data/month_lengths/"  ! Windows path
+outpath = "\Projects\Calendar\data\work08\"  ! Windows path
+!infopath = "/Projects/Calendar/PaleoCalAdjust/data/info_files/"    ! Windows path
+infopath = "/Projects/Calendar/data/info_files/"    ! Windows path
 !outpath = "/Users/bartlein/Projects/Calendar/PaleoCalAdjust/data/month_lengths/"  ! Mac path
 !infopath = "/Users/bartlein/Projects/Calendar/PaleoCalAdjust/data/info_files/"    ! Mac path
-infofile = "month_length_info.csv"
+infofile = "month_length_info.csv" ! 'month_length_info_PMIP4.csv' ! 
 
 ! open the info file, and loop over specified calendar tables
 ! past ages are negative, e.g. 21 ka = 21,000 cal yr BP = -21000, and 1950 CE = 0 cal yr BP = 0 here
@@ -109,27 +112,25 @@ do
     ! open files
     open (1,file=trim(outpath)//trim(prefix)//"_cal_"//trim(calendar_type)//"_rmonlen.csv")
     open (2,file=trim(outpath)//trim(prefix)//"_cal_"//trim(calendar_type)//"_imonlen.csv")
-    write (1,'(a)') "   "//trim(header(1))//trim(header(2))//trim(header(3))//trim(header(4))//" VE_day    , ndays"
-    write (2,'(a)') "   "//trim(header(5))//trim(header(6))//trim(header(7))//trim(header(8))//" VE_day, ndays"
-
-    !open(23,file="/Projects/Calendar/data/work01/"//trim(prefix)//"_debug_kg_old_360.dat")
+    write (1,'(a)') "   "//trim(header(1))//trim(header(2))//trim(header(3))//trim(header(4))//" VE_day , SS_day ,  ndays"
+    write (2,'(a)') "   "//trim(header(5))//trim(header(6))//trim(header(7))//trim(header(8))//" VE_day , SS_day , ndays"
 
     ! allocate arrays
     nages = (endageBP - begageBP)/agestep + 1
     allocate (iageBP(nages*nsimyrs), iyearCE(nages*nsimyrs))
     allocate (imonlen(nages*nsimyrs,nm),imonmid(nages*nsimyrs,nm),imonbeg(nages*nsimyrs,nm),imonend(nages*nsimyrs,nm))
     allocate (rmonlen(nages*nsimyrs,nm),rmonmid(nages*nsimyrs,nm),rmonbeg(nages*nsimyrs,nm),rmonend(nages*nsimyrs,nm))
-    allocate (VE_day(nages*nsimyrs),ndays(nages*nsimyrs))
+    allocate (VE_day(nages*nsimyrs),SS_day(nages*nsimyrs),ndays(nages*nsimyrs))
 
     ! initialize arrays
     imonlen = 0; imonmid = 0; imonbeg = 0; imonend = 0
     rmonlen = 0.0d0; rmonmid = 0.0d0; rmonbeg = 0.0d0; rmonend = 0.0d0
-    VE_day = 0.0d0; ndays = 0
+    VE_day = 0.0d0; SS_day = 0.0d0; ndays = 0
 
-    ! get month-lengths
+    ! get month lengths
     write (*,'(a)') "Getting month lengths..."
     call get_month_lengths(calendar_type, begageBP, endageBP, agestep, nages, begyrCE, nsimyrs, & 
-        iageBP, iyearCE, imonlen, imonmid, imonbeg, imonend, rmonlen, rmonmid, rmonbeg, rmonend, VE_day, ndays)
+        iageBP, iyearCE, imonlen, imonmid, imonbeg, imonend, rmonlen, rmonmid, rmonbeg, rmonend, VE_day, SS_day, ndays)
 
     ! write out the data
     write (*,'(a)') "Writing month lengths..."
@@ -143,16 +144,16 @@ do
                 case default
                     continue
             end select
-            write (1,'(i8,", ",i8,48(", ",f12.8),", ",f10.6,", ",i4)') &
-                iageBP(ii),iyearCE(ii),rmonlen(ii,1:nm),rmonmid(ii,1:nm), rmonbeg(ii,1:nm),rmonend(ii,1:nm),VE_day(ii),ndays(ii)
-            write (2,'(i8,", ",i8,48(", ",3x,i4),", ",f6.3,", ",i4)') &
-                iageBP(ii),iyearCE(ii),imonlen(ii,1:nm),imonmid(ii,1:nm), imonbeg(ii,1:nm),imonend(ii,1:nm),VE_day(ii),ndays(ii)        
+            write (1,'(i8,", ",i8,48(", ",f12.8),2(", ",f7.3),", ",i4)') &
+                iageBP(ii),iyearCE(ii),rmonlen(ii,1:nm),rmonmid(ii,1:nm), rmonbeg(ii,1:nm),rmonend(ii,1:nm),VE_day(ii),SS_day(ii),ndays(ii)
+            write (2,'(i8,", ",i8,48(", ",3x,i4),2(", ",f7.3),", ",i4)') &
+                iageBP(ii),iyearCE(ii),imonlen(ii,1:nm),imonmid(ii,1:nm), imonbeg(ii,1:nm),imonend(ii,1:nm),VE_day(ii),SS_day(ii),ndays(ii)        
         end do
     end do
 
     close(1); close(2)
     
-    deallocate(iageBP, iyearCE, imonlen, imonmid, imonbeg, imonend, rmonlen, rmonmid, rmonbeg, rmonend, VE_day, ndays)
+    deallocate(iageBP, iyearCE, imonlen, imonmid, imonbeg, imonend, rmonlen, rmonmid, rmonbeg, rmonend, VE_day, SS_day, ndays)
     
     write (*,*) " "
 

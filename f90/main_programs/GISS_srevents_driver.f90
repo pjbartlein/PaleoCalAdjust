@@ -14,7 +14,7 @@ real(8), parameter      :: EDAYzY=365.2425d0 ! 365.24219876d0 ) !
 integer(4), parameter   :: nm=12
 
 integer(4)      :: iyminBP, iymaxBP, iyinc, iyminCE, iymaxCE, iyearCE, ndays, i4yrs
-real(8)         :: veqday, veqday2, perihelion, aphelion
+real(8)         :: veqday, veqday2, ssday, ssday2, perihelion, aphelion
 character(2)    :: year_type
 character(2056) :: outpath
 character(64)   :: sreventsfile, VPAdayfile
@@ -37,14 +37,14 @@ iymaxCE = iymaxBP + 1950
 
 !  Write header information
 WRITE (1,920) EDAYzY
-write (2,'(a)') "YearBP, YearCE, ndays, before_leap, veq_day, veq_day2, perihelion_day, aphelion_day"
+write (2,'(a)') "YearBP, YearCE, ndays, before_leap, veq_day, veq_day2, ss_day, ss_day2, perihelion_day, aphelion_day"
 
 ! loop over years
 
 i4yrs = before_leap(iyminCE + iyinc)
 do iyearCE = iyminCE,iymaxCE,iyinc
     
-    call GISS_srevents(year_type, iyearCE, edayzy, veqday, perihelion, aphelion, ndays)
+    call GISS_srevents(year_type, iyearCE, edayzy, veqday, ssday, perihelion, aphelion, ndays)
 
     if(KPERIH==1 .and. KAPHEL==1)  then
         write (1,927) iyearCE, &
@@ -68,11 +68,12 @@ do iyearCE = iyminCE,iymaxCE,iyinc
     end if
     
     veqday2 =  80.0d0 + (dble(i4yrs) * 0.25d0)
+    ssday2 = 170.5d0 + (dble(i4yrs) * 0.25d0)
     i4yrs = i4yrs + 1
     if (i4yrs.gt.3) i4yrs = 0
 
-    write (2,'(i8,", ",i8,2(", ",i4),2(", ",f10.6), 2(", ",f12.6))') & 
-        iyearCE-1950, iyearCE, ndays, i4yrs, veqday, veqday2, perihelion, aphelion
+    write (2,'(i8,", ",i8,2(", ",i4),4(", ",f10.6), 2(", ",f12.6))') & 
+        iyearCE-1950, iyearCE, ndays, i4yrs, veqday, veqday2, ssday, ssday2, perihelion, aphelion
 
 end do
 

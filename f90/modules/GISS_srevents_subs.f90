@@ -17,7 +17,7 @@ module GISS_srevents_subs
 
 contains
 
-subroutine GISS_srevents(year_type, iyear, EDAYzY, veqday, perihelion, aphelion, ndays_in_year)
+subroutine GISS_srevents(year_type, iyear, EDAYzY, veqday, ssday, perihelion, aphelion, ndays_in_year)
 ! subroutines based on
 ! SREVENTS.FOR    Solar EVENTS each year    2012/05/29
 ! https://data.giss.nasa.gov/ar5/SOLAR/SREVENTS.FOR downloaded 2017-09-12
@@ -30,7 +30,7 @@ subroutine GISS_srevents(year_type, iyear, EDAYzY, veqday, perihelion, aphelion,
     character(2), intent(in)    :: year_type
     integer(4), intent(in)      :: iyear
     real(8), intent(in)         :: EDAYzY
-    real(8), intent(out)        :: veqday, perihelion, aphelion
+    real(8), intent(out)        :: veqday, ssday, perihelion, aphelion
     integer(4), intent(out)     :: ndays_in_year
 
     integer(4)                  :: YearCE, YearBP
@@ -79,18 +79,22 @@ subroutine GISS_srevents(year_type, iyear, EDAYzY, veqday, perihelion, aphelion,
 !  Determine orbital parameters
     YEAR = dble(YearCE)
     CALL ORBPAR (YEAR, ECCEN,OBLIQ,OMEGVP) ! orbpar() expects YearCE input
+    !write (*,'("YEAR, ECCEN,OBLIQ,OMEGVP:" 4f14.7)') YEAR, ECCEN,OBLIQ,OMEGVP 
     BSEMI  = dSQRT (1.0d0-ECCEN*ECCEN)
 !  Vernal Equinox
-    VEREQX = VERNAL (YearCE, EDAYzY) ! NOTE:  made EDAYzY an argument
+    VEREQX = VERNAL (YearCE, EDAYzY)! NOTE:  made EDAYzY an argument
+    !VEREQX = dmod(VERNAL (YearCE, EDAYzY), EDAYzy) ! NOTE:  made EDAYzY an argument
     CALL DtoYMDHM (VEREQX, JVEYR,JVEMON,JVEDAT,JVEHR,JVEMIN)
     TAofVE = - OMEGVP
     EAofVE = dATAN2 (dSIN(TAofVE)*BSEMI, dCOS(TAofVE)+ECCEN)
     MAofVE = EAofVE - ECCEN*dSIN(EAofVE)
     IF(MAofVE.lt.0.0d0)  MAofVE = MAofVE + TWOPI
+    !write (*,'("VEREQX, TAofVE, EAofVE, MAofVE: ",4f14.7)') VEREQX, TAofVE, EAofVE, MAofVE
 !  Perihelion
     KPERIH = 0
     PERIH1 = VEREQX - MAofVE*EDAYzY/TWOPI
     PERIH2 = PERIH1 + EDAYzY
+    !write (*,'("EDAYzY, PERIH1, PERIH2: ",3f14.7)') EDAYzY, PERIH1, PERIH2
     Call DtoYMDHM (PERIH1, JPRYR,JPRMON,JPRDAT,JPRHR,JPRMIN)
     If (JPRYR /= IYEAR)  GoTo 210
     KPERIH = 1
@@ -134,17 +138,21 @@ subroutine GISS_srevents(year_type, iyear, EDAYzY, veqday, perihelion, aphelion,
     WINSOL = VEREQX + (MAofWS-MAofVE)*EDAYzY/TWOPI
     Call DtoYMDHM (WINSOL, JWSYR,JWSMON,JWSDAT,JWSHR,JWSMIN)
 
-! vernal equinox day
+! vernal equinox and northern summer solstice days
 
-    veqday = 0.0d0
+    veqday = 0.0d0; ssday = 0.0d0
     if(isleap(YearCE)) then
         ndays_in_year = 366
         veqday = veqday + nd_leap(1) + nd_leap(2) + dble(JVEDAT) + dble(JVEHR)/24.0d0 + dble(JVEMIN)/1440.0d0
+        ssday = ssday + nd_leap(1) + nd_leap(2) + nd_leap(3) + nd_leap(4) + nd_leap(5) &
+            + dble(JSSDAT) + dble(JSSHR)/24.0d0 + dble(JSSMIN)/1440.0d0
         perihelion = dble(accumday_leap(JPRMON)) + dble(JPRDAT) + dble(JPRHR)/24.0d0 + dble(JPRMIN)/1440.0d0
         aphelion   = dble(accumday_leap(JAPMON)) + dble(JAPDAT) + dble(JAPHR)/24.0d0 + dble(JAPMIN)/1440.0d0
     else
         ndays_in_year = 365
         veqday = veqday + nd_noleap(1) + nd_noleap(2) + dble(JVEDAT) + dble(JVEHR)/24.0d0 + dble(JVEMIN)/1440.0d0
+        ssday = ssday + nd_noleap(1) + nd_noleap(2) + nd_noleap(3) + nd_noleap(4) + nd_noleap(5) &
+            + dble(JSSDAT) + dble(JSSHR)/24.0d0 + dble(JSSMIN)/1440.0d0
         perihelion = dble(accumday_noleap(JPRMON)) + dble(JPRDAT) + dble(JPRHR)/24.0d0 + dble(JPRMIN)/1440.0d0
         aphelion   = dble(accumday_noleap(JAPMON)) + dble(JAPDAT) + dble(JAPHR)/24.0d0 + dble(JAPMIN)/1440.0d0
     end if
@@ -213,6 +221,7 @@ real(8) function vernal (iyear, edayzy)
     integer(4), intent(in)  :: iyear
 
     vernal = ve2000 + dble((iyear-2000))*edayzy
+    ! write (*,*) iyear, edayzy, ve2000, vernal, dble((iyear-2000))
 
 end function vernal
 

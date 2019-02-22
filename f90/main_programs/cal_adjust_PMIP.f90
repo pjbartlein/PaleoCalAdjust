@@ -32,8 +32,8 @@ program cal_adjust_PMIP3
 
 ! Author: Patrick J. Bartlein, Univ. of Oregon (bartlein@uoregon.edu), with contributions by S.L. Shafer (sshafer@usgs.gov)
 !
-! Version: 1.1
-! Last update: 2018-12-18
+! Version: 1.0c
+! Last update: 2019-02-22
 
 use calendar_effects_subs
 use pseudo_daily_interp_subs
@@ -63,7 +63,8 @@ integer(4), allocatable :: imonlen(:,:),imonmid(:,:)    ! integer-value month le
 integer(4), allocatable :: imonbeg(:,:),imonend(:,:)    ! integer-value month beginning and ending days (paleo)
 real(8), allocatable    :: rmonlen(:,:),rmonmid(:,:)    ! real-value month lengths and mid days (paleo)
 real(8), allocatable    :: rmonbeg(:,:),rmonend(:,:)    ! real-value month beginning and ending days (paleo)
-real(8), allocatable    :: VE_day(:)                    ! vernal equinox day
+real(8), allocatable    :: VE_day(:)                    ! vernal equinox day in simulation year
+real(8), allocatable    :: SS_day(:)                    ! (northern) summer solstice day in simulation year
 integer(4), allocatable :: ndays(:)                     ! number of days in year
 
 integer(4), allocatable :: imonlen_0ka_ts(:)            ! integer-value month lengths at present as time series
@@ -195,7 +196,7 @@ do
     allocate (imonlen_0ka(ny,nm),imonmid_0ka(ny,nm),imonbeg_0ka(ny,nm),imonend_0ka(ny,nm))
     allocate (imonlen(ny,nm), imonmid(ny,nm), imonbeg(ny,nm), imonend(ny,nm))
     allocate (rmonlen(ny,nm), rmonmid(ny,nm), rmonbeg(ny,nm), rmonend(ny,nm))
-    allocate (VE_day(ny), ndays(ny), imonlen_0ka_ts(nt),ndays_ts(nt))
+    allocate (VE_day(ny), SS_day(ny), ndays(ny), imonlen_0ka_ts(nt),ndays_ts(nt))
     allocate (imonmid_ts(nt), imonbeg_ts(nt),imonend_ts(nt), rmonmid_ts(nt), rmonbeg_ts(nt), rmonend_ts(nt))
     allocate (mon_time(nt), mon_time_bnds(2,nt))
 
@@ -205,13 +206,13 @@ do
     if (trim(time_freq) .ne. 'day') then
         write (*,'(a)') "0 ka month lengths for pseudo-daily interpolation..."
         call get_month_lengths(calendar_type, 0, 0, agestep, nages, begyrCE, nsimyrs, &
-            iageBP, iyearCE, imonlen_0ka, imonmid_0ka, imonbeg_0ka, imonend_0ka, rmonlen, rmonmid, rmonbeg, rmonend, VE_day, ndays)
+            iageBP, iyearCE, imonlen_0ka, imonmid_0ka, imonbeg_0ka, imonend_0ka, rmonlen, rmonmid, rmonbeg, rmonend, VE_day, SS_day, ndays)
     end if
 
     ! paleo month lengths
     write (*,'(a)') "Paleo month-lengths for aggregation of daily data..."
     call get_month_lengths(calendar_type, begageBP, endageBP, agestep, nages, begyrCE, nsimyrs, &
-        iageBP, iyearCE, imonlen, imonmid, imonbeg, imonend, rmonlen, rmonmid, rmonbeg, rmonend, VE_day, ndays)
+        iageBP, iyearCE, imonlen, imonmid, imonbeg, imonend, rmonlen, rmonmid, rmonbeg, rmonend, VE_day, SS_day, ndays)
 
     ! reshape month lengths into time series, and get cumulative number of days in years
     ndtot_0ka = 0; ndyr = 0
@@ -353,7 +354,7 @@ do
     deallocate (imonlen_0ka,imonmid_0ka,imonbeg_0ka,imonend_0ka)
     deallocate (imonlen, imonmid, imonbeg, imonend)
     deallocate (rmonlen, rmonmid, rmonbeg, rmonend)
-    deallocate (VE_day, ndays, imonlen_0ka_ts,ndays_ts)
+    deallocate (VE_day, SS_day, ndays, imonlen_0ka_ts,ndays_ts)
     deallocate (imonmid_ts, imonbeg_ts,imonend_ts, rmonmid_ts, rmonbeg_ts, rmonend_ts)
     deallocate (mon_time, mon_time_bnds)
     deallocate (var3d_in, xdh, var3d_adj, var3d_out)
