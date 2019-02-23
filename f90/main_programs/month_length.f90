@@ -20,7 +20,7 @@ program month_length
 ! Author: Patrick J. Bartlein, Univ. of Oregon (bartlein@uoregon.edu), with contributions by S.L. Shafer (sshafer@usgs.gov)
 !
 ! Version: 1.0c
-! Last update: 2019-02-22
+! Last update: 2019-02-22 
 
 use month_length_subs
     
@@ -69,12 +69,12 @@ integer(4)              :: iostatus ! IOSTAT value
 data monname /'Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'/
 
 !outpath = "/Projects/Calendar/PaleoCalAdjust/data/month_lengths/"  ! Windows path
-!outpath = "\Projects\Calendar\data\work08\"  ! Windows path
+outpath = "\Projects\Calendar\data\work08\"  ! Windows path
 !infopath = "/Projects/Calendar/PaleoCalAdjust/data/info_files/"    ! Windows path
-!infopath = "/Projects/Calendar/data/info_files/"    ! Windows path
-outpath = "/Users/bartlein/Projects/Calendar/PaleoCalAdjust/data/month_lengths/"  ! Mac path
-infopath = "/Users/bartlein/Projects/Calendar/PaleoCalAdjust/data/info_files/"    ! Mac path
-infofile = 'month_length_info.csv' ! "month_length_info.csv" !
+infopath = "/Projects/Calendar/data/info_files/"    ! Windows path
+!outpath = "/Users/bartlein/Projects/Calendar/PaleoCalAdjust/data/month_lengths/"  ! Mac path
+!infopath = "/Users/bartlein/Projects/Calendar/PaleoCalAdjust/data/info_files/"    ! Mac path
+infofile = "month_length_info.csv" ! 'month_length_info_PMIP4.csv' ! 
 
 ! open the info file, and loop over specified calendar tables
 ! past ages are negative, e.g. 21 ka = 21,000 cal yr BP = -21000, and 1950 CE = 0 cal yr BP = 0 here
@@ -145,11 +145,9 @@ do
                     continue
             end select
             write (1,'(i8,", ",i8,48(", ",f12.8),2(", ",f7.3),", ",i4)') &
-                iageBP(ii),iyearCE(ii),rmonlen(ii,1:nm),rmonmid(ii,1:nm), rmonbeg(ii,1:nm),rmonend(ii,1:nm), &
-                VE_day(ii),SS_day(ii),ndays(ii)
+                iageBP(ii),iyearCE(ii),rmonlen(ii,1:nm),rmonmid(ii,1:nm), rmonbeg(ii,1:nm),rmonend(ii,1:nm),VE_day(ii),SS_day(ii),ndays(ii)
             write (2,'(i8,", ",i8,48(", ",3x,i4),2(", ",f7.3),", ",i4)') &
-                iageBP(ii),iyearCE(ii),imonlen(ii,1:nm),imonmid(ii,1:nm), imonbeg(ii,1:nm),imonend(ii,1:nm), &
-                VE_day(ii),SS_day(ii),ndays(ii)
+                iageBP(ii),iyearCE(ii),imonlen(ii,1:nm),imonmid(ii,1:nm), imonbeg(ii,1:nm),imonend(ii,1:nm),VE_day(ii),SS_day(ii),ndays(ii)        
         end do
     end do
 

@@ -33,7 +33,7 @@ program cal_adjust_PMIP3
 ! Author: Patrick J. Bartlein, Univ. of Oregon (bartlein@uoregon.edu), with contributions by S.L. Shafer (sshafer@usgs.gov)
 !
 ! Version: 1.0c
-! Last update: 2019-02-22
+! Last update: 2019-02-22 
 
 use calendar_effects_subs
 use pseudo_daily_interp_subs
@@ -126,8 +126,8 @@ max_threads = max_threads - 2 ! to be able to do other things
 call omp_set_num_threads(max_threads)
 
 ! info files
-!infopath = "/Projects/Calendar/PaleoCalAdjust/data/info_files/" ! Windows path
-infopath = "/Users/bartlein/Projects/Calendar/PaleoCalAdjust/data/info_files/"  ! Mac path
+infopath = "/Projects/Calendar/PaleoCalAdjust/data/info_files/" ! Windows path
+!infopath = "/Users/bartlein/Projects/Calendar/PaleoCalAdjust/data/info_files/"  ! Mac path
 infofile = "cal_adj_info.csv"
 
 ! open the info file, and loop over specified calendar tables
@@ -206,8 +206,7 @@ do
     if (trim(time_freq) .ne. 'day') then
         write (*,'(a)') "0 ka month lengths for pseudo-daily interpolation..."
         call get_month_lengths(calendar_type, 0, 0, agestep, nages, begyrCE, nsimyrs, &
-            iageBP, iyearCE, imonlen_0ka, imonmid_0ka, imonbeg_0ka, imonend_0ka, rmonlen, rmonmid, rmonbeg, rmonend, &
-                VE_day, SS_day, ndays)
+            iageBP, iyearCE, imonlen_0ka, imonmid_0ka, imonbeg_0ka, imonend_0ka, rmonlen, rmonmid, rmonbeg, rmonend, VE_day, SS_day, ndays)
     end if
 
     ! paleo month lengths
