@@ -48,7 +48,7 @@ There are four folders:
 - ` /data/nc_files/PMIP4/adjusted/` (which contains month-length-adjusted CMIP6/PMIP4 files):
 
 		tas_Amon_IPSL-CM6A-LR_lig127k_r1i1p1f1_gr_185001-194912_cal_adj.nc
-		tas_Amon_IPSL-CM6A-LR_midHolocene_r1i1p1f2_gr_185001-204912_cal_adj.nc
+		tas_Amon_IPSL-CM6A-LR_midHolocene_r1i1p1f1_gr_185001-204912_cal_adj.nc
 
 Note that daily output files, e.g. "`tas_day_CCSM4_midHolocene_r1i1p1_10000101-10491231.nc`" are renamed to e.g. "`tas_Amon2_CCSM4_midHolocene_r1i1p1_10000101-10491231_cal_adj.nc`" after aggregating to monthly time-step data, using the file-name element `Amon2` to distinguish such files from standard monthly time-step files with the file-name element of `Amon`.
 
