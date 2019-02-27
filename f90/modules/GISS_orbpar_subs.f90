@@ -52,6 +52,7 @@ subroutine orbpar(year, eccen, obliq, omegvp)   ! year should be YearCE
     
 ! .f90 version of the ORBPAR() subroutine contained in
 !  https://data.giss.nasa.gov/ar5/SOLAR/ORBPAR.FOR downloaded 2017-09-04 17:17
+!  also retrievable from https://web.archive.org/web/20150920211936/http://data.giss.nasa.gov/ar5/solar.html
 ! 
 !  ORBPAR calculates the three orbital parameters as a function of
 !  YEAR.  The source of these calculations is: Andre L. Berger,

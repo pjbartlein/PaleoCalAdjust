@@ -2,6 +2,7 @@ program srevents
 ! f90 version of SREVENTS.FOR driver program
 ! subroutines based on GISS program SREVENTS.FOR -- Solar EVENTS each year    2003/10/22
 ! downloaded 2016-10-07 16:20
+! also retrieveable from https://web.archive.org/web/20150920211936/http://data.giss.nasa.gov/ar5/solar.html
     
 ! NOTE:  Year CE/AD = 0 is assumed to exist, and is equivalent to 1950 BP (-1950)
     

@@ -2,6 +2,7 @@ module GISS_srevents_subs
 ! subroutines based on
 ! SREVENTS.FOR    Solar EVENTS each year    2012/05/29
 ! https://data.giss.nasa.gov/ar5/SOLAR/SREVENTS.FOR downloaded 2017-09-12
+! also retrievable from https://web.archive.org/web/20150920211936/http://data.giss.nasa.gov/ar5/solar.html   
 ! conversion to .f90 by P.J. Bartlein
 
     implicit none

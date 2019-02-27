@@ -2,7 +2,8 @@ program giss_orbpar
 ! calls GISS subroutine ORBPAR(YEAR, ECCEN,OBLIQ,OMEGVP) to compute orbital parameters
 ! using Berger (1978) JAS 35:2362-2367 algorithm and tables
 ! https://data.giss.nasa.gov/ar5/SOLAR/ORBPAR.FOR downloCEed 2017-09-04 17:17
-
+! also retrievable from https://web.archive.org/web/20150920211936/http://data.giss.nasa.gov/ar5/solar.html
+    
 use GISS_orbpar_subs
 
 implicit none
