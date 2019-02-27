@@ -9,6 +9,8 @@ The programs implement an approach for adjusting for the "paleo calendar effect"
 
 Several minor modifications to the main program `cal_adjust_PMIP.f90` and its modules were made to accommodate CMIP6/PMIP4 files, the filenames of which contain an additional "grid_label" field not present in CMIP5/PMIP3 filenames.  Additionally, following a referee's suggestion, we replaced the approach for calculating month lengths using the approximation of Kutzbach and Gallimore (1988, J. Geophys. Res. 93(D1):803-821), with a direct approach based on Kepler's equation. This substitution of approaches had no practical significance.  Several other code modifications were made in the interests of transparency.
 
+This release (v1.0c) is consistent with the Author Comments (AC) in the GMDD paper discussion.
+
 The main changes from the original submission therefore include:
 
 - the main program `cal_adjust_PMIP3.f90` and module `CMIP5_netCDF_subs.f90` were renamed as `cal_adjust_PMIP.f90` and `CMIP_netCDF_subs.f90` respectivly, because they are now generic.  No changes were made to `CMIP_netCDF_subs.f90`, and only minor changes were made to `cal_adjust_PMIP.f90` to allow reading and writing of both CMIP5/PMIP3 and CMIP6/PMIP4 formatted files;
