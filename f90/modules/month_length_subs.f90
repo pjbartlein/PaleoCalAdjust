@@ -587,7 +587,7 @@ subroutine kepler_theta(eccen, M_angle, theta_deg)
     
     !! check
     !M = E - eccen * dsin(E)
-    !write (*,*) radians(dayangle), M
+    !write (*,*) radians(M_angle), M
     
     theta= 2.0d0 * datan(dsqrt((1.0d0 + eccen)/(1 - eccen)) * dtan(E/2.0d0))
     r = a * (1.0d0 - eccen**2) / (1.0d0 + eccen * dcos(theta))
