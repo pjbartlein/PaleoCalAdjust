@@ -549,33 +549,49 @@ subroutine kepler_theta(eccen, M_angle, theta_deg)
 
     implicit none
     
-    real(8), intent(in)     :: eccen            ! eccentricity
-    real(8), intent(in)     :: M_angle          ! mean anomaly (angle), degrees)
-    real(8), intent(out)    :: theta_deg        ! angular position along orbit (degrees)
+    real(8), intent(in)     :: eccen
+    real(8), intent(in)     :: M_angle          ! Mean anomaly, degrees)
+    real(8), intent(out)    :: theta_deg        ! true anomaly angular position along elliptical orbit (degrees)
     
-    real(8)                 :: M                ! mean anomaly
-    real(8)                 :: E                ! eccentric anomaly
+    real(8)                 :: M                ! Mean anomaly, radians
+    real(8)                 :: E                ! Eccentric anomaly, radians
     
     real(8)                 :: theta            ! angular position along orbit (radians)
-    real(8)                 :: alpha            ! mean anomaly
-    real(8)                 :: pi !, radians, degrees
+    real(8)                 :: pi
     real(8)                 :: a, r             ! semi-major axis length, polar-coordinate r (for plotting)
-    
-    integer(4)              :: n, nterms = 10
-    
+    real(8)                 :: tol = 1.0d-08
+    real(8)                 :: E_ratio, fE1, fE2
+
     pi=4.0d0*datan(1.0d0)
     a = 1.0d0
     
     M = radians(M_angle)
-    alpha = M
     
-    do n = 1,nterms
-        alpha = alpha + (2.0d0 / dble(n)) * bessel_jn(n, n*eccen) * dsin(dble(n)*M)
-    end do
+    ! Newton's method
+    ! initial value of E
+    if (M .lt. pi) then 
+        E = M + eccen/2.0d0
+    else
+        E = M - eccen/2.0d0
+    endif 
     
-    theta= 2.0d0 * datan(dsqrt((1.0d0 + eccen)/(1 - eccen)) * dtan(alpha/2.0d0))
+    ! iterate
+    E_ratio = 1.0d0
+    do while (dabs(E_ratio) .gt. tol)
+        fE1 = (E - eccen * dsin(E) - M)
+        fE2 = 1.0d0 - eccen * dcos(E)
+        E_ratio = fE1 / fE2
+        E = E - E_ratio
+        ! write (*,*) fE1, fE2, E_ratio, E
+    end do 
+    
+    !! check
+    !M = E - eccen * dsin(E)
+    !write (*,*) radians(dayangle), M
+    
+    theta= 2.0d0 * datan(dsqrt((1.0d0 + eccen)/(1 - eccen)) * dtan(E/2.0d0))
     r = a * (1.0d0 - eccen**2) / (1.0d0 + eccen * dcos(theta))
-    E =  M + eccen*dsin(alpha)
+
     theta_deg = degrees(theta)
     if (theta_deg .lt. 0.0d0) then
         theta_deg = theta_deg + 360.0d0
@@ -583,9 +599,10 @@ subroutine kepler_theta(eccen, M_angle, theta_deg)
         theta_deg = theta_deg
     end if
     
-    !write (*,'(" angle, M, alpha, theta, r, theta_deg, E: ",8(", ",f8.4))') angle, M, alpha, theta, r, theta_deg, E
+    !write (*,'(" dayangle, M, theta, r, theta_deg, E: ",8(", ",f8.4))') dayangle, M, theta, r, theta_deg, E
     
-    end subroutine kepler_theta
+end subroutine kepler_theta
+
 
 subroutine kepler_daylen(ndyr, yrlen, eccen, veqday, angle_perih_to_Jan1, tt_perih_to_veq, & 
     perih_angle_day, tt_day, t_day, daylen, start_day)
