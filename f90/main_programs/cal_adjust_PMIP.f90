@@ -206,7 +206,8 @@ do
     if (trim(time_freq) .ne. 'day') then
         write (*,'(a)') "0 ka month lengths for pseudo-daily interpolation..."
         call get_month_lengths(calendar_type, 0, 0, agestep, nages, begyrCE, nsimyrs, &
-            iageBP, iyearCE, imonlen_0ka, imonmid_0ka, imonbeg_0ka, imonend_0ka, rmonlen, rmonmid, rmonbeg, rmonend, VE_day, SS_day, ndays)
+            iageBP, iyearCE, imonlen_0ka, imonmid_0ka, imonbeg_0ka, imonend_0ka, rmonlen, &
+            rmonmid, rmonbeg, rmonend, VE_day, SS_day, ndays)
     end if
 
     ! paleo month lengths
