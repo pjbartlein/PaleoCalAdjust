@@ -46,7 +46,7 @@ subroutine copy_dims_and_glatts(ncid_in, ncid_out, addglattname, addglatt, nt, t
     character(*), intent(in)    :: comment
     integer(4), intent(out)     :: varid_out
 
-    real(8),allocatable         :: var1d(:), var2d(:,:)
+    real(8), allocatable        :: var1d(:), var2d(:,:) ! see select case() statements below for dimensions
     real(8)                     :: var0d
     integer(4)                  :: i, ii
     character(256)              :: attname
@@ -153,7 +153,7 @@ subroutine copy_dims_and_glatts(ncid_in, ncid_out, addglattname, addglatt, nt, t
                 allocate(var2d(dimlen(vardimids(i,1)), dimlen(vardimids(i,2))))
                 call check( nf90_get_var(ncid_in, varid_in, var2d) )
                 
-                ! if variable is time_bnds or climatology_bouns, replace the existing values with new ones
+                ! if variable is time_bnds or climatology_bnds, replace the existing values with new ones
                 if (varname(i) .eq. 'time_bnds') var2d=time_bnds
                 if (varname(i) .eq. 'climatology_bnds') var2d=time_bnds
                 call check( nf90_put_var(ncid_out, varid_out, var2d) )

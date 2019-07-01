@@ -55,9 +55,9 @@ subroutine GISS_srevents(year_type, iyear, EDAYzY, veqday, ssday, perihelion, ap
         (/ 31.0d0, 28.0d0, 31.0d0, 30.0d0, 31.0d0, 30.0d0, 31.0d0, 31.0d0, 30.0d0, 31.0d0, 30.0d0, 31.0d0 /)
     real(8)     :: nd_leap(nm) = &         ! present-day month lengths in 366-day (leap) year
         (/ 31.0d0, 29.0d0, 31.0d0, 30.0d0, 31.0d0, 30.0d0, 31.0d0, 31.0d0, 30.0d0, 31.0d0, 30.0d0, 31.0d0 /)
-    real(8)     :: accumday_noleap(nm) = &       ! present-day accumulated days lengths in 365-day (noleap) year
+    real(8)     :: accumday_noleap(nm) = &       ! present-day accumulated day lengths in 365-day (noleap) year
         (/  0.0d0, 31.0d0, 59.0d0, 90.0d0,120.0d0,151.0d0,181.0d0,212.0d0,243.0d0,273.0d0,304.0d0,334.0d0 /)
-    real(8)     :: accumday_leap(nm) = &         ! present-day accumulated days in 366-day (leap) year
+    real(8)     :: accumday_leap(nm) = &         ! present-day accumulated day lengths in 366-day (leap) year
         (/  0.0d0, 31.0d0, 60.0d0, 91.0d0,121.0d0,152.0d0,182.0d0,213.0d0,244.0d0,274.0d0,305.0d0,335.0d0 /)
 
 
@@ -67,7 +67,7 @@ subroutine GISS_srevents(year_type, iyear, EDAYzY, veqday, ssday, perihelion, ap
     ! NOTE:  Year CE/AD = 0 is assumed to exist, and is equivalent to 1950 BP (-1950)
     ! subroutine orbpar() expects real-valued YearCE, but converts to YearBP for calculations
     select case (year_type)
-    case ('CE', 'AD' , 'ce', 'ad')
+    case ('CE', 'AD', 'ce', 'ad')
         YearCE = iyear
         YearBP = iyear - 1950
     case ('BP', 'bp')
@@ -163,7 +163,7 @@ end subroutine GISS_srevents
 logical(4) function isleap(yearCE)
 ! is yearCE a leap year? -- no year zero or Gregorian-Julian adjustment
 
-    ! NOTE:  Year CE/AD = 0 is assumbed to exist, and is equivalent to 1950 BP (-1950)
+    ! NOTE:  Year CE/AD = 0 is assumed to exist, and is equivalent to 1950 BP (-1950)
 
     implicit none
 
@@ -198,22 +198,22 @@ real(8) function vernal (iyear, edayzy)
 ! SREVENTS.FOR    Solar EVENTS each year    2012/05/29
 ! https://data.giss.nasa.gov/ar5/SOLAR/SREVENTS.FOR downloaded 2017-09-12
 
-!  for a given year, vernal calculates an approximate time of vernal
-!  equinox in days measured from 2000 january 1, hour 0.
+!  For a given year, vernal calculates an approximate time of vernal
+!  equinox in days measured from 2000 January 1, hour 0.
 !
-!  vernal assumes that vernal equinoxes from one year to the next
+!  Vernal assumes that vernal equinoxes from one year to the next
 !  are separated by exactly 365.2425 days, a tropical year
-!  [explanatory supplement to the astronomical ephemeris].  if the
+!  [Explanatory Supplement to the Astronomical Ephemeris].  If the
 !  tropical year is 365.2422 days, as indicated by other references,
 !  then the time of the vernal equinox will be off by 2.88 hours in
 !  400 years.
 !
-!  time of vernal equinox for year 2000 a.d. is march 20, 7:36 gmt
-!  [nasa reference publication 1349, oct. 1994].  vernal assumes
-!  that vernal equinox for year 2000 will be on march 20, 7:30, or
-!  79.3125 days from 2000 january 1, hour 0.  vernal equinoxes for
+!  Time of vernal equinox for year 2000 A.D. is March 20, 7:36 GMT
+!  [NASA Reference Publication 1349, Oct. 1994].  Vernal assumes
+!  that vernal equinox for year 2000 will be on March 20, 7:30, or
+!  79.3125 days from 2000 January 1, hour 0.  Vernal equinoxes for
 !  other years returned by vernal are also measured in days from
-!  2000 january 1, hour 0.  79.3125 = 31 + 29 + 19 + 7.5/24.
+!  2000 January 1, hour 0.  79.3125 = 31 + 29 + 19 + 7.5/24.
 
     implicit none
 
