@@ -1,6 +1,6 @@
 Comparison of linear and harmonic pseudo-daily interpolation
 
-Example 1, Madison CFSR tas (Fig. S8a):
+Example 1, Madison CFSR tas (Fig. 15a):
            xm:    -6.770   -4.330    1.520    8.350   14.740   20.290   23.220   22.170   16.940   10.350    3.080   -4.290
 Weighted annual mean of input data:     8.843014
 
@@ -10,13 +10,13 @@ Linear interpolation (not mean preserving):
    difference:     0.626    0.458    0.126    0.028   -0.082   -0.269   -0.497   -0.544   -0.240   -0.115   -0.103    0.611
 Annual mean of interpolated data:     8.840699    Difference:    0.002315
 
-Mean-preserving (harmoninc) interpolation (Epstein, 1991):
+Mean-preserving (harmonic) interpolation (Epstein, 1991):
            xm:    -6.770   -4.330    1.520    8.350   14.740   20.290   23.220   22.170   16.940   10.350    3.080   -4.290
   xm_harmonic:    -6.770   -4.330    1.520    8.350   14.740   20.290   23.220   22.170   16.940   10.350    3.080   -4.290
    difference:    -0.000   -0.000   -0.000    0.000    0.000    0.000    0.000    0.000    0.000    0.000    0.000   -0.000
 Annual mean of interpolated data:     8.843013    Difference:    0.000001
 
-Example 2, Australia CFSR tas (Fig. S8b):
+Example 2, Australia CFSR tas (Fig. 15b):
            xm:    25.320   24.930   22.630   19.730   16.170   13.000   12.380   14.040   17.360   19.780   22.520   24.040
 Weighted annual mean of input data:    19.291781
 
@@ -26,13 +26,13 @@ Linear interpolation (not mean preserving):
    difference:    -0.207   -0.244   -0.077   -0.121    0.036    0.290    0.285    0.221   -0.075    0.051   -0.124   -0.030
 Annual mean of interpolated data:    19.294274    Difference:   -0.002493
 
-Mean-preserving (harmoninc) interpolation (Epstein, 1991):
+Mean-preserving (harmonic) interpolation (Epstein, 1991):
            xm:    25.320   24.930   22.630   19.730   16.170   13.000   12.380   14.040   17.360   19.780   22.520   24.040
   xm_harmonic:    25.320   24.930   22.630   19.730   16.170   13.000   12.380   14.040   17.360   19.780   22.520   24.040
    difference:     0.000    0.000    0.000    0.000   -0.000   -0.000   -0.000   -0.000    0.000   -0.000    0.000   -0.000
 Annual mean of interpolated data:    19.291782    Difference:   -0.000001
 
-Example 3, Madison CMAP precip (Fig. S8c):
+Example 3, Madison CMAP precip (Fig. 15c):
            xm:     0.900    0.980    1.570    2.490    2.710    3.350    3.070    3.160    2.700    2.070    1.960    1.170
 Weighted annual mean of input data:     2.182438
 
@@ -42,13 +42,13 @@ Linear interpolation (not mean preserving):
    difference:     0.043    0.065    0.043   -0.079    0.055   -0.111    0.046   -0.071   -0.028    0.064   -0.089    0.065
 Annual mean of interpolated data:     2.183116    Difference:   -0.000678
 
-Mean-preserving (harmoninc) interpolation (Epstein, 1991):
+Mean-preserving (harmonic) interpolation (Epstein, 1991):
            xm:     0.900    0.980    1.570    2.490    2.710    3.350    3.070    3.160    2.700    2.070    1.960    1.170
   xm_harmonic:     0.900    0.980    1.570    2.490    2.710    3.350    3.070    3.160    2.700    2.070    1.960    1.170
    difference:    -0.000   -0.000   -0.000    0.000   -0.000    0.000   -0.000    0.000    0.000   -0.000    0.000   -0.000
 Annual mean of interpolated data:     2.182439    Difference:   -0.000000
 
-Example 4, Indian Ocean CMAP precip (pathological precipitation case) (Fig. S8d):
+Example 4, Indian Ocean CMAP precip (pathological precipitation case) (Fig. 15d):
            xm:     0.210    0.070    0.030    0.090    2.530    8.230    2.000    1.090    1.730    2.230    2.480    1.020
 Weighted annual mean of input data:     1.808959
 
@@ -64,7 +64,7 @@ Harmonic (Epstein, 1991) interpolation (mean preserving):
    difference:     0.000    0.002    0.007    0.007    0.000    0.000    0.000    0.000    0.000    0.000    0.000    0.000
 Annual mean of interpolated data:     1.810341    Difference:   -0.001382
 
-Example 5,  pre with zeros (Not in Fig. S8):
+Example 5,  pre with zeros (Not in Fig. 15):
            xm:    44.000   60.000  182.000  103.000    7.000    0.000    0.000    0.000    6.000   36.000   78.000   66.000
 Weighted annual mean of input data:    48.424658
 
