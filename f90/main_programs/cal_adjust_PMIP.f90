@@ -1,16 +1,16 @@
-program cal_adjust_PMIP3
-! Calculates calendar (month-leghth) adjustments of data in a CMIP/PMIP-formatted netCDF file.
+program cal_adjust_PMIP
+! Calculates calendar (month-length) adjustments of data in a CMIP/PMIP-formatted netCDF file.
 ! Creates a new netCDF file by copying dimension variables and global attributes from the input file.
 ! This version supports 3-D (longitude, latitude, time) long-term mean (AClim), monthly (Amon) or daily input files.
 
-! The program requires the modules: calendar_effects_subs.f90, CMIP5_netCDF_subs.f90, GISS_orbpar_subs.f90,
+! The program requires the modules: calendar_effects_subs.f90, CMIP_netCDF_subs.f90, GISS_orbpar_subs.f90,
 ! GISS_srevents_subs.f90, month_length_subs.f90 and pseudo_daily_interp_subs.f90
 ! The program must be compiled with local netCDF support, and it will use OpenMP if available
 
 ! An info .csv file (with an appropriate header) containing the following information is read:
 ! activity      :: (string) PMIP3 or PMIP4
 ! variable      :: (string) CMIP/PMIP variable name (e.g. "tas", "pr")
-! time_freq     :: (string) CMIP/PMIP output time-frequency type (e.g. "Amon", "Aclim",'...)
+! time_freq     :: (string) CMIP/PMIP output time-frequency type (e.g. "Amon", "Aclim",...)
 ! model         :: (string) CMIP/PMIP model name
 ! experiment    :: (string) CMIP/PMIP experiment name (e.g. "midHolocene")
 ! ensemble      :: (string) CMIP/PMIP ensemble member code (e.g. "r1i1p1")
@@ -23,7 +23,7 @@ program cal_adjust_PMIP3
 ! begageBP      :: (integer) beginning simulation age (year BP) (e.g. 21000 (= 21 ka)
 ! endageBP      :: (integer) ending simulation age (year BP) 
 ! agestep       :: (integer) interval between age calculations
-! begyrCE       :: (integer) beginning calendar year of simulation for multi-year simulations at each agedd
+! begyrCE       :: (integer) beginning calendar year of simulation for multi-year simulations at each age
 ! nsimyrs       :: (integer) number of calendar years
 ! source_path   :: (string) path to (input) source files (enclosed in quotation marks)
 ! adjusted_path :: (string) path to (output) adjusted files (enclosed in quotation marks)
@@ -32,8 +32,8 @@ program cal_adjust_PMIP3
 
 ! Author: Patrick J. Bartlein, Univ. of Oregon (bartlein@uoregon.edu), with contributions by S.L. Shafer (sshafer@usgs.gov)
 !
-! Version: 1.0c
-! Last update: 2019-02-27 
+! Version: 1.0d
+! Last update: 2019-07-01 (removed extra debugging write statements) 
 
 use calendar_effects_subs
 use pseudo_daily_interp_subs
@@ -49,75 +49,80 @@ integer(4)              :: begageBP             ! beginning year (BP) (negative,
 integer(4)              :: endageBP             ! ending year (BP)
 integer(4)              :: agestep              ! age step size
 integer(4)              :: nages                ! number of simulation ages
-integer(4), allocatable :: iageBP(:)            ! year BP 1950 (negative, e.g. 1900 CE = -50 years BP 1950)
+integer(4), allocatable :: iageBP(:)            ! (ny) year BP 1950 (negative, e.g. 1900 CE = -50 years BP 1950)
 
-! simulation year-related variables (controls of VE_day and leap-year status)
+! simulation year-related variables (controls of vernal equinox day and leap-year status)
 integer(4)              :: begyrCE              ! beginning (pseudo-) year of individual model simulation
 integer(4)              :: nsimyrs              ! number of years of simulation
-integer(4), allocatable :: iyearCE(:)           ! yearCE simulation year (e.g. 1850CE, 850CE, etc.)
+integer(4), allocatable :: iyearCE(:)           ! (ny) yearCE simulation year (e.g. 1850CE, 850CE, etc.)
 
 ! month-length variables
-integer(4), allocatable :: imonlen_0ka(:,:),imonmid_0ka(:,:)    ! integer-value month lengths and mid days-- 0ka
-integer(4), allocatable :: imonbeg_0ka(:,:),imonend_0ka(:,:)    ! integer-value month beginning and ending days -- 0ka
-integer(4), allocatable :: imonlen(:,:),imonmid(:,:)    ! integer-value month lengths and mid days (paleo)
-integer(4), allocatable :: imonbeg(:,:),imonend(:,:)    ! integer-value month beginning and ending days (paleo)
-real(8), allocatable    :: rmonlen(:,:),rmonmid(:,:)    ! real-value month lengths and mid days (paleo)
-real(8), allocatable    :: rmonbeg(:,:),rmonend(:,:)    ! real-value month beginning and ending days (paleo)
-real(8), allocatable    :: VE_day(:)                    ! vernal equinox day in simulation year
-real(8), allocatable    :: SS_day(:)                    ! (northern) summer solstice day in simulation year
-integer(4), allocatable :: ndays(:)                     ! number of days in year
+integer(4), allocatable :: imonlen_0ka(:,:)     ! (ny,nm) integer-value month lengths -- 0ka
+integer(4), allocatable :: imonmid_0ka(:,:)     ! (ny,nm) integer-value mid days -- 0ka
+integer(4), allocatable :: imonbeg_0ka(:,:)     ! (ny,nm) integer-value month beginning days -- 0ka
+integer(4), allocatable :: imonend_0ka(:,:)     ! (ny,nm) integer-value month ending days -- 0ka
+integer(4), allocatable :: imonlen(:,:)         ! (ny,nm) integer-value month lengths (paleo)
+integer(4), allocatable :: imonmid(:,:)         ! (ny,nm) integer-value mid days (paleo)
+integer(4), allocatable :: imonbeg(:,:)         ! (ny,nm) integer-value month beginning (paleo)
+integer(4), allocatable :: imonend(:,:)         ! (ny,nm) integer-value month ending days (paleo)
+real(8), allocatable    :: rmonlen(:,:)         ! (ny,nm) real-value month lengths (paleo)
+real(8), allocatable    :: rmonmid(:,:)         ! (ny,nm) real-value mid days (paleo)
+real(8), allocatable    :: rmonbeg(:,:)         ! (ny,nm) real-value month beginning (paleo)
+real(8), allocatable    :: rmonend(:,:)         ! (ny,nm) real-value month ending days (paleo)
+real(8), allocatable    :: VE_day(:)            ! (ny) vernal equinox day in simulation year
+real(8), allocatable    :: SS_day(:)            ! (ny) (northern) summer solstice day in simulation year
+integer(4), allocatable :: ndays(:)             ! (ny) number of days in year
 
-integer(4), allocatable :: imonlen_0ka_ts(:)            ! integer-value month lengths at present as time series
-real(8), allocatable    :: rmonmid_ts(:)                ! real-value paleo month mid days as time series
-real(8), allocatable    :: rmonbeg_ts(:)                ! real-value paleo month beginning days as time series
-real(8), allocatable    :: rmonend_ts(:)                ! real-value paleo month ending as time series
-integer(4), allocatable :: imonmid_ts(:)                ! integer-value paleo month mid days as time series
-integer(4), allocatable :: imonbeg_ts(:)                ! integer-value paleo month beginning days as time series
-integer(4), allocatable :: imonend_ts(:)                ! integer-value paleo month ending as time series
-integer(4), allocatable :: ndays_ts(:)                  ! integer-value times series of paleo year lengths
-character(256)          :: time_comment                 ! source fo new monthly time values
-real(8), allocatable    :: mon_time(:)                  ! new monthly time values for daily-input files
-real(8), allocatable    :: mon_time_bnds(:,:)           ! new monthly time-bounds values for daily input files
+integer(4), allocatable :: imonlen_0ka_ts(:)    ! (nt) integer-value month lengths at present as time series
+real(8), allocatable    :: rmonmid_ts(:)        ! (nt) real-value paleo month mid days as time series
+real(8), allocatable    :: rmonbeg_ts(:)        ! (nt) real-value paleo month beginning days as time series
+real(8), allocatable    :: rmonend_ts(:)        ! (nt) real-value paleo month ending as time series
+integer(4), allocatable :: imonmid_ts(:)        ! (nt) integer-value paleo month mid days as time series
+integer(4), allocatable :: imonbeg_ts(:)        ! (nt) integer-value paleo month beginning days as time series
+integer(4), allocatable :: imonend_ts(:)        ! (nt) integer-value paleo month ending as time series
+integer(4), allocatable :: ndays_ts(:)          ! (nt) integer-value times series of paleo year lengths
+character(256)          :: time_comment         ! source of new monthly time values
+real(8), allocatable    :: mon_time(:)          ! (nt) new monthly time values for daily-input files
+real(8), allocatable    :: mon_time_bnds(:,:)   ! (2,nt) new monthly time-bounds values for daily input files
 
 ! other names
-character(32)           :: calendar_type                ! calendar type
+character(32)           :: calendar_type        ! calendar type
 
 ! components of file names
-character(8)            :: activity                     ! PMIP version (PMIP3 or PMIP4)
-character(64)           :: variable                     ! variable name
-character(8)            :: time_freq                    ! type of CMIP/PMIP time frequency (e.g. Aclim, Amon, day, etc.)
-character(8)            :: time_freq_output             ! time_freq output label
-character(64)           :: model                        ! model name
-character(64)           :: experiment                   ! experiment name
-character(16)           :: ensemble                     ! ensemble designator
-character(64)           :: grid_label                   ! grid type (PMIP4 only)
-character(8)            :: begdate, enddate             ! string beginning and ending dates of simulation
-character(32)           :: suffix                       ! file name suffix (e.g. "-clim")
-character(32)           :: adj_name                     ! adjustment name (e.g. "_adj")
+character(8)            :: activity             ! PMIP version (PMIP3 or PMIP4)
+character(64)           :: variable             ! variable name
+character(8)            :: time_freq            ! type of CMIP/PMIP time frequency (e.g. Aclim, Amon, day, etc.)
+character(8)            :: time_freq_output     ! time_freq output label
+character(64)           :: model                ! model name
+character(64)           :: experiment           ! experiment name
+character(16)           :: ensemble             ! ensemble designator
+character(64)           :: grid_label           ! grid type (PMIP4 only)
+character(8)            :: begdate, enddate     ! string beginning and ending dates of simulation
+character(32)           :: suffix               ! file name suffix (e.g. "-clim")
+character(32)           :: adj_name             ! adjustment name (e.g. "_adj")
 
 ! data
-integer(4)              :: nlon, nlat, ny, nt           ! number of longitudes, latitudes, years, obs nt = ny*nm
-integer(4)              :: ndtot,ndtot_0ka,ndyr         ! total number of days
-real(4), allocatable    :: var3d_in(:,:,:)              ! input data (nlon x nlat x nt)
-real(4), allocatable    :: var3d_out(:,:,:)             ! output adjusted data (nlon x nlat x nt)
-real(8), allocatable    :: xdh(:,:)                     ! pseudo- or actual daily data (lat x ndtot)
-real(8), allocatable    :: var3d_adj(:,:)               ! adjusted data (nlat x nt)
-real(8)                 :: vfill                        ! fill value
+integer(4)              :: nlon, nlat, ny, nt   ! number of longitudes, latitudes, years, obs nt = ny*nm
+integer(4)              :: ndtot,ndtot_0ka,ndyr ! total number of days
+real(4), allocatable    :: var3d_in(:,:,:)      ! (nlon,nlat,nd or ndtot) input data 
+real(4), allocatable    :: var3d_out(:,:,:)     ! (nlon,nlat,nt) output adjusted data 
+real(8), allocatable    :: xdh(:,:)             ! (nlat,ndtot) pseudo- or actual daily data
+real(8), allocatable    :: var3d_adj(:,:)       ! (nlat,nt) adjusted data 
+real(8)                 :: vfill                ! fill value
 
 ! smoothing parameters for multi-year pseudo-daily interpolation
-integer(4)              :: nw_tmp=21, nsw_tmp=20        ! smoothing parameters
+integer(4)              :: nw_tmp=21, nsw_tmp=20    ! smoothing parameters
 logical                 :: smooth=.true., restore=.true.
-logical                 :: no_negatives = .false.       ! restrict pseudo-daily interpolated values to positive values?
+logical                 :: no_negatives = .false.   ! restrict pseudo-daily interpolated values to positive values?
 
-integer(4)              :: n,m,j,k,i                    ! indices
-integer(4)              :: max_threads                  ! if OpenMP enabled
-integer(4)              :: iostatus                     ! IOSTAT value
+integer(4)              :: n,m,j,k,i            ! indices
+integer(4)              :: max_threads          ! if OpenMP enabled
+integer(4)              :: iostatus             ! IOSTAT value
 
 ! file paths and names
 character(2048)         :: source_path, ncfile_in, adjusted_path, ncfile_out, nc_fname, infopath
-!character(2084)         :: debugpath, debugfile
 character(64)           :: infofile
-character(1)            :: csvheader                            ! info .csv file header
+character(1)            :: csvheader            ! info .csv file header
 
 ! if OpenMP enabled
 max_threads = omp_get_max_threads()
@@ -206,8 +211,8 @@ do
     if (trim(time_freq) .ne. 'day') then
         write (*,'(a)') "0 ka month lengths for pseudo-daily interpolation..."
         call get_month_lengths(calendar_type, 0, 0, agestep, nages, begyrCE, nsimyrs, &
-            iageBP, iyearCE, imonlen_0ka, imonmid_0ka, imonbeg_0ka, imonend_0ka, rmonlen, &
-            rmonmid, rmonbeg, rmonend, VE_day, SS_day, ndays)
+            iageBP, iyearCE, imonlen_0ka, imonmid_0ka, imonbeg_0ka, imonend_0ka, rmonlen, rmonmid, rmonbeg, rmonend, &
+                VE_day, SS_day, ndays)
     end if
 
     ! paleo month lengths
@@ -238,7 +243,7 @@ do
     end do
     write (*,'("ny, nt, ndtot: ",4i8)') ny, nt, ndtot, ndtot_0ka
     
-    ! Step 3:  Open input and output netCDF files, and a debug file
+    ! Step 3:  Open input and create output netCDF files
 
     ! input netCDF file
     write (*,'(a)') trim(source_path)
@@ -252,10 +257,6 @@ do
     print '(" nc_fname (out) = ",a)', trim(nc_fname)
     call check( nf90_create(nc_fname, 0, ncid_out) )
     if (nc_print) print '("  ncid_put = ",i8)', ncid_out
-    
-    !debugpath=trim(adjusted_path)
-    !debugfile=trim(model)//"_"//trim(experiment)//"_debug_cal_adjust.dat"
-    !open (10, file=trim(debugpath)//trim(debugfile))
     
     ! Step 4:  Redefine the time-coordinate variable
 
@@ -321,7 +322,7 @@ do
         !$omp parallel do
         do k=1,nlat
             !write (*,'(/2i5)') j,k
-            ! unless the input data is daily, do pseudo-daily interpolation of the monthly input data
+            ! unless the input data are daily, do pseudo-daily interpolation of the monthly input data
             if (trim(time_freq) .ne. 'day') then
                 ! interpolate
                 call mon_to_day_ts(nt, imonlen_0ka_ts, dble(var3d_in(j,k,:)), dble(vfill), &
@@ -329,7 +330,7 @@ do
                 ! reaggregate daily data using correct calendar
                 call day_to_mon_ts(ny,ndays,rmonbeg,rmonend,ndtot,xdh(k,:),dble(vfill),var3d_adj(k,:))
             else
-                ! input data is daily, just reaggregate using correct calendar
+                ! input data are already daily, so just reaggregate using correct calendar
                 call day_to_mon_ts(ny,ndays,rmonbeg,rmonend,ndtot,xdh(k,:),dble(vfill),var3d_adj(k,:))
             end if
 

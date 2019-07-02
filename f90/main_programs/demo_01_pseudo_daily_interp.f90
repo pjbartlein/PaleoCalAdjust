@@ -17,7 +17,7 @@ logical             :: debug_write=.true.
 
 debug_unit=10; out_unit=1
 if (debug_write) open (10, file="/Projects/Calendar/data/work01/debug_pseudo_daily.csv")
-open (out_unit, file="/Projects/Calendar/PaleoCalAdjust/data/figure_data/pseudo_daily_plots/FigS08.dat")
+open (out_unit, file="/Projects/Calendar/PaleoCalAdjust/data/figure_data/pseudo_daily_plots/Fig15.dat")
 
 write (out_unit,'(a)') "Comparison of linear and harmonic pseudo-daily interpolation"
 
@@ -29,7 +29,7 @@ data imonlen /31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31/
 xm = (/ -6.77, -4.33, 1.52, 8.35, 14.74, 20.29, 23.22, 22.17, 16.94, 10.35, 3.08, -4.29/)
 
 ! write out the monthly "control" data
-write (out_unit,'(/a)') "Example 1, Madison CFSR tas (Fig. S8a):"
+write (out_unit,'(/a)') "Example 1, Madison CFSR tas (Fig. 15a):"
 write (out_unit,'("           xm: ",12f9.3)') xm(1:nm)
 
 ! weighted annual mean of monthly input
@@ -47,7 +47,7 @@ call ann_mean(nd, xd_linear, xann_linear)
 write (out_unit,'("Annual mean of interpolated data: ", f12.6, "    Difference:", f12.6)') xann_linear, xann-xann_linear
 
 ! mean-preserving (harmonic) interpolation (Epstein, 1991) 
-write (out_unit,'(/a)') "Mean-preserving (harmoninc) interpolation (Epstein, 1991):"
+write (out_unit,'(/a)') "Mean-preserving (harmonic) interpolation (Epstein, 1991):"
 no_negatives = .false.
 call  hdaily(nm, nd, xm, imonlen, no_negatives, xd_harmonic)
 call monmean(nm, nd, imonlen, xd_harmonic, xm_harmonic)
@@ -62,7 +62,7 @@ write (out_unit,'("Annual mean of interpolated data: ", f12.6, "    Difference:"
 xm = (/ 25.320, 24.930, 22.630, 19.730, 16.170, 13.000, 12.380, 14.040, 17.360, 19.780, 22.520, 24.040/)
 
 ! write out the monthly "control" data
-write (out_unit,'(/a)') "Example 2, Australia CFSR tas (Fig. S8b):"
+write (out_unit,'(/a)') "Example 2, Australia CFSR tas (Fig. 15b):"
 write (out_unit,'("           xm: ",12f9.3)') xm(1:nm)
 
 ! weighted annual mean of monthly input
@@ -80,7 +80,7 @@ call ann_mean(nd, xd_linear, xann_linear)
 write (out_unit,'("Annual mean of interpolated data: ", f12.6, "    Difference:", f12.6)') xann_linear, xann-xann_linear
 
 ! mean-preserving (harmonic) interpolation (Epstein, 1991) 
-write (out_unit,'(/a)') "Mean-preserving (harmoninc) interpolation (Epstein, 1991):"
+write (out_unit,'(/a)') "Mean-preserving (harmonic) interpolation (Epstein, 1991):"
 no_negatives = .false.
 call  hdaily(nm, nd, xm, imonlen, no_negatives, xd_harmonic)
 call monmean(nm, nd, imonlen, xd_harmonic, xm_harmonic)
@@ -95,7 +95,7 @@ write (out_unit,'("Annual mean of interpolated data: ", f12.6, "    Difference:"
 xm = (/ 0.900, 0.980, 1.570, 2.490, 2.710, 3.350, 3.070, 3.160, 2.700, 2.070, 1.960, 1.170 /)
 
 ! write out the monthly "control" data
-write (out_unit,'(/a)') "Example 3, Madison CMAP precip (Fig. S8c):"
+write (out_unit,'(/a)') "Example 3, Madison CMAP precip (Fig. 15c):"
 write (out_unit,'("           xm: ",12f9.3)') xm(1:nm)
 
 ! weighted annual mean of monthly input
@@ -113,7 +113,7 @@ call ann_mean(nd, xd_linear, xann_linear)
 write (out_unit,'("Annual mean of interpolated data: ", f12.6, "    Difference:", f12.6)') xann_linear, xann-xann_linear
 
 ! mean-preserving (harmonic) interpolation (Epstein, 1991) 
-write (out_unit,'(/a)') "Mean-preserving (harmoninc) interpolation (Epstein, 1991):"
+write (out_unit,'(/a)') "Mean-preserving (harmonic) interpolation (Epstein, 1991):"
 no_negatives = .false.
 call  hdaily(nm, nd, xm, imonlen, no_negatives, xd_harmonic)
 call monmean(nm, nd, imonlen, xd_harmonic, xm_harmonic)
@@ -128,7 +128,7 @@ write (out_unit,'("Annual mean of interpolated data: ", f12.6, "    Difference:"
 xm = (/ 0.21, 0.07, 0.03, 0.09, 2.53, 8.23, 2.0, 1.09, 1.73, 2.23, 2.48, 1.02/)
 
 ! write out the monthly "control" data
-write (out_unit,'(/a)') "Example 4, Indian Ocean CMAP precip (pathological precipitation case) (Fig. S8d):"
+write (out_unit,'(/a)') "Example 4, Indian Ocean CMAP precip (pathological precipitation case) (Fig. 15d):"
 write (out_unit,'("           xm: ",12f9.3)') xm(1:nm)
 
 ! weighted annual mean of monthly input
@@ -162,7 +162,7 @@ write (out_unit,'("Annual mean of interpolated data: ", f12.6, "    Difference:"
 xm = (/ 44., 60.,  182.,  103.,  7.,  0.,  0.,  0.,  6., 36., 78., 66./)
 
 ! write out the monthly "control" data
-write (out_unit,'(/a)') "Example 5,  pre with zeros (Not in Fig. S8):"
+write (out_unit,'(/a)') "Example 5,  pre with zeros (Not in Fig. 15):"
 write (out_unit,'("           xm: ",12f9.3)') xm(1:nm)
 
 ! weighted annual mean of monthly input

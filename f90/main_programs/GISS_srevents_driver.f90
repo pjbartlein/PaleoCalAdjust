@@ -91,6 +91,8 @@ GO TO 999
 ! 981 format (a / a)
 999 continue
     
+write (*,'(a)') "Done (GISS_srevents_driver)"
+    
 end program srevents 
 
 

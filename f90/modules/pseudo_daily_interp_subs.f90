@@ -36,10 +36,10 @@ subroutine hdaily(nm,nd,xm,monlen,no_negatives,xdh)
 end subroutine hdaily
 
 subroutine harmonic_coeffs(nm,y,a,b)
-! calculates a's and b's of an "adjusted" harmonic fit to monthly values of a variable,
-! which preserves the monthly (and annual) mean values by interpolatred daily values
-! adapted from Epstein, E.S. (1991) On obtaining daily climatological values from monthly means
-! J. Climate 4:365-368
+! Calculates a's and b's of an "adjusted" harmonic fit to monthly values of a variable,
+! which preserves the monthly (and annual) mean values by interpolated daily values
+! adapted from Epstein (1991, On obtaining daily climatological values from monthly means,
+! J. Climate 4:365-368).
 
     implicit none
     
@@ -102,9 +102,9 @@ subroutine harmonic_coeffs(nm,y,a,b)
 end subroutine harmonic_coeffs
 
 subroutine xdhat(nm,nd,monlen,a,b,yhat)
-! calculates/interpolates pseudo-daily values of variable using the a's and b's from harmonic_coeffs()
-! adapted from Epstein, E.S. (1991) On obtaining daily climatological values from monthly means
-! J. Climate 4:365-368
+! Calculates/interpolates pseudo-daily values of variable using the a's and b's from harmonic_coeffs()
+! adapted from Epstein (1991, On obtaining daily climatological values from monthly means,
+! J. Climate 4:365-368).
 
     implicit none
     
@@ -136,7 +136,7 @@ subroutine xdhat(nm,nd,monlen,a,b,yhat)
 end subroutine xdhat
 
 subroutine dayinterp(nm,nd,monlen,zm,zd)
-! interpolate pseudo-daily values of monthly data.  Not mean-preserving.
+! Interpolate pseudo-daily values of monthly data.  Not mean-preserving.
 
     implicit none
     
@@ -234,9 +234,9 @@ subroutine midmonth_real(nm,veq_mon,veq_midmon_day,rmonlen,rmidmon,rmonbeg,rmone
     
     logical                 :: debug_write = .false.
     
-    ! midmonth target values (NOTE:  first month is Jan)
-    ! first month is Jan: 0ka equinox:  31.0+28.0+21.5 = 80.5; 0ka March midmonth day:  31.0+28.0+15.5 = 74.5
-    ! first month is Dec: 0ka equinox:  31.0+31.0+28.0+21.5 = 111.5; 0ka March midmonth day:  31.0+31.0+28.0+15.5 = 105.5
+    ! midmonth target values 
+    ! if first month is Jan: 0ka equinox:  31.0+28.0+21.5 = 80.5; 0ka March midmonth day:  31.0+28.0+15.5 = 74.5
+    ! if first month is Dec: 0ka equinox:  31.0+31.0+28.0+21.5 = 111.5; 0ka March midmonth day:  31.0+31.0+28.0+15.5 = 105.5
     
     rmidmon(veq_mon)=veq_midmon_day ! fixed March midmonth relative to noleap VE
     rmonbeg(veq_mon)=rmidmon(veq_mon)-(rmonlen(veq_mon)/2.0d0)

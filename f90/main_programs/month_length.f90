@@ -1,12 +1,16 @@
 program month_length
 ! Calculates the length of months under different paleo calendars, using 
-! - orbital-element parameters calculated by GISS orbpar.for (https://data.giss.nasa.gov/ar5/SOLAR/ORBPAR.FOR) using 
-!   Berger (1978) JAS 35:2362-2367 algorithm and tables;
+! - orbital-element parameters calculated by GISS ORBPAR.FOR (https://data.giss.nasa.gov/ar5/SOLAR/ORBPAR.FOR) using 
+!   Berger (1978, JAS 35:2362-2367) algorithm and tables;
 ! - "solar events" (i.e. vernal equinox day) calculated by GISS SREVENTS.FOR (https://data.giss.nasa.gov/ar5/SOLAR/SREVENTS.FOR)
 !   (Orbital-element parameter calculations are thought to be valid over the past and future 1.0 Myr)
-! - generalization of the 360-day month-length algorithm from Kutzbach and Gallimore (1988) JGR 93(D1):803-821.
+! - generalization of the 360-day month-length algorithm from Kutzbach and Gallimore (1988, JGR 93(D1):803-821), and
+! - application of Kepler's "travel time" or "time-of-flight" equation, after
+!   Curtis, H.D. (2014, Orbital Mechanics for Engineering Students, Elsevier, Ch. 3).
    
 ! The program requires the modules month_length_subs.f90, GISS_orbpar_subs.f90 and GISS_srevents_subs.f90
+! GISS_orbpar_subs.f90 and GISS_srevents_subs.f90 are based on GISS ORBPAR.FOR and SREVENTS.FOR, which are retrievable from:
+! https://web.archive.org/web/20150920211936/http://data.giss.nasa.gov/ar5/solar.html
 
 ! An info .csv file (with an appropriate header) containing the following information is read:
 ! prefix        :: (string) a short name for the output month-length table
@@ -19,8 +23,8 @@ program month_length
     
 ! Author: Patrick J. Bartlein, Univ. of Oregon (bartlein@uoregon.edu), with contributions by S.L. Shafer (sshafer@usgs.gov)
 !
-! Version: 1.0c
-! Last update: 2019-02-27 
+! Version: 1.0d
+! Last update: 2019-07-01
 
 use month_length_subs
     
@@ -31,21 +35,21 @@ integer(4)              :: begageBP             ! beginning year (BP) (negative,
 integer(4)              :: endageBP             ! ending year (BP) 
 integer(4)              :: agestep              ! age step size
 integer(4)              :: nages                ! number of simulation ages 
-integer(4), allocatable :: iageBP(:)            ! year BP 1950 (negative, e.g. 1900 CE = -50 years BP 1950)
+integer(4), allocatable :: iageBP(:)            ! (nages*nsimyrs) year BP 1950 (negative, e.g. 1900 CE = -50 years BP 1950)
 
-! individual model simulation year-related variables (controls VE_day and leap-year status)
+! individual model simulation year-related variables (controls vernal equinox day and leap-year status)
 integer(4)              :: begyrCE              ! beginning (pseudo-) year of individual model simulation
 integer(4)              :: nsimyrs              ! number of years of simulation
-integer(4), allocatable :: iyearCE(:)           ! yearCE simulation year (e.g. 1850CE, 850CE, etc.)
+integer(4), allocatable :: iyearCE(:)           ! (nages*nsimyrs) yearCE simulation year (e.g. 1850CE, 850CE, etc.)
 
 ! month-length variables
-integer(4), allocatable :: imonlen(:,:),imonmid(:,:)    ! integer-value month lengths and mid days
-integer(4), allocatable :: imonbeg(:,:),imonend(:,:)    ! integer-value month beginning and ending days 
-real(8), allocatable    :: rmonlen(:,:),rmonmid(:,:)    ! real-value month lengths and mid days 
-real(8), allocatable    :: rmonbeg(:,:),rmonend(:,:)    ! real-value month beginning and ending days 
-real(8), allocatable    :: VE_day(:)                    ! vernal equinox day in simulation year
-real(8), allocatable    :: SS_day(:)                    ! (northern) summer solstice day in simulation year
-integer(4), allocatable :: ndays(:)                     ! number of days in year
+integer(4), allocatable :: imonlen(:,:),imonmid(:,:)    ! (nages*nsimyrs,nm) integer-value month lengths and mid days
+integer(4), allocatable :: imonbeg(:,:),imonend(:,:)    ! (nages*nsimyrs,nm) integer-value month beginning and ending days 
+real(8), allocatable    :: rmonlen(:,:),rmonmid(:,:)    ! (nages*nsimyrs,nm) real-value month lengths and mid days 
+real(8), allocatable    :: rmonbeg(:,:),rmonend(:,:)    ! (nages*nsimyrs,nm) real-value month beginning and ending days 
+real(8), allocatable    :: VE_day(:)                    ! (nages*nsimyrs) vernal equinox day in simulation year
+real(8), allocatable    :: SS_day(:)                    ! (nages*nsimyrs) (northern) summer solstice day in simulation year
+integer(4), allocatable :: ndays(:)                     ! (nages*nsimyrs) number of days in year
 
 ! calendar type
 character(32)           :: calendar_type               
@@ -68,13 +72,11 @@ integer(4)              :: iostatus ! IOSTAT value
 
 data monname /'Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'/
 
-!outpath = "/Projects/Calendar/PaleoCalAdjust/data/month_lengths/"  ! Windows path
-outpath = "\Projects\Calendar\data\work08\"  ! Windows path
-!infopath = "/Projects/Calendar/PaleoCalAdjust/data/info_files/"    ! Windows path
-infopath = "/Projects/Calendar/data/info_files/"    ! Windows path
+outpath = "/Projects/Calendar/PaleoCalAdjust/data/month_lengths/"  ! Windows path
+infopath = "/Projects/Calendar/PaleoCalAdjust/data/info_files/"    ! Windows path
 !outpath = "/Users/bartlein/Projects/Calendar/PaleoCalAdjust/data/month_lengths/"  ! Mac path
 !infopath = "/Users/bartlein/Projects/Calendar/PaleoCalAdjust/data/info_files/"    ! Mac path
-infofile = "month_length_info.csv" ! 'month_length_info_PMIP4.csv' ! 
+infofile = 'month_length_info.csv' ! 
 
 ! open the info file, and loop over specified calendar tables
 ! past ages are negative, e.g. 21 ka = 21,000 cal yr BP = -21000, and 1950 CE = 0 cal yr BP = 0 here
@@ -87,7 +89,7 @@ do
     read (3,*,iostat=iostatus) prefix, calendar_type, begageBP, endageBP, agestep, begyrCE, nsimyrs
     !write (*,'("iostatus = ",i2)') iostatus
     if (iostatus.lt.0) then
-        write (*,'(a)') "Done"
+        write (*,'(a)') "Done (month_length)"
         exit
     end if
     write (*,'(125("="))')   
@@ -112,7 +114,7 @@ do
     ! open files
     open (1,file=trim(outpath)//trim(prefix)//"_cal_"//trim(calendar_type)//"_rmonlen.csv")
     open (2,file=trim(outpath)//trim(prefix)//"_cal_"//trim(calendar_type)//"_imonlen.csv")
-    write (1,'(a)') "   "//trim(header(1))//trim(header(2))//trim(header(3))//trim(header(4))//" VE_day , SS_day ,  ndays"
+    write (1,'(a)') "   "//trim(header(1))//trim(header(2))//trim(header(3))//trim(header(4))//" VE_day , SS_day , ndays"
     write (2,'(a)') "   "//trim(header(5))//trim(header(6))//trim(header(7))//trim(header(8))//" VE_day , SS_day , ndays"
 
     ! allocate arrays
@@ -145,9 +147,11 @@ do
                     continue
             end select
             write (1,'(i8,", ",i8,48(", ",f12.8),2(", ",f7.3),", ",i4)') &
-                iageBP(ii),iyearCE(ii),rmonlen(ii,1:nm),rmonmid(ii,1:nm), rmonbeg(ii,1:nm),rmonend(ii,1:nm),VE_day(ii),SS_day(ii),ndays(ii)
+                iageBP(ii),iyearCE(ii),rmonlen(ii,1:nm),rmonmid(ii,1:nm), rmonbeg(ii,1:nm),rmonend(ii,1:nm),VE_day(ii), &
+                    SS_day(ii),ndays(ii)
             write (2,'(i8,", ",i8,48(", ",3x,i4),2(", ",f7.3),", ",i4)') &
-                iageBP(ii),iyearCE(ii),imonlen(ii,1:nm),imonmid(ii,1:nm), imonbeg(ii,1:nm),imonend(ii,1:nm),VE_day(ii),SS_day(ii),ndays(ii)        
+                iageBP(ii),iyearCE(ii),imonlen(ii,1:nm),imonmid(ii,1:nm), imonbeg(ii,1:nm),imonend(ii,1:nm),VE_day(ii), &
+                    SS_day(ii),ndays(ii)
         end do
     end do
 
