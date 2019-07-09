@@ -1,4 +1,7 @@
 prefix,calendar_type,begageBP,endageBP,agestep,begyrCE,nsimyrs,note
+IPSL-CM6A-LR_127ka_Amon,gregorian,-127000,-127000,1,1850,100,
+IPSL-CM6A-LR_006ka_Amon,gregorian,-6000,-6000,1,1850,200,
+IPSL-CM6A-LR_000ka_Amon,gregorian,0,0,1,1850,200,
 tr21,noleap,-22000,39,1,1950,1,generate tables of month lengths
 PMIP4,noleap,-150000,0,1000,1950,1,
 PMIP360,360_day,-150000,0,1000,1950,1,
