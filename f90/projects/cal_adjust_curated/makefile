@@ -5,13 +5,13 @@ prog = ../../main_programs/
 mod = ../../modules/
 
 # netCDF and OpenMP libraries -- needs localization
-NCINC = /opt/anaconda/include
-NCLIB = /opt/anaconda/lib
+NCINC = -I$(HOME)/.conda/envs/paleocaladjust/include
+NCLIB = -L$(HOME)/.conda/envs/paleocaladjust/lib 
 LIBS = -lnetcdff -lnetcdf -lgomp
 
 # compiler and flags
 FC = gfortran 
-FFLAGS = -O3 -Wall
+FFLAGS = -O3 -Wall -Wl,-rpath,$(HOME)/.conda/envs/paleocaladjust/lib
 
 # target, object and .mod files
 target = cal_adjust_curated
@@ -21,7 +21,7 @@ modules = pseudo_daily_interp_subs.mod calendar_effects_subs.mod GISS_orbpar_sub
     GISS_srevents_subs.mod month_length_subs.mod CMIP_netCDF_subs.mod
 
 $(target): $(objects) 
-	$(FC) $(FFLAGS) -L$(NCLIB) -o $(target) $(objects) $(LIBS)
+	$(FC) $(FFLAGS) $(NCLIB) -o $(target) $(objects) $(LIBS)
 
 pseudo_daily_interp_subs.o: $(mod)pseudo_daily_interp_subs.f90
 	$(FC) $(FFLAGS) -c $(mod)pseudo_daily_interp_subs.f90
@@ -39,7 +39,7 @@ month_length_subs.o: $(mod)month_length_subs.f90
 	$(FC) $(FFLAGS) -c $(mod)month_length_subs.f90
 
 CMIP_netCDF_subs.o: $(mod)CMIP_netCDF_subs.f90 
-	$(FC) $(FFLAGS) -I$(NCINC) -c $(mod)CMIP_netCDF_subs.f90 
+	$(FC) $(FFLAGS) $(NCINC) -c $(mod)CMIP_netCDF_subs.f90 
 
 cal_adjust_PMIP.o: $(prog)cal_adjust_curated.f90
 	$(FC) $(FFLAGS) -fopenmp -c $(prog)cal_adjust_curated.f90

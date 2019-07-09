@@ -20,7 +20,7 @@ do
     echo "activity,variable,time_freq,model,experiment,ensemble,grid_label,begdate,enddate,suffix,adj_name,calendar_type,begageBP,endageBP,agestep,begyrCE,nsimyrs,source_path,adjusted_path" > $info_file    
     cd $ESGF_DIR/$gcm/$expt
     ncfiles=`ls -d *.nc`
-    echo "$ncfiles"
+    #echo "$ncfiles"
     cd $THIS_DIR
     for ncfile in $ncfiles
     do
@@ -33,9 +33,10 @@ do
         end_yr=`echo ${yr_str##*-} | cut -c-4`
         let length=$((10#$end_yr))-$((10#$start_yr))+1
         #write names into csv file
-        echo `pwd`
+        # echo `pwd`
         echo 'PMIP4,'${prior_str//_/,},$start_yr'01',$end_yr'12,,_cal_adj,noleap,-6000,-6000,1,1000,'$length',"'$ESGF_DIR/$gcm/$expt'/","'$ESGF_DIR/$gcm/$expt'_cal_adj/"' >> $info_file 
       fi
    done
+   #./cal_adjust_curated
   done
 done
