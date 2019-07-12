@@ -36,4 +36,4 @@ Comparisons among the different *tas* simulations suggests that the calendar eff
 
 Among the three *midHolocene* precipitation-rate simulations generally show smaller spatial-scale long-term mean difference sign-reversal patterns than temperature, reflecting both the smaller spatial scale of the map-patterns of precipitation, and the tendency for the long-term mean differences to show a combination of amplification and damping of broad-scale features (like the monsoons), as well as some shifts in the location of features.  For example, the calendar-effect maps show a consistent pattern of decreases in N. African monsoon precipitation in the adjusted data in July and August, and increases in September, October and November.  In contrast to temperature, these changes do not produce sign changes in the long-term mean differences that are of large scale and consistent from month to month.
 
-	
+Note:  Individual panels for the figures are in the zipped file `pngs.zip`	
