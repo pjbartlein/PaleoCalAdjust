@@ -163,12 +163,12 @@ do
         ncfile_in = trim(variable)//"_"//trim(time_freq)//"_"//trim(model)//"_"//trim(experiment)//"_"// &
             trim(ensemble)//"_"//trim(begdate)//"-"//trim(enddate)//trim(suffix)//".nc"
         ncfile_out = trim(variable)//"_"//trim(time_freq_output)//"_"//trim(model)//"_"//trim(experiment)//"_"// &
-            trim(ensemble)//"_"//trim(begdate)//"-"//trim(enddate)//trim(suffix)//trim(adj_name)//".nc"
+            trim(ensemble)//trim(adj_name)//"_"//trim(begdate)//"-"//trim(enddate)//trim(suffix)//".nc"
     case ('PMIP4', 'pmip4')
         ncfile_in = trim(variable)//"_"//trim(time_freq)//"_"//trim(model)//"_"//trim(experiment)//"_"// &
             trim(ensemble)//"_"//trim(grid_label)//"_"//trim(begdate)//"-"//trim(enddate)//trim(suffix)//".nc"
         ncfile_out = trim(variable)//"_"//trim(time_freq_output)//"_"//trim(model)//"_"//trim(experiment)//"_"// &
-            trim(ensemble)//"_"//trim(grid_label)//"_"//trim(begdate)//"-"//trim(enddate)//trim(suffix)//trim(adj_name)//".nc"
+            trim(ensemble)//"_"//trim(grid_label)//trim(adj_name)//"_"//trim(begdate)//"-"//trim(enddate)//trim(suffix)//".nc"
     case default
         stop "activity type"
     end select

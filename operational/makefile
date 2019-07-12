@@ -1,8 +1,8 @@
 # cal_adjust_PMIP
 
 # (relative) paths to source files -- needs localization
-prog = ../../main_programs/
-mod = ../../modules/
+prog = ../f90/main_programs/
+mod = ../f90/modules/
 
 # netCDF and OpenMP libraries -- needs localization
 NCINC = -I$(HOME)/.conda/envs/paleocaladjust/include
@@ -41,12 +41,13 @@ month_length_subs.o: $(mod)month_length_subs.f90
 CMIP_netCDF_subs.o: $(mod)CMIP_netCDF_subs.f90 
 	$(FC) $(FFLAGS) $(NCINC) -c $(mod)CMIP_netCDF_subs.f90 
 
-cal_adjust_PMIP.o: $(prog)cal_adjust_curated.f90
+cal_adjust_curated.o: $(prog)cal_adjust_curated.f90
 	$(FC) $(FFLAGS) -fopenmp -c $(prog)cal_adjust_curated.f90
 
 clean: 
 	rm -f $(objects)
 	rm -f $(modules)
+ 
 
 clobber: clean
 	rm -f $(target)
