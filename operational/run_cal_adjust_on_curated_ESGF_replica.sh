@@ -7,7 +7,7 @@ ESGF_DIR="/data/CMIP/curated_ESGF_replica"
 THIS_DIR=`pwd`
 echo $PWD
 info_file="cal_adj_info.csv"
-CA_STR="_cal-adj"
+CA_STR="cal-adj"
 NO_OVERWRITE="TRUE"
 
 # define a function to test whether the contents of the netcdf file is a regular lat,lon) file
@@ -49,7 +49,7 @@ do
     esac    
     if [ -d $ESGF_DIR/$gcm/$expt ] 
     then
-      mkdir -p $ESGF_DIR/$gcm/$expt${CA_STR/_/-}
+      mkdir -p $ESGF_DIR/$gcm/$expt\-$CA_STR
       echo "activity,variable,time_freq,model,experiment,ensemble,grid_label,begdate,enddate,suffix,adj_name,calendar_type,begageBP,endageBP,agestep,begyrCE,nsimyrs,source_path,adjusted_path" > $info_file    
       cd $ESGF_DIR/$gcm/$expt
       ncfiles=`ls -d *.nc`
@@ -61,9 +61,11 @@ do
           #only include is the file is a regular lat,lon grid (PaleoCalAdjust won't work otherwise)
           isLatLon $ESGF_DIR/$gcm/$expt $ncfile
           if [ $? == 1 ]; then
-            if [ $NO_OVERWRITE == "TRUE" ] && [ -f $ESGF_DIR/$gcm${CA_STR/_/-}/$expt/$ncfile ]; then 
+            input_file="$ESGF_DIR/$gcm/$expt/$ncfile"
+            output_file=${input_file//$expt/$expt\-$CA_STR}
+            if [ $NO_OVERWRITE == "TRUE" ] && [ -f $output_file ]; then 
               #skip over this one
-              echo "Not overwriting "$ESGF_DIR/$gcm${CA_STR/_/-}/$expt/$ncfile
+              echo "Not overwriting "$output_file
             else
               #manipulate string
               no_nc=`echo ${ncfile%.nc}`
@@ -75,7 +77,7 @@ do
               calendar=`ncdump -h $ESGF_DIR/$gcm/$expt/$ncfile | grep time | grep calendar | cut -d\" -f2`
               #write names into csv file
               # echo `pwd`
-              echo 'PMIP3,'${prior_str//_/,},,$start_yr'01',$end_yr'12,,'$CA_STR','$calendar','$expt_yr','$expt_yr',1,1000,'$length',"'$ESGF_DIR/$gcm/$expt'/","'$ESGF_DIR/$gcm/$expt${CA_STR/_/-}'/"' >> $info_file 
+              echo 'PMIP3,'${prior_str//_/,},,$start_yr'01',$end_yr'12,,'$CA_STR','$calendar','$expt_yr','$expt_yr',1,1000,'$length',"'$ESGF_DIR/$gcm/$expt'/","'$ESGF_DIR/$gcm/$expt\-$CA_STR'/"' >> $info_file 
             fi
           fi
         fi
@@ -88,7 +90,7 @@ done
 
 
 #PMIP4
-pmip4_gcms="IPSL-CM6A-LR"
+pmip4_gcms="IPSL-CM6A-LR HadGEM3-GC31 AWI-ESM"
 pmip4_expts="midHolocene lig127k lgm"
 
 for gcm in $pmip4_gcms
@@ -112,7 +114,7 @@ do
     esac    
     if [ -d $ESGF_DIR/$gcm/$expt ] 
     then
-      mkdir -p $ESGF_DIR/$gcm/$expt${CA_STR/_/-}
+      mkdir -p $ESGF_DIR/$gcm/$expt\-$CA_STR
       echo "activity,variable,time_freq,model,experiment,ensemble,grid_label,begdate,enddate,suffix,adj_name,calendar_type,begageBP,endageBP,agestep,begyrCE,nsimyrs,source_path,adjusted_path" > $info_file    
       cd $ESGF_DIR/$gcm/$expt
       ncfiles=`ls -d *.nc`
@@ -124,9 +126,11 @@ do
           #only include is the file is a regular lat,lon grid (PaleoCalAdjust won't work otherwise)
           isLatLon $ESGF_DIR/$gcm/$expt $ncfile
           if [ $? == 1 ]; then
-            if [ $NO_OVERWRITE == "TRUE" ] && [ -f $ESGF_DIR/$gcm${CA_STR/_/-}/$expt/ ]; then 
+            input_file="$ESGF_DIR/$gcm/$expt/$ncfile"
+            output_file=${input_file//$expt/$expt\-$CA_STR}
+            if [ $NO_OVERWRITE == "TRUE" ] && [ -f $output_file ]; then 
               #skip over this one
-              echo "Not overwriting "$ESGF_DIR/$gcm${CA_STR/_/-}/$expt/$ncfile
+              echo "Not overwriting "$output_file
             else
               #manipulate string
               no_nc=`echo ${ncfile%.nc}`
