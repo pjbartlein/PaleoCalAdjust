@@ -29,7 +29,7 @@ module CMIP_netCDF_subs
     character(nf90_max_name)    :: addvarattname
     character(2048)             :: addvaratt
 
-    logical                     :: nc_print = .false.
+    logical                     :: nc_print = .true.
 
 contains   
 

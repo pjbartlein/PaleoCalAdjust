@@ -154,9 +154,9 @@ read (3,'(a)') csvheader
 
 ! main loop (over individual model output files)
 iostatus = 1
-overall_secs = secnds(0.0); monlen_secs = secnds(0.0)
+overall_secs = secnds(0.0)
 do
-    total_secs = secnds(0.0)
+    total_secs = secnds(0.0); monlen_secs = secnds(0.0)
     ! Step 1:  Read info file, construct variable and file names, allocate month-length arrays, etc.
     
     ! read a line from the info file, and construct netCDF file names
