@@ -34,7 +34,7 @@ module CMIP_netCDF_subs
     character(nf90_max_name)    :: addvarattname
     character(2048)             :: addvaratt
 
-    logical                     :: nc_print = .true.
+    logical                     :: nc_print = .false.
 
     contains   
     
@@ -259,7 +259,7 @@ subroutine new_time_day(ncid_in, ny, nm, nt, ndtot, &
     integer(4)                  :: imid, ibeg, iend     ! indices
     integer(4)                  :: n
 
-    write (*,'("new_time: ny, nm, nt, ndtot: ",4i8)') ny,nm,nt,ndtot
+    write (*,'("new time values: ny, nm, nt, ndtot: ",4i8)') ny,nm,nt,ndtot
 
     ! get the existing daily time values
     call check ( nf90_inq_varid(ncid_in, 'time', timeid) )

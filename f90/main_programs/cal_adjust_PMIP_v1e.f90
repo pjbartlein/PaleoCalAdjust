@@ -41,7 +41,6 @@ use pseudo_daily_interp_subs
 use month_length_subs
 use CMIP_netCDF_subs
 use omp_lib
-use ifport
 
 implicit none
 
@@ -129,7 +128,8 @@ character(64)           :: infofile
 character(1)            :: csvheader            ! info .csv file header
 
 ! timers
-real(4)                 :: overall_secs, monlen_secs, define_secs, read_secs, openmp_secs, total_secs
+real(4)                 :: overall_secs, monlen_secs, define_secs, read_secs, allocate_secs
+real(4)                 :: openmp_secs, write_secs, total_secs
 
 ! progress bar
 integer(4)              :: ntotalpts, numberdone, nprogress, nextra
@@ -138,7 +138,7 @@ real(4)                 :: onepercent, nextonepercent
 ! if OpenMP enabled
 max_threads = omp_get_max_threads()
 write (*,'("OMP max_threads: ",i4)') max_threads
-max_threads = max_threads - 2 ! to be able to do other things
+max_threads = max_threads !- 2 ! to be able to do other things
 call omp_set_num_threads(max_threads)
 
 ! info files
@@ -321,7 +321,7 @@ do
     ! Step 6:  Get the input variable to be adjusted
     
     ! allocate variables
-    read_secs = secnds(0.0)
+    allocate_secs = secnds(0.0)
     write (*,'(a)') "Allocating arrays"
     select case(invar_ndim)
     case (3)
@@ -344,9 +344,11 @@ do
         stop "allocating variables"
     end select
     allocate(xdh(invar_dimlen(1),ndtot), var_adj(invar_dimlen(1),nt))
+   write (*,'(a,f7.2)') "Allocate time: ", secnds(allocate_secs)
     
     ! get input data
     write (*,'(a)') "Reading input data..."
+    read_secs = secnds(0.0)
     select case (invar_ndim)
     case (3)
         call check( nf90_get_var(ncid_in, varid_in, var3d_in) )
@@ -481,6 +483,7 @@ do
     ! Step 8:  Write out the adjusted data, and close the output netCDF file.
     
     ! write out adjusted data
+    write_secs = secnds(0.0)
     write (*,'(/a)') "Writing adjusted data..."
     select case(invar_ndim)
     case (3)
@@ -492,6 +495,7 @@ do
     end select
     ! close the output file
     call check( nf90_close(ncid_out) )
+    write (*,'(a,f7.2)') "write time: ", secnds(write_secs)
     !close (10)
 
     deallocate (iageBP, iyearCE)
