@@ -1,11 +1,18 @@
 module CMIP_netCDF_subs
+! This module contains several subroutines to facilitate reading an existing netCDF file of daily or monthly data
+!   and creating a new file (of adjusted data), amending and copying the attributes of the original file.
+! get_var_diminfo() gets information on dimension variables in the netCDF file (including the number of dimensions).
+! copy_dims_and_glatts() copies dimension, dimension variables and attributes from the old file to the new
+! new_time_day() and new_time_month() redefine the time-dimension variable to reflect the adjusted month lengths
+! define_outvar() defines the output (adjusted) variable
+! check() and current_time() are utility subroutines
 
     use netcdf
     use typesizes
 
     implicit none
 
-    integer, parameter          :: maxdims = 4, maxvars = 8, maxatts = 100, maxdimsize = 1440
+    integer, parameter          :: maxdims = 5, maxvars = 10, maxatts = 100, maxdimsize = 1440
 
     ! dimensions
     integer(4)                  :: ncid_in, ncid_out, ndim, nvar, nglatt, unlimid, ncformat
@@ -18,6 +25,11 @@ module CMIP_netCDF_subs
     character(nf90_max_name)    :: varname(maxvars)
     character(2048)             :: varatt(maxvars,maxatts)
     integer(4)                  :: dataid(maxvars)
+    
+    ! input variable dimensions
+    integer(4)                  :: invar_ndim
+    integer(4)                  :: invar_dimid(maxdims), invar_dimlen(maxdims)
+    character(nf90_max_name)    :: invar_dimname(maxdims)
 
     ! global attributes
     character(nf90_max_name)    :: glattname, addglattname
@@ -29,9 +41,40 @@ module CMIP_netCDF_subs
     character(nf90_max_name)    :: addvarattname
     character(2048)             :: addvaratt
 
-    logical                     :: nc_print = .true.
+    logical                     :: nc_print = .false.
 
-contains   
+    contains   
+    
+subroutine get_var_diminfo(ncid_in, invar_name, invar_ndim, invar_dimid, invar_dimlen, invar_dimname)
+! gets the dimension characteristics of a variable
+
+    implicit none
+    
+    ! netCDF file and variable name
+    integer(4), intent(in)      :: ncid_in
+    character(*), intent(in)    :: invar_name
+    
+    ! dimensions
+    integer(4), intent(out)     :: invar_ndim
+    integer(4), intent(out)     :: invar_dimid(maxdims), invar_dimlen(maxdims)
+    character(nf90_max_name), intent(out)    :: invar_dimname(maxdims)
+    
+    integer(4)                  :: invarid, i
+    
+    if (nc_print) print '("Variable dimensions")'
+    call check( nf90_inq_varid(ncid_in, invar_name, invarid) )
+    call check( nf90_inquire_variable(ncid_in, invarid, ndims=invar_ndim) )
+    if (nc_print) print '("invar_name, invarid, invar_ndim: ",a,1x,i5,i3)', trim(invar_name), invarid, invar_ndim
+    
+    call check( nf90_inquire_variable(ncid_in, invarid, dimids = invar_dimid(:invar_ndim)) )
+    
+    do i = 1, invar_ndim
+        call check( nf90_inquire_dimension(ncid_in, invar_dimid(i), invar_dimname(i), invar_dimlen(i)) )
+        if (nc_print) print '("i, invar_dimid, invar_dimlen, invar_dimname: ",i3,i5,i6,1x,a)', &
+        i, invar_dimid(i), invar_dimlen(i), trim(invar_dimname(i))
+    end do
+    
+end subroutine get_var_diminfo
 
 subroutine copy_dims_and_glatts(ncid_in, ncid_out, addglattname, addglatt, nt, time, time_bnds, comment, varid_out)
 ! copies dimensions and global attributes from an existing to a new netCDF file
@@ -46,19 +89,25 @@ subroutine copy_dims_and_glatts(ncid_in, ncid_out, addglattname, addglatt, nt, t
     character(*), intent(in)    :: comment
     integer(4), intent(out)     :: varid_out
 
-    real(8), allocatable        :: var1d(:), var2d(:,:) ! see select case() statements below for dimensions
+    real(8), allocatable        :: var1d(:), var2d(:,:), var3d(:,:,:) ! see select case() statements below for dimensions
     real(8)                     :: var0d
     integer(4)                  :: i, ii
     character(256)              :: attname
 
     ! structure of input file
+    if (nc_print) print '("Define and copy dimensions, dimension variables, and global attributes")'
     call check( nf90_inquire(ncid_in, ndim, nvar, nglatt, unlimid, ncformat) )
     if (nc_print) print '(" ndim, nvar, nglatt, unlimid: ",4i6)', ndim, nvar, nglatt, unlimid
 
-    ! copy dimensions
+    ! get dimensions
+    if (nc_print) print '("Define dimensions:")'
+    write (*,*) nt
     do i = 1,ndim
         dimid(i) = i
         call check( nf90_inquire_dimension(ncid_in, dimid(i), dimname(i), dimlen(i)) )
+        if (nc_print) print '("   in:  dimid, dimlen, dimname = " ,2i7,1x,a)', i, dimlen(i), trim(dimname(i))
+        
+        
         if (i .eq. unlimid) then
             call check( nf90_def_dim(ncid_out, dimname(i), nf90_unlimited, dimid(i)) )
         else
@@ -66,10 +115,11 @@ subroutine copy_dims_and_glatts(ncid_in, ncid_out, addglattname, addglatt, nt, t
         end if
         ! if dimension is time, replace length with new length (nt)
         if (dimname(i) .eq. 'time') dimlen(i) = nt
-        if (nc_print) print '("  dimid, dimlen, dimname = " ,2i7,1x,a)', i, dimlen(i), trim(dimname(i))
+        
     end do
-
+    
     ! define dimension variables
+    if (nc_print) print '("Define dimension variables:")'
     varid_out = 0
     do i = 1,nvar
 
@@ -81,8 +131,9 @@ subroutine copy_dims_and_glatts(ncid_in, ncid_out, addglattname, addglatt, nt, t
 
         ! define dimension variables only
         select case (varname(i))
-        case ('lon', 'lon_bnds', 'lat', 'lat_bnds', 'time', 'time_bnds', 'climatology_bnds', 'height')
-
+        case ('lon', 'lon_bnds', 'lat', 'lat_bnds', 'time', 'time_bnds', 'climatology_bnds', 'height', &
+                'plev', 'j', 'i', 'vertices', 'lon_vertices', 'lat_vertices', 'lev', 'lev_bnds')
+        
             ! define variable
             varid_out=varid_out+1
             call check( nf90_def_var(ncid_out, varname(i), xtype(i), vardimids(i,:nvardims(i)), dataid(i)) )
@@ -100,6 +151,8 @@ subroutine copy_dims_and_glatts(ncid_in, ncid_out, addglattname, addglatt, nt, t
                 call check ( nf90_put_att(ncid_out, varid_out, 'comment', comment) )
                 if (nc_print) print '("  ii, attname: ",i4,1x,a)', ii, "comment"
             end if
+            
+        !end if
 
         case default
             continue
@@ -107,6 +160,7 @@ subroutine copy_dims_and_glatts(ncid_in, ncid_out, addglattname, addglatt, nt, t
     end do
 
     ! copy global attributes
+    if (nc_print) print '("Copy global attributes")' 
     do i = 1, nglatt
         call check ( nf90_inq_attname(ncid_in, nf90_global, i, glattname) )
         if (nc_print) print '(" global attribute: ", a)', trim(glattname)
@@ -120,18 +174,22 @@ subroutine copy_dims_and_glatts(ncid_in, ncid_out, addglattname, addglatt, nt, t
     call check( nf90_enddef(ncid_out) )
 
     ! copy dimension variable values, replacing time and time_bnds
+    if (nc_print) print '("Copy dimension variables")'
     varid_out = 0
     do i = 1,nvar
 
         varid_in = i
         select case (varname(i))
-        case ('lon', 'lon_bnds', 'lat', 'lat_bnds', 'time', 'time_bnds', 'climatology_bnds', 'height')
+        case ('lon', 'lon_bnds', 'lat', 'lat_bnds', 'time', 'time_bnds', 'climatology_bnds', 'height', &
+                'plev', 'j', 'i', 'vertices', 'lon_vertices', 'lat_vertices', 'lev', 'lev_bnds')
+        
             varid_out=varid_out + 1
             if (nc_print) print '(" varname: ",a)', trim(varname(i))
             ! how many dimensions?
             select case(nvardims(i))
             case (0)
-                if (nc_print) print '("  i: nvardims(i): ", 2i6, 1x, a)', i,nvardims(i),trim(varname(i))
+                if (nc_print) print '("  i: nvardims(i): ", 2i6, 1x, a)', &
+                    i,nvardims(i),trim(varname(i))
                 call check( nf90_get_var(ncid_in, varid_in, var0d) )
                 
                 ! if variable is time, replace the existing values with new ones
@@ -149,7 +207,7 @@ subroutine copy_dims_and_glatts(ncid_in, ncid_out, addglattname, addglatt, nt, t
                 deallocate(var1d)
             case (2)
                 if (nc_print) print '("  i, nvardims(i), vardimids, dimlen: ", 6i6, 1x, a)', &
-                    i, nvardims(i), vardimids(i,1), vardimids(i,2), dimlen(vardimids(i,1)), dimlen(vardimids(i,1)), trim(varname(i))
+                    i, nvardims(i), vardimids(i,1), vardimids(i,2), dimlen(vardimids(i,1)), dimlen(vardimids(i,2)), trim(varname(i))
                 allocate(var2d(dimlen(vardimids(i,1)), dimlen(vardimids(i,2))))
                 call check( nf90_get_var(ncid_in, varid_in, var2d) )
                 
@@ -158,6 +216,19 @@ subroutine copy_dims_and_glatts(ncid_in, ncid_out, addglattname, addglatt, nt, t
                 if (varname(i) .eq. 'climatology_bnds') var2d=time_bnds
                 call check( nf90_put_var(ncid_out, varid_out, var2d) )
                 deallocate(var2d)
+            case (3)
+                if (nc_print) print '("  i, nvardims(i), vardimids, dimlen: ", 8i6, 1x, a)', &
+                    i, nvardims(i), vardimids(i,1), vardimids(i,2), vardimids(i,3), &
+                    dimlen(vardimids(i,1)), dimlen(vardimids(i,2)), dimlen(vardimids(i,3)), trim(varname(i))
+                allocate(var3d(dimlen(vardimids(i,1)), dimlen(vardimids(i,2)), dimlen(vardimids(i,3))))
+                call check( nf90_get_var(ncid_in, varid_in, var3d) )
+                
+                ! if variable is time_bnds or climatology_bnds, replace the existing values with new ones
+                if (varname(i) .eq. 'time_bnds') var2d=time_bnds
+                if (varname(i) .eq. 'climatology_bnds') var2d=time_bnds
+                call check( nf90_put_var(ncid_out, varid_out, var3d) )
+                deallocate(var3d)               
+                
             case default
                 continue
             end select
@@ -193,7 +264,7 @@ subroutine new_time_day(ncid_in, ny, nm, nt, ndtot, &
     integer(4)                  :: imid, ibeg, iend     ! indices
     integer(4)                  :: n
 
-    write (*,'("new_time: ny, nm, nt, ndtot: ",4i8)') ny,nm,nt,ndtot
+    write (*,'("new time values: ny, nm, nt, ndtot: ",4i8)') ny,nm,nt,ndtot
 
     ! get the existing daily time values
     call check ( nf90_inq_varid(ncid_in, 'time', timeid) )
@@ -244,7 +315,7 @@ subroutine new_time_month(calendar_type, ncid_in, ny, nm, nt, &
     ! get the existing monthly time values
     call check ( nf90_inq_varid(ncid_in, 'time', timeid) )
     call check ( nf90_get_var(ncid_in, timeid, mon_time) )
-
+    
     ! new time variables -- calculate appropriate monthly values
     if (trim(calendar_type) .eq. '360_day') then
         ref_time = mon_time(1) - 15.0
@@ -265,7 +336,7 @@ subroutine new_time_month(calendar_type, ncid_in, ny, nm, nt, &
 
 end subroutine new_time_month
 
-subroutine define_outvar(ncid_in, ncid_out, varinname, varid_out, varoutname, addvarattname, addvaratt, varid_in, nlon, nlat, nt)
+subroutine define_outvar(ncid_in, ncid_out, varinname, varid_out, varoutname, addvarattname, addvaratt, varid_in) 
 
     implicit none
 
@@ -273,7 +344,7 @@ subroutine define_outvar(ncid_in, ncid_out, varinname, varid_out, varoutname, ad
     character(*), intent(in)    :: varinname, varoutname
     integer(4), intent(in)      :: varid_out
     character(*), intent(in)    :: addvarattname, addvaratt
-    integer(4), intent(out)     :: varid_in, nlon, nlat, nt
+    integer(4), intent(out)     :: varid_in 
 
     integer(4)                  :: i, ii
 
@@ -284,7 +355,8 @@ subroutine define_outvar(ncid_in, ncid_out, varinname, varid_out, varoutname, ad
         if (trim(varname(i)) .eq. trim(varinname)) exit
     end do
     varid_in = i
-    if (nc_print) print '(" i, varid, varname(i), varinname: ",2i4,1x,a,1x,a)', i, varid_in, trim(varname(i)), trim(varinname)
+    if (nc_print) print '(" i, varid, nvardims(i), varname(i), varinname: ",3i4,1x,a,1x,a)', &
+        i, varid_in, nvardims(i), trim(varname(i)), trim(varinname)
 
     ! enter define mode again
     call check( nf90_redef(ncid_out) )
@@ -305,12 +377,6 @@ subroutine define_outvar(ncid_in, ncid_out, varinname, varid_out, varoutname, ad
 
     ! end definition of new netCDF file
     call check( nf90_enddef(ncid_out) )
-
-    ! get dimension lengths
-    nlon = dimlen(vardimids(i,1))
-    nlat = dimlen(vardimids(i,2))
-    nt = dimlen(vardimids(i,3))
-    if (nc_print) print '(" nlon, nlat, nt: ",3i5)', nlon,nlat,nt
 
 end subroutine define_outvar
 

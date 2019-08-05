@@ -1,7 +1,8 @@
 program cal_adjust_PMIP
 ! Calculates calendar (month-length) adjustments of data in a CMIP/PMIP-formatted netCDF file.
 ! Creates a new netCDF file by copying dimension variables and global attributes from the input file.
-! This version supports 3-D (longitude, latitude, time) long-term mean (AClim), monthly (Amon) or daily input files.
+! This version supports 3-D (e.g. longitude, latitude, time) and 4-D (e.g. longitude, latitude, level, time)
+! long-term mean (AClim, Oclim), monthly (Amon, Omon, OImon) or daily input files.
 
 ! The program requires the modules: calendar_effects_subs.f90, CMIP_netCDF_subs.f90, GISS_orbpar_subs.f90,
 ! GISS_srevents_subs.f90, month_length_subs.f90 and pseudo_daily_interp_subs.f90
@@ -32,8 +33,8 @@ program cal_adjust_PMIP
 
 ! Author: Patrick J. Bartlein, Univ. of Oregon (bartlein@uoregon.edu), with contributions by S.L. Shafer (sshafer@usgs.gov)
 !
-! Version: 1.0d
-! Last update: 2019-07-01 (removed extra debugging write statements) 
+! Version: 1.0d  (Generalized to handle 4-D files)
+! Last update: 2019-08-04
 
 use calendar_effects_subs
 use pseudo_daily_interp_subs
@@ -102,12 +103,14 @@ character(32)           :: suffix               ! file name suffix (e.g. "-clim"
 character(32)           :: adj_name             ! adjustment name (e.g. "_adj")
 
 ! data
-integer(4)              :: nlon, nlat, ny, nt   ! number of longitudes, latitudes, years, obs nt = ny*nm
+integer(4)              :: ny, nt               ! number of years and total nmber of months (nt = ny*nm)
 integer(4)              :: ndtot,ndtot_0ka,ndyr ! total number of days
-real(4), allocatable    :: var3d_in(:,:,:)      ! (nlon,nlat,nd or ndtot) input data 
-real(4), allocatable    :: var3d_out(:,:,:)     ! (nlon,nlat,nt) output adjusted data 
-real(8), allocatable    :: xdh(:,:)             ! (nlat,ndtot) pseudo- or actual daily data
-real(8), allocatable    :: var3d_adj(:,:)       ! (nlat,nt) adjusted data 
+real(4), allocatable    :: var3d_in(:,:,:)      ! 3-D (e.g. nlon,nlat,ndtot) input data 
+real(4), allocatable    :: var3d_out(:,:,:)     ! 3-D (e.g. nlon,nlat,nt) output adjusted data 
+real(8), allocatable    :: xdh(:,:)             ! 3-D (e.g. ivar_dimlen(1),ndtot) pseudo- or actual daily data
+real(8), allocatable    :: var_adj(:,:)       ! 3-D (e.g. ivar_dimlen(1),nt) adjusted data 
+real(8), allocatable    :: var4d_in(:,:,:,:)    ! 4-D (e.g. nlon,nlat,nlev,nt) input data
+real(4), allocatable    :: var4d_out(:,:,:,:)   ! 4-D (e.g. nlon,nlat,nlev,nt) output adjusted data
 real(8)                 :: vfill                ! fill value
 
 ! smoothing parameters for multi-year pseudo-daily interpolation
@@ -115,7 +118,7 @@ integer(4)              :: nw_tmp=21, nsw_tmp=20    ! smoothing parameters
 logical                 :: smooth=.true., restore=.true.
 logical                 :: no_negatives = .false.   ! restrict pseudo-daily interpolated values to positive values?
 
-integer(4)              :: n,m,j,k,i            ! indices
+integer(4)              :: n,m,j,k,l,i          ! indices
 integer(4)              :: max_threads          ! if OpenMP enabled
 integer(4)              :: iostatus             ! IOSTAT value
 
@@ -124,16 +127,24 @@ character(2048)         :: source_path, ncfile_in, adjusted_path, ncfile_out, nc
 character(64)           :: infofile
 character(1)            :: csvheader            ! info .csv file header
 
+! timers
+real(4)                 :: overall_secs, monlen_secs, define_secs, read_secs, allocate_secs
+real(4)                 :: openmp_secs, write_secs, total_secs
+
+! progress bar
+integer(4)              :: ntotalpts, numberdone, nprogress, nextra
+real(4)                 :: onepercent, nextonepercent
+
 ! if OpenMP enabled
 max_threads = omp_get_max_threads()
 write (*,'("OMP max_threads: ",i4)') max_threads
-max_threads = max_threads - 2 ! to be able to do other things
+max_threads = max_threads !- 2 ! subtract 2 to free up threads for other computational processes
 call omp_set_num_threads(max_threads)
 
 ! info files
 infopath = "/Projects/Calendar/PaleoCalAdjust/data/info_files/" ! Windows path
 !infopath = "/Users/bartlein/Projects/Calendar/PaleoCalAdjust/data/info_files/"  ! Mac path
-infofile = "cal_adj_info.csv"
+infofile = "cal_adj_info_test4d_CCSM4.csv"
 
 ! open the info file, and loop over specified calendar tables
 open (3,file=trim(infopath)//trim(infofile))
@@ -142,11 +153,13 @@ read (3,'(a)') csvheader
 
 ! main loop (over individual model output files)
 iostatus = 1
+overall_secs = secnds(0.0)
 do
+    total_secs = secnds(0.0); monlen_secs = secnds(0.0)
     ! Step 1:  Read info file, construct variable and file names, allocate month-length arrays, etc.
     
     ! read a line from the info file, and construct netCDF file names
-    write (*,'(125("="))')
+    write (*,'(125("*"))')
     suffix = ""
     read (3,*,iostat=iostatus) activity, variable, time_freq, model, experiment, ensemble, grid_label, &
         begdate, enddate, suffix, adj_name, calendar_type, begageBP, endageBP, agestep, begyrCE, nsimyrs, &
@@ -185,7 +198,7 @@ do
     ! set no_negatives flag
     no_negatives = .false.
     select case (trim(variable))
-    case ('pr','clt')
+    case ('pr','clt','sic')
         no_negatives = .true.
     case default
         continue
@@ -225,7 +238,6 @@ do
     do n=1,ny
         ndtot_0ka=ndtot_0ka + ndays(n)
         ndyr = ndyr + ndays(n)
-        !write (10,'(2i6,f12.6,2i8)') iageBP(n),iyearCE(n),VE_day(n),ndays(n),ndtot_0ka
         do m=1,nm
             i = (n-1)*nm + m
             imonlen_0ka_ts(i) = imonlen_0ka(n,m)
@@ -242,10 +254,12 @@ do
         !write (10,'(2i6,f12.6,2i8)') iageBP(n),iyearCE(n),VE_day(n),ndays(n),ndtot
     end do
     write (*,'("ny, nt, ndtot: ",4i8)') ny, nt, ndtot, ndtot_0ka
+    write (*,'(a,f7.2)') "Month-length time: ", secnds(monlen_secs)
     
-    ! Step 3:  Open input and create output netCDF files
+    ! Step 3:  Open input and create output netCDF files 
 
     ! input netCDF file
+    define_secs = secnds(0.0)
     write (*,'(a)') trim(source_path)
     nc_fname = trim(source_path)//trim(ncfile_in)
     print '(" nc_fname (in) = ",a)', trim(nc_fname)
@@ -256,7 +270,7 @@ do
     nc_fname = trim(adjusted_path)//trim(ncfile_out)
     print '(" nc_fname (out) = ",a)', trim(nc_fname)
     call check( nf90_create(nc_fname, 0, ncid_out) )
-    if (nc_print) print '("  ncid_put = ",i8)', ncid_out
+    if (nc_print) print '("  ncid_out = ",i8)', ncid_out
     
     ! Step 4:  Redefine the time-coordinate variable
 
@@ -271,9 +285,12 @@ do
             rmonmid_ts, rmonbeg_ts, rmonend_ts, ndays_ts, mon_time, mon_time_bnds)
     end if
     
-    ! Step 5:  Create the new netCDF file
+    ! Step 5:  Define the new netCDF file
+    
+    ! get number of input variable dimensions, dimension names and lengths
+    call get_var_diminfo(ncid_in, varinname, invar_ndim, invar_dimid, invar_dimlen, invar_dimname)
 
-    ! create a new netCDF file, and copy dimension variables and global attributes
+    ! define the new netCDF file, and copy dimension variables and global attributes
     call current_time(current)
     addglattname = "paleo_calendar_adjustment"
     addglatt = trim(current)//" paleo calendar adjustment by cal_adjust_PMIP.f90"
@@ -283,74 +300,199 @@ do
     ! define the output (adjusted) variable, and copy attributes
     write (*,'(a)') "Defining (new) adjusted variable..."
     addvarattname = "paleo_calendar_adjustment"
-    if (trim(time_freq).eq."Aclim") then
+    select case (trim(time_freq))
+    case ('Aclim', 'Oclim', 'OIclim', 'LIclim')
         addvaratt = "long-term mean values adjusted for the appropriate paleo calendar"
-    else if (trim(time_freq).eq."Amon") then
+    case ('Amon', 'Omon', 'OImon', 'LImon')
         addvaratt = "monthly values adjusted for the appropriate paleo calendar"
-    else if (trim(time_freq).eq."day") then
-        addvaratt = "daily values converted to monthly values adjusted for the appropriate paleo calendar"
-    end if
+    case ('day')
+        addvaratt = "daily values aggregated to monthly values using the appropriate paleo month lengths"
+    case default 
+        stop "defining new variable"
+    end select
 
-    call define_outvar(ncid_in, ncid_out, varinname, varid_out, varoutname, addvarattname, addvaratt, varid_in, nlon, nlat, nt)
+    ! define the output variable
+    call define_outvar(ncid_in, ncid_out, varinname, varid_out, varoutname, addvarattname, addvaratt, varid_in) 
+    write (*,'(a,f7.2)') "Define time: ", secnds(define_secs)
 
     ! Step 6:  Get the input variable to be adjusted
     
     ! allocate variables
-    if (trim(time_freq) .eq. 'day') then
-        allocate(var3d_in(nlon,nlat,ndtot))
-    else
-        allocate(var3d_in(nlon,nlat,nt))
-    end if
-    allocate(xdh(nlat,ndtot), var3d_adj(nlat,nt), var3d_out(nlon,nlat,nt))
-
+    allocate_secs = secnds(0.0)
+    write (*,'(a)') "Allocating arrays"
+    select case(invar_ndim)
+    case (3)
+        write (*,*) invar_dimlen(1),invar_dimlen(2),nt,invar_dimlen(1)*invar_dimlen(2)*nt
+        if (trim(time_freq) .eq. 'day') then
+            allocate(var3d_in(invar_dimlen(1),invar_dimlen(2),ndtot))
+        else
+            allocate(var3d_in(invar_dimlen(1),invar_dimlen(2),nt))
+        end if
+        allocate(var3d_out(invar_dimlen(1),invar_dimlen(2),nt))
+    case (4)
+        write (*,*) invar_dimlen(1),invar_dimlen(2),invar_dimlen(3),nt,invar_dimlen(1)*invar_dimlen(2)*invar_dimlen(3)*nt
+        if (trim(time_freq) .eq. 'day') then
+            allocate(var4d_in(invar_dimlen(1),invar_dimlen(2),invar_dimlen(3),ndtot))
+        else
+            allocate(var4d_in(invar_dimlen(1),invar_dimlen(2),invar_dimlen(3),nt))
+        end if
+        allocate(var4d_out(invar_dimlen(1),invar_dimlen(2),invar_dimlen(3),nt))
+    case default
+        stop "allocating variables"
+    end select
+    allocate(xdh(invar_dimlen(1),ndtot), var_adj(invar_dimlen(1),nt))
+   write (*,'(a,f7.2)') "Allocate time: ", secnds(allocate_secs)
+    
     ! get input data
     write (*,'(a)') "Reading input data..."
-    call check( nf90_get_var(ncid_in, varid_in, var3d_in) )
+    read_secs = secnds(0.0)
+    select case (invar_ndim)
+    case (3)
+        call check( nf90_get_var(ncid_in, varid_in, var3d_in) )
+    case (4)
+        call check( nf90_get_var(ncid_in, varid_in, var4d_in) )
+    case default
+        stop "input data"
+    end select
 
     ! get _FillValue
     call check( nf90_get_att(ncid_in, varid_in, '_FillValue', vfill) )
     write (*,'("_FillValue:", g14.6)') vfill
+    write (*,'(a,f7.2)') "Read time: ", secnds(read_secs)
     
     ! Step 7:  Get calendar-adjusted values
+    
+    openmp_secs = 0.0
+    if (trim(time_freq) .eq.'day') then
+        write (*,'(a)') "Aggregating daily data ..."
+    else
+        write (*,'(a)') "Interpolating and aggregating ..."
+    end if
+    
+    openmp_secs = secnds(0.0)
+    select case(invar_ndim)
+    case (3) 
+        ntotalpts = invar_dimlen(1) * invar_dimlen(2)
+        write (*,'("Number of grid points = ",i6)') ntotalpts
+    case (4)
+        ntotalpts = invar_dimlen(1) * invar_dimlen(2) * invar_dimlen(3)
+        write (*,'("Number of grid points x number of levels = ",i6)') ntotalpts
+    end select
+        
+    numberdone = 0; onepercent = (ntotalpts/100); nextonepercent = onepercent; nprogress = 0
+    write (*,'("|",9("---------+"),"---------|")'); write (*,'(a1,$)') " "
+    
+    ! Note: OpenMP seems to work best if only innermost loop is parallelized
+    select case (invar_ndim)
+    case (3)
+        do k=1,invar_dimlen(2)      
+            ! if daily data, copy into xdh
+            if (trim(time_freq) .eq.'day') xdh(:,:) = var3d_in(:,k,:)
+        
+            !$omp parallel do
+            do j=1,invar_dimlen(1)
+                !write (*,'(/2i5)') j,k
+                if (trim(time_freq) .eq.'day') xdh(j,:) = var3d_in(j,k,:)
+                ! unless the input data are daily, do pseudo-daily interpolation of the monthly input data
+                if (trim(time_freq) .ne. 'day') then
+                    ! interpolate
+                    call mon_to_day_ts(nt, imonlen_0ka_ts, dble(var3d_in(j,k,:)), dble(vfill), &
+                        no_negatives, smooth, restore, ndtot, nw_tmp, nsw_tmp, xdh(j,:))
+                    ! reaggregate daily data using correct calendar
+                    call day_to_mon_ts(ny,ndays,rmonbeg,rmonend,ndtot,xdh(j,:),dble(vfill),var_adj(j,:))
+                else
+                    ! input data are already daily, so just reaggregate using correct calendar
+                    call day_to_mon_ts(ny,ndays,rmonbeg,rmonend,ndtot,xdh(j,:),dble(vfill),var_adj(j,:))
+                end if
+            
+                var3d_out(j,k,:)=sngl(var_adj(j,:))
 
-    ! loop over lons and lats
-    write (*,'(a)') "Interpolating (if necessary) and aggregating..."
-    write (*,'("Longitude index (nlon = ",i4,"): ")') nlon
-    do j=1,nlon !
-        write(*,'(i5,$)') j; if (mod(j,25).eq.0) write (*,'(" ")')
-        if (trim(time_freq) .eq.'day') xdh(:,:) = var3d_in(j,:,:)
-        !$omp parallel do
-        do k=1,nlat
-            !write (*,'(/2i5)') j,k
-            ! unless the input data are daily, do pseudo-daily interpolation of the monthly input data
-            if (trim(time_freq) .ne. 'day') then
-                ! interpolate
-                call mon_to_day_ts(nt, imonlen_0ka_ts, dble(var3d_in(j,k,:)), dble(vfill), &
-                    no_negatives, smooth, restore, ndtot, nw_tmp, nsw_tmp, xdh(k,:))
-                ! reaggregate daily data using correct calendar
-                call day_to_mon_ts(ny,ndays,rmonbeg,rmonend,ndtot,xdh(k,:),dble(vfill),var3d_adj(k,:))
-            else
-                ! input data are already daily, so just reaggregate using correct calendar
-                call day_to_mon_ts(ny,ndays,rmonbeg,rmonend,ndtot,xdh(k,:),dble(vfill),var3d_adj(k,:))
+            end do
+            !$omp end parallel do
+          
+            ! update progress bar
+            numberdone = numberdone + invar_dimlen(1)
+            if (numberdone .ge. nextonepercent) then
+                if (nprogress .lt. 99) then
+                    write (*,'(a1,$)') "="
+                    nextonepercent = nextonepercent + onepercent
+                    nprogress = nprogress + 1
+                    !write (*,*) numberdone, nextonepercent
+                end if
             end if
 
-            var3d_out(j,k,:)=sngl(var3d_adj(k,:))
-            
         end do
-        !$omp end parallel do
-    end do
+        
+    case(4)
+        do l=1,invar_dimlen(3)
+            do k=1,invar_dimlen(2)      
+                ! if daily data, copy into xdh
+                if (trim(time_freq) .eq.'day') xdh(:,:) = var4d_in(:,k,l,:)
+        
+                !$omp parallel do
+                do j=1,invar_dimlen(1)
+                    !write (*,'(/3i5)') j,k,l
+                    if (trim(time_freq) .eq.'day') xdh(j,:) = var4d_in(j,k,l,:)
+                    ! unless the input data are daily, do pseudo-daily interpolation of the monthly input data
+                    if (trim(time_freq) .ne. 'day') then
+                        ! interpolate
+                        call mon_to_day_ts(nt, imonlen_0ka_ts, dble(var4d_in(j,k,l,:)), dble(vfill), &
+                            no_negatives, smooth, restore, ndtot, nw_tmp, nsw_tmp, xdh(j,:))
+                        ! reaggregate daily data using correct calendar
+                        call day_to_mon_ts(ny,ndays,rmonbeg,rmonend,ndtot,xdh(j,:),dble(vfill),var_adj(j,:))
+                    else
+                        ! input data are already daily, so just reaggregate using correct calendar
+                        call day_to_mon_ts(ny,ndays,rmonbeg,rmonend,ndtot,xdh(j,:),dble(vfill),var_adj(j,:))
+                    end if
+            
+                    var4d_out(j,k,l,:)=sngl(var_adj(j,:))
+
+                end do
+                !$omp end parallel do
+          
+                ! update progress bar
+                numberdone = numberdone + invar_dimlen(1)
+                if (numberdone .ge. nextonepercent) then
+                    if (nprogress .lt. 99) then
+                        write (*,'(a1,$)') "="
+                        nextonepercent = nextonepercent + onepercent
+                        nprogress = nprogress + 1
+                        !write (*,*) numberdone, nextonepercent
+                    end if
+                end if
+
+            end do
+        end do
+    case default
+        stop "adjusting"
+    end select
+    
+    ! finish progress bar if short
+    if (nprogress .lt. 99) then
+        do nextra=1,(99-nprogress)
+            write (*,'(a1,$)') "="
+        end do
+    end if
     write (*,'(a)') " "
-    write (*,'(a)') "out of loop"
+    
+    write (*,'(a,f7.2)') "OpenMP time: ", secnds(openmp_secs)
 
     ! Step 8:  Write out the adjusted data, and close the output netCDF file.
     
     ! write out adjusted data
+    write_secs = secnds(0.0)
     write (*,'(/a)') "Writing adjusted data..."
-    call check( nf90_put_var(ncid_out, varid_out, var3d_out) )
-
+    select case(invar_ndim)
+    case (3)
+        call check( nf90_put_var(ncid_out, varid_out, var3d_out) )
+    case (4)
+        call check( nf90_put_var(ncid_out, varid_out, var4d_out) )
+    case default
+        stop "adjusted output"
+    end select
     ! close the output file
     call check( nf90_close(ncid_out) )
-    !close (10)
+    write (*,'(a,f7.2)') "write time: ", secnds(write_secs)
 
     deallocate (iageBP, iyearCE)
     deallocate (imonlen_0ka,imonmid_0ka,imonbeg_0ka,imonend_0ka)
@@ -359,11 +501,22 @@ do
     deallocate (VE_day, SS_day, ndays, imonlen_0ka_ts,ndays_ts)
     deallocate (imonmid_ts, imonbeg_ts,imonend_ts, rmonmid_ts, rmonbeg_ts, rmonend_ts)
     deallocate (mon_time, mon_time_bnds)
-    deallocate (var3d_in, xdh, var3d_adj, var3d_out)
+    select case (invar_ndim)
+    case (3)
+        deallocate (var3d_in, var3d_out)
+    case (4)
+        deallocate (var4d_in, var4d_out)
+    case default
+        stop "deallocating"
+    end select
+    deallocate (xdh, var_adj)
 
-    write (*,'(a)') " "
-
+    !write (*,'(a)') " "
+    write (*,'(a,f7.2)') "Total time: ", secnds(Total_secs)
+    
 end do
+
+    write (*,'(a,f7.2)') "Overall time: ", secnds(overall_secs)
 
 end program
 
