@@ -24,7 +24,7 @@ program month_length
 ! Author: Patrick J. Bartlein, Univ. of Oregon (bartlein@uoregon.edu), with contributions by S.L. Shafer (sshafer@usgs.gov)
 !
 ! Version: 1.0d
-! Last update: 2019-07-01
+! Last update: 2019-08-04
 
 use month_length_subs
     
