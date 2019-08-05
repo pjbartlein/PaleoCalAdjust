@@ -1,4 +1,9 @@
 module calendar_effects_subs
+! This module contains the two main subroutines used to adjust monthly data for the paleo calendar effect:
+! mon_to_day_ts() interpolates input monthly data to pseudo-daily values using the Epstein (1991) mean-
+!   preserving "harmonic" interplation method, implemented in the module pseudo_daily_interp()
+! day_to_mon() aggregates daily or pseudo daily values to monthly totals using real-number definitions of 
+!   month lengths.
     
 implicit none
 
