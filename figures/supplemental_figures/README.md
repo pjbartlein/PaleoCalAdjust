@@ -3,7 +3,7 @@ Supplemental Figures
 
 The following figures illustrate the calendar effects on a selection of simulations used to exercise the calendar-effect adjustment program (`cal_adjust_PMIP.f90`).  Each figure has four panels:  
 
-- the long-term mean differences (experiment minu control, sometimes referred to as "anomalies") for each simulation calculated using adjusted paleo data (upper left); 
+- the long-term mean differences (experiment minus control, sometimes referred to as "anomalies") for each simulation calculated using adjusted paleo data (upper left); 
 - the long-term mean differences (experiment minus control) calculated using unadjusted data (upper right);
 - the calendar effect, or the adjusted long-term mean differences minus the unadjusted long-term mean differences  (positive differences for near-surface air temperature (*tas*) indicate where the adjusted temperatures would be higher than unadjusted ones, and similarly for precipitation rate (*pr*) where adjusted data would be greater than unadjusted data) (lower left); and
 - long-term mean difference sign reversals (which indicate regions where the magnitude of the calendar effect is large enough to reverse the sign of the long-term mean difference) (bottom right). 
