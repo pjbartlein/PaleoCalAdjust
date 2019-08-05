@@ -34,7 +34,7 @@ program cal_adjust_PMIP
 ! Author: Patrick J. Bartlein, Univ. of Oregon (bartlein@uoregon.edu), with contributions by S.L. Shafer (sshafer@usgs.gov)
 !
 ! Version: 1.0d  (Generalized to handle 4-D files)
-! Last update: 2019-08-04
+! Last update: 2019-08-05
 
 use calendar_effects_subs
 use pseudo_daily_interp_subs

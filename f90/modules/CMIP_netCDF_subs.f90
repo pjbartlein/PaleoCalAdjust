@@ -2,10 +2,10 @@ module CMIP_netCDF_subs
 ! This module contains several subroutines to facilitate reading an existing netCDF file of daily or monthly data
 !   and creating a new file (of adjusted data), amending and copying the attributes of the original file.
 ! get_var_diminfo() gets information on dimension variables in the netCDF file (including the number of dimensions).
-! copy_dims_and_glatts() copies dimension, dimension variables and attributes from the old file to the new
-! new_time_day() and new_time_month() redefine the time-dimension variable to reflect the adjusted month lengths
-! define_outvar() defines the output (adjusted) variable
-! check() and current_time() are utility subroutines
+! copy_dims_and_glatts() copies dimension, dimension variables and attributes from the old file to the new.
+! new_time_day() and new_time_month() redefine the time-dimension variable to reflect the adjusted month lengths.
+! define_outvar() defines the output (adjusted) variable.
+! check() and current_time() are utility subroutines.
 
     use netcdf
     use typesizes
