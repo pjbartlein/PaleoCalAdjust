@@ -3,7 +3,7 @@ PaleoCalAdjust
 
 This is the repository that accompanies the paper:
 
-Bartlein, P. J. and Shafer, S. L.: Paleo calendar-effect adjustments in time-slice and transient climate-model simulations (PaleoCalAdjust v1.0): impact and strategies for data analysis, *Geosci. Model Dev.*,  [https://doi.org/10.5194/gmd-2018-283](https://doi.org/10.5194/gmd-2018-283), 2019.
+Bartlein, P. J. and Shafer, S. L.: Paleo calendar-effect adjustments in time-slice and transient climate-model simulations (PaleoCalAdjust v1.0): impact and strategies for data analysis, *Geosci. Model Dev.*,  [https://doi.org/10.5194/gmd-12-3889-2019](https://doi.org/10.5194/gmd-12-3889-2019), 2019.
 
 ### Abstract ###
 
@@ -19,7 +19,7 @@ This release (v1.0d) is consistent with the revised and accepted version of the 
 
 The main changes from the original submission therefore include:
 
-- the main program `cal_adjust_PMIP3.f90` and module `CMIP5_netCDF_subs.f90` were renamed as `cal_adjust_PMIP.f90` and `CMIP_netCDF_subs.f90` respectivly, because they are now generic.  No changes were made to `CMIP_netCDF_subs.f90`, and only minor changes were made to `cal_adjust_PMIP.f90` to allow reading and writing of both CMIP5-PMIP3 and CMIP6-PMIP4 formatted files;
+- the main program `cal_adjust_PMIP3.f90` and module `CMIP5_netCDF_subs.f90` were renamed as `cal_adjust_PMIP.f90` and `CMIP_netCDF_subs.f90` respectivly, because they are now generic.  An additional subroutine was added to the module `CMIP_netCDF_subs.f90` (see below), and only minor changes were made to `cal_adjust_PMIP.f90` to allow reading and writing of both CMIP5-PMIP3 and CMIP6-PMIP4 formatted files;
 - the info file read by `cal_adjust_PMIP.f90` (e.g. `cal_adj_info.csv`) was modified to include an "activity" field (either "PMIP3" or "PMIP4") and a "grid_label" field (blank for PMIP3 files);
 - the paths to the "source" and "adjusted" netCDF files are now explicitly given in the info file, as opposed to being set in the main program;
 - the subroutine `monlen(...)` in the module file `month_length_subs.f90` now computes month length, beginning, middle and ending days using an approach based on Kepler's equation.  To view the code changes and their impact on the results, the code and figures (plus the data used to plot the figures) in this release can be compared with those in previous releases (e.g. v1.0b);
