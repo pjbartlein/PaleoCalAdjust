@@ -27,7 +27,7 @@ There are four folders:
 		pr_Amon_CCSM4_midHolocene_r1i1p1_100001-130012.nc
 		pr_Aclim_CCSM4_midHolocene_r1i1p1_100001-130012-clim.nc
 
-- `/data/nc_files/PMIP3/adjusted/` (which contains month-length-adjusted files created by `cal_adjust_PMIP.f90`):
+- `/data/nc_files/PMIP3_adjusted/` (which contains month-length-adjusted files created by `cal_adjust_PMIP.f90`):
 
 		tas_Aclim_CCSM4_midHolocene_r1i1p1_100001-130012-clim_cal_adj.nc
 		tas_Aclim_CNRM-CM5_midHolocene_r1i1p1_195001-214912-clim_cal_adj.nc
@@ -42,12 +42,12 @@ There are four folders:
 		pr_Amon_CCSM4_midHolocene_r1i1p1_100001-130012_cal_adj.nc
 		pr_Amon_MPI-ESM-P_midHolocene_r1i1p1_185001-194912_cal_adj.nc
 
-- ` /data/nc_files/PMIP4/source/` (which contains two example CMIP6/PMIP4 files):
+- ` /data/nc_files/PMIP4_source/` (which contains two example CMIP6/PMIP4 files):
 
 		tas_Amon_IPSL-CM6A-LR_lig127k_r1i1p1f1_gr_185001-194912.nc
 		tas_Amon_IPSL-CM6A-LR_midHolocene_r1i1p1f1_gr_185001-204912.nc	
 
-- ` /data/nc_files/PMIP4/adjusted/` (which contains month-length-adjusted CMIP6/PMIP4 files):
+- ` /data/nc_files/PMIP4_adjusted/` (which contains month-length-adjusted CMIP6/PMIP4 files):
 
 		tas_Amon_IPSL-CM6A-LR_lig127k_r1i1p1f1_gr_185001-194912_cal_adj.nc
 		tas_Amon_IPSL-CM6A-LR_midHolocene_r1i1p1f1_gr_185001-204912_cal_adj.nc
