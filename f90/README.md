@@ -28,7 +28,7 @@ The programs are used as follows:
 - `month_length.f90` reads the info file `month_length_info.csv` in the folder `/info_files` and writes month-length tables to the folder `/month_lengths`;
 - `cal_adjust_PMIP.f90` reads the info file `cal_adj_info.csv` in the folder `/info_files`, and source netCDF files from the folders `/nc_files/PMIP3_source` and `/nc_files/PMIP4_source` and writes paleo calendar-adjusted netCDF files to the folder `/nc_files/PMIP3_adjusted` and `/nc_files/PMIP4_adjusted`;
 - `demo_01_pseudo_daily_interp.f90`, `demo_02_adjust_1yr.f90`, and `demo_04_CE_month_lengths.f90` are stand-alone programs, writing only to the console;
-- `demo_03_adjust_TraCE_ts.f90` reads, for example, the file `TraCE_c30r40_tas_land_monlen0ka_Jan-Dec.csv` in the folder `TraCE_example` and writes a paleo calendar-adjusted output file into the same folder.
+- `demo_03_adjust_TraCE_ts.f90` reads, for example, the file `TraCE_c30r40_tas_land_monlen0ka_Jan-Dec.csv` in the folder `/TraCE_example` and writes a paleo calendar-adjusted output file into the same folder.
 
 Most of the programs write progress information to the console.
 
