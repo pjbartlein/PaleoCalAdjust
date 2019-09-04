@@ -32,7 +32,7 @@ inverse of the climatic precession parameter is plotted for easier
 comparison.) The day of the Northern Hemisphere summer solstice is
 indicated by a black diamond on the x axes.
 
-**Figure 3.** Calendar effects on insolation at 45◦ N. The differences
+**Figure 3.** Calendar effects on insolation at 45° N. The differences
 plotted show the values of average daily insolation at mid-month days
 identiﬁed using the appropriate ﬁxed-angular paleo calendar minus those
 using the ﬁxed-length deﬁnition of present-day months, with orange hues
@@ -55,7 +55,7 @@ CE). The left side of each horizontal bar shows the beginning day, while
 the right side shows the ending day of a particular month for each 1 kyr
 interval.
 
-**Figure 5.** Calendar effects on insolation at 45◦ S. The differences
+**Figure 5.** Calendar effects on insolation at 45° S. The differences
 plotted show the values of average daily insolation at mid-month days
 identiﬁed using the appropriate ﬁxed-angular paleo calendar minus those
 using the ﬁxed-length deﬁnition of present-day months, with orange hues
@@ -73,7 +73,7 @@ as e · sin ω, where e is eccentricity and ω is the longitude of
 perihelion measured from the vernal equinox.
 
 **Figure 7.** Long-term differences in mid-month average daily
-insolation relative to present (0 ka or 1950 CE) at 45◦ N for a
+insolation relative to present (0 ka or 1950 CE) at 45° N for a
 ﬁxed-angular calendar. As in Fig. 1, variations over the past 150 kyr in
 the beginning and ending days of ﬁxed-angular months for a 365 d
 *noleap* calendar are shown for 1 kyr intervals beginning at 0 ka (1950
@@ -91,7 +91,7 @@ the right side shows the ending day of a particular month for each 1 kyr
 interval.
 
 **Figure 9.** Long-term differences in mid-month average daily
-insolation relative to present (0 ka or 1950 CE) at 45◦ S for a
+insolation relative to present (0 ka or 1950 CE) at 45° S for a
 ﬁxed-angular calendar. As in Fig. 1, variations over the past 150 kyr in
 the beginning and ending days of ﬁxed-angular months for a 365 d
 *noleap* calendar are shown for 1 kyr intervals beginning at 0 ka (1950
@@ -99,7 +99,7 @@ CE). The left side of each horizontal bar shows the beginning day, while
 the right side shows the ending day of a particular month for each 1 kyr
 interval.
 
-**Figure 10.** Present-day (1981--2010 CE) long-term mean values of
+**Figure 10.** Present-day (1981-2010 CE) long-term mean values of
 monthly near-surface air temperature (*tas*) from the Climate Forecast
 System Reanalysis (CFSR), the mean temperatures of the warmest (MTWA)
 and coldest (MTCO) months and their differences from the same data, and
@@ -109,41 +109,41 @@ Precipitation (CMAP).
 **Figure 11.** Calendar effects on near-surface air temperature for 6 ka
 (**a**), 97 ka (**b**), 127 ka (**c**), and 116 ka (**d**). The maps
 show the patterns of month-length adjusted average temperatures minus
-the unadjusted values using 1981--2010 long-term averages of CFSR tas
+the unadjusted values using 1981-2010 long-term averages of CFSR tas
 values, with positive differences (indicating that the adjusted data
-would be warmer than unadjusted data) in red hues and negative
+would be warmer than unadjusted data) in red hues and negative-
 differences in blue.
 
 **Figure 12.** Calendar effects on the mean near-surface air
-tem-peratures of the warmest (MTWA) and coldest (MTCO) months and their
+temperatures of the warmest (MTWA) and coldest (MTCO) months and their
 differences (an index of seasonality) for 6, 97, 116, and 127 ka (top to
 bottom row). The maps show the patterns of month-length adjusted average
 temperatures minus the unadjusted values for MTWA and MTCO using
-1981--2010 long-term averages of CFSR tas values, with positive
+1981-2010 long-term averages of CFSR tas values, with positive
 differences (indicating that the adjusted data would be warmer than
 unadjusted data) in red hues and negative differences in blue.
 
 **Figure 13.** Calendar effects on precipitation rate for 6 ka (**a**),
 97 ka (**b**), 127 ka (**c**), and 116 ka (**d**). The maps show the
 patterns of month-length adjusted precipitation rate minus the
-unadjusted values using 1981--2010 long-term averages of CMAP *precip*
+unadjusted values using 1981-2010 long-term averages of CMAP *precip*
 values, with positive differences (indicating that the adjusted data
 would be wetter than unadjusted data) in blue hues and negative
 differences in brown.
 
 **Figure 14.** Time series of original and month-length adjusted annual
 area-weighted averages of TraCE-21ka data (Liu et al., 2009), expressed
-as differences from the 1961--1989 long-term mean for (**a--c**) 2 m air
-temperature, (**d**) precipitation rate, and (**e--f**) precipitation
-minus evap-oration (*P − E*). The original or unadjusted data are
+as differences from the 1961-1989 long-term mean for (**a-c**) 2 m air
+temperature, (**d**) precipitation rate, and (**e-f**) precipitation
+minus evaporation (*P* - *E*). The original or unadjusted data are
 plotted in gray and black, and the adjusted data are in color. The area
 averages are grid-cell area-weighted values for land grid points in each
 region, and the smoother curves are locally weighted regression curves
 with a window half-width of 100 years. The regions are deﬁned as (**a**)
-15 to 75◦ N and −170 to 60◦ E, (**b**) 10 to 50◦ S and 110 to 160◦ E,
-(**c**) global ice-free land area, (**d**) 0 to 30◦ N and −30 to 120◦ E,
-(**e**) 5 to 17◦ N and −5 to 30◦ E, and (**f**) 31 to 43◦ N and −5 to
-30◦ E.
+15 to 75° N and −170 to 60° E, (**b**) 10 to 50° S and 110 to 160° E,
+(**c**) global ice-free land area, (**d**) 0 to 30° N and −30 to 120° E,
+(**e**) 5 to 17° N and −5 to 30° E, and (**f**) 31 to 43° N and −5 to
+30° E.
 
 **Figure 15.** Pseudo-daily interpolated temperature (**a, b**) and
 precipitation (**c, d**) for some representative locations: (**a, c**)
@@ -164,12 +164,12 @@ b**) The interpolation errors, or the differences between the original
 monthly mean values and the monthly mean values recalculated from linear
 interpolation of pseudo-daily values. (**c, d**) The interpolation
 errors for mean-preserving (Epstein, 1991) interpolation. The errors for
-linear interpolation of the temperature data (◦C) range from −1.20851 to
+linear interpolation of the temperature data (°C) range from −1.20851 to
 1.29904, with a mean of 0.05664 and standard deviation of 0.16129 (over
 all months and grid points), while those for mean-preserving
 interpolation range from −0.00002 to 0.00050, with a mean of −0.0061 and
 standard deviation of 0.00007. The errors for linear interpolation of
-the precipitation data (mm d−1) range from −1.10617 to 1.40968, with a
+the precipitation data (mm d<sup>−1</sup>) range from −1.10617 to 1.40968, with a
 mean of 0.00087 and standard deviation of 0.11851, while those for
 mean-preserving interpolation range from −0.00002 to 0.00383, with a
 mean of 0.00001 and standard deviation of 0.00163.
