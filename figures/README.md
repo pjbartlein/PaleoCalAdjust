@@ -156,7 +156,7 @@ interpolation error (or the difference between the annual average
 calculated using the original data and the pseudo-daily interpolated
 data) is given for the mean-preserving approach in each case. The
 interpolated data for this ﬁgure were generated using the program
-`demo\_01\_pseudo\_daily\_interp.f90`.
+`demo_01_pseudo_daily_interp.f90`.
 
 **Figure 16.** Pseudo-daily interpolation errors for CFSR near-surface
 air temperature (**a, c**) and CMAP precipitation rate (**b, d**). (**a,
