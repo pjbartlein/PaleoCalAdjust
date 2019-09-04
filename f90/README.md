@@ -1,6 +1,6 @@
 ## Programs (PaleoCalAdjust v1.0) ##
 
-Main programs, including `month_lenth.f90` and `cal_adjust_PMIP.f90`, plus additional driver and demonstration programs are in the folder `/main_programs`:
+Main programs, including `month_length.f90` and `cal_adjust_PMIP.f90`, plus additional driver and demonstration programs are in the folder `/main_programs`:
 
 	month_length.f90			! month-length tables
 	cal_adjust_PMIP.f90			! paleo calendar adjustment
