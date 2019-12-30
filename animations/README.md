@@ -16,9 +16,10 @@ The folders include:
 		/ orb_position
 		/ orb_solsitice_anm
 
-	/files			! animated .gifs and text files with ImageMagick 7 command lines and file lists
+	/files			! text files with ImageMagick 7 command lines and file lists
+	/gifs			! animated .gifs 
 	/ppt			! a folder containing the animated .gifs embedded in a PowerPoint presentation
-	/R 				! R scripts 
+	/R    			! R scripts 
 
 (Note that pathnames in the R scripts should be adjusted to reflect the local environment.)
 
