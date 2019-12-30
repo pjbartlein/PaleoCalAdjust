@@ -8,7 +8,7 @@ The folders include:
 	/data			
 		/ input     ! orbital elements and month lengths for the past 150 kyr, and a text file of months and days in a 363-day year
 
-		Five subfolders, empty here, which can be populated with files by running the R scripts:
+		Five subfolders, containing individual .pngs:
 
 		/ orb_0ka
 		/ orb_monangle
