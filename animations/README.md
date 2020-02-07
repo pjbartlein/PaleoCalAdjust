@@ -7,7 +7,7 @@ The folders include:
 	
 	/data			
 		/ input     ! orbital elements and month lengths for the past 150 kyr, and a text file of 
-						! months and days in a 366-day year
+		! months and days in a 365-day year
 
 		Five subfolders, containing individual .pngs:
 
