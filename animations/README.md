@@ -6,7 +6,8 @@ The animations included here illustrate the nature of Earth's elliptical orbit a
 The folders include: 
 	
 	/data			
-		/ input     ! orbital elements and month lengths for the past 150 kyr, and a text file of months and days in a 363-day year
+		/ input     ! orbital elements and month lengths for the past 150 kyr, and a text file of 
+						! months and days in a 366-day year
 
 		Five subfolders, containing individual .pngs:
 
