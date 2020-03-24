@@ -6,7 +6,7 @@ Example CMIP5/PMIP3-formatted netCDF source files (and resulting month-length ad
 [[https://www.dropbox.com/sh/hromb9qagzqk9kl/AAAcItqBRJzTnjW5VhjkSMOOa?dl=0]](https://www.dropbox.com/sh/hromb9qagzqk9kl/AAAcItqBRJzTnjW5VhjkSMOOa?dl=0)**
 
 **Globus:  
-[[https://app.globus.org/file-manager?origin_id=d74454ce-e6b4-11e7-80f5-0a208f818180&origin_path=%2FPaleoCalendarAdjust%2Fdata%2F]](https://app.globus.org/file-manager?origin_id=d74454ce-e6b4-11e7-80f5-0a208f818180&origin_path=%2FPaleoCalendarAdjust%2Fdata%2F)**
+[[https://app.globus.org/file-manager?origin_id=3c131f8a-6df3-11ea-af52-0201714f6eab&origin_path=%2F]](https://app.globus.org/file-manager?origin_id=3c131f8a-6df3-11ea-af52-0201714f6eab&origin_path=%2F)**
 
 ### Example source and adjusted CMIP5/PMIP3 and CMIP6/PMIP4 netCDF files ###
 
