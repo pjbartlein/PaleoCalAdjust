@@ -1,0 +1,20 @@
+prefix,calendar_type,begageBP,endageBP,agestep,begyrCE,nsimyrs,path,note,
+CCSM4_006ka_Aclim,365_day,-6000,-6000,1,1000,1,'e:\Projects\Calendar\data\month_lengths\',time slice,"Aclim-type files, 6ka and present calendars"
+CNRM-CM5_006ka_Aclim,standard,-6000,-6000,1,1950,1,'e:\Projects\Calendar\data\month_lengths\',time slice,
+MPI-ESM-P_006ka_Aclim,progreg,-6000,-6000,1,1850,1,'e:\Projects\Calendar\data\month_lengths\',time slice,
+CCSM4_000ka_Aclim,365_day,0,0,1,1000,1,'e:\Projects\Calendar\data\month_lengths\',time slice,
+CNRM-CM5_000ka_Aclim,standard,0,0,1,1000,1,'e:\Projects\Calendar\data\month_lengths\',time slice,
+MPI-ESM-P_000ka_Aclim,progreg,0,0,1,1000,1,'e:\Projects\Calendar\data\month_lengths\',time slice,
+CCSM4_006ka_Amon,noleap,-6000,-6000,1,1000,301,'e:\Projects\Calendar\data\month_lengths\',time slice,"Amon-type files, time series"
+CNRM-CM5_006ka_Amon,gregorian,-6000,-6000,1,2050,100,'e:\Projects\Calendar\data\month_lengths\',time slice,
+MPI-ESM-P_006ka_Amon,progreg,-6000,-6000,1,1850,100,'e:\Projects\Calendar\data\month_lengths\',time slice,
+CCSM4_000ka_Amon,noleap,0,0,1,1000,301,'e:\Projects\Calendar\data\month_lengths\',time slice,
+CNRM-CM5_000ka_Amon,gregorian,0,0,1,2050,100,'e:\Projects\Calendar\data\month_lengths\',time slice,
+MPI-ESM-P_000ka_Amon,progreg,0,0,1,1000,100,'e:\Projects\Calendar\data\month_lengths\',time slice,
+IPSL-CM6A-LR_127ka_Amon,gregorian,-127000,-127000,1,1850,100,'e:\Projects\Calendar\data\month_lengths\',time slice,
+IPSL-CM6A-LR_006ka_Amon,gregorian,-6000,-6000,1,1850,200,'e:\Projects\Calendar\data\month_lengths\',time slice,
+IPSL-CM6A-LR_000ka_Amon,gregorian,0,0,1,1850,200,'e:\Projects\Calendar\data\month_lengths\',time slice,
+tr21,noleap,-22000,39,1,-20050,1,'e:\Projects\Calendar\data\month_lengths\',transient,time-varying values
+PMIP4,noleap,-150000,0,1000,-148050,1,'e:\Projects\Calendar\data\month_lengths\',transient,
+PMIP360,360_day,-150000,0,1000,-148050,1,'e:\Projects\Calendar\data\month_lengths\',transient,
+CommonEra,progreg,-1949,150,1,1,1,'e:\Projects\Calendar\data\month_lengths\',transient,

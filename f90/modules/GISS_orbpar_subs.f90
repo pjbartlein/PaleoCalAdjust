@@ -1,4 +1,8 @@
 module giss_orbpar_subs
+
+! This moodule is .f90 version of the ORBPAR() subroutine contained in the file
+! https://data.giss.nasa.gov/ar5/SOLAR/ORBPAR.FOR downloaded 2017-09-04 17:17
+! also retrievable from https://web.archive.org/web/20150920211936/http://data.giss.nasa.gov/ar5/solar.html
     
 contains
     
@@ -50,7 +54,7 @@ subroutine orbpar(year, eccen, obliq, omegvp)   ! year should be YearCE
 
 ! NOTE:  Year CE/AD = 0 is assumed to not exist
     
-! .f90 version of the ORBPAR() subroutine contained in
+! .f90 version of the ORBPAR() subroutine contained in the file
 !  https://data.giss.nasa.gov/ar5/SOLAR/ORBPAR.FOR downloaded 2017-09-04 17:17
 !  also retrievable from https://web.archive.org/web/20150920211936/http://data.giss.nasa.gov/ar5/solar.html
 ! 

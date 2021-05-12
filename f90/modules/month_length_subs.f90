@@ -1,5 +1,26 @@
 module month_length_subs
 
+! This module contins subroutines necessary for calculating celestial or angular month lengths using Kepler's equation
+! for specific orbital parameter values.
+! Author: Patrick J. Bartlein, Univ. of Oregon (bartlein@uoregon.edu), with contributions by S.L. Shafer (sshafer@usgs.gov)
+! This program and related subroutines are part of PaleoCalAdjust v1.0:
+!
+! Version: 1.0 (original release)
+!   - see P.J. Bartlein & S.L. Shafer (2019) Paleo calendar-effect adjustments in time-slice and transient
+!         climate-model simulations (PaleoCalAdjust v1.0): impact and strategies for data analysis,
+!         Geoscientific Model Development, 12:3889ñ3913, doi: 10.5194/gmd-12-3889-2019
+!   - available from GitHub:  https://github.com/pjbartlein/PaleoCalAdjust or Zenodo:  https://doi.org/10.5281/zenodo.1478824
+!
+! Version 1.1:
+!   - modified the info file to include path to output data
+!   - infofile name and path are now read as a command-line arguement
+!   - separated the calculation of iageBP and iyearCE for time-slice and transient simulations for clarity
+!
+! Please cite Bartlein & Shafer (2019) if you use this code.
+!
+! Last update: 2021-05-05
+
+
     implicit none
 
     integer(4), parameter   :: nm = 12              ! number of months in the year
@@ -26,33 +47,33 @@ module month_length_subs
 
     ! month-length definitions
     real(8)     :: present_mon_360(nm) = 30.0d0     ! present-day month lengths in 360-day year
-    real(8)     :: present_mon_noleap(nm) = &       ! present-day month lengths in 365-day (noleap) year
-        (/ 31.0d0, 28.0d0, 31.0d0, 30.0d0, 31.0d0, 30.0d0, 31.0d0, 31.0d0, 30.0d0, 31.0d0, 30.0d0, 31.0d0 /)
-    real(8)     :: present_mon_leap(nm) = &         ! present-day month lengths in 366-day (leap) year
-        (/ 31.0d0, 29.0d0, 31.0d0, 30.0d0, 31.0d0, 30.0d0, 31.0d0, 31.0d0, 30.0d0, 31.0d0, 30.0d0, 31.0d0 /)
-    real(8)     :: present_mon_365_trop(nm) = &     ! present-day month lengths in a tropical year (note Feb.)
-        (/ 31.0d0, 28.24219876d0, 31.0d0, 30.0d0, 31.0d0, 30.0d0, 31.0d0, 31.0d0, 30.0d0, 31.0d0, 30.0d0, 31.0d0 /)
-    real(8)     :: present_mon_365_progreg(nm) = &  ! present-day month lengths in a Gregorian year (note Feb.)
-        (/ 31.0d0, 28.2425d0, 31.0d0, 30.0d0, 31.0d0, 30.0d0, 31.0d0, 31.0d0, 30.0d0, 31.0d0, 30.0d0, 31.0d0 /)
-    
     real(8)     :: present_beg_360(nm) = &          ! present-day month beginning day in 360-day year
         (/  0.0d0, 30.0d0, 60.0d0, 90.0d0, 120.0d0, 150.0d0, 180.0d0, 210.0d0, 240.0d0, 270.0d0, 300.0d0, 330.0d0 /)
     real(8)     :: present_mid_360(nm) = &          ! present-day month middle day in 360-day year
         (/ 15.0d0, 45.0d0, 75.0d0, 105.0d0, 135.0d0, 165.0d0, 195.0d0, 225.0d0, 255.0d0, 285.0d0, 315.0d0, 345.0d0 /)
     real(8)     :: present_end_360(nm) = &          ! present-day month ending day in 360-day year
-        (/ 30.0d0, 60.0d0, 90.0d0, 120.0d0, 150.0d0, 180.0d0, 210.0d0, 240.0d0, 270.0d0, 300.0d0, 330.0d0, 360.0d0 /)
+        (/ 30.0d0, 60.0d0, 90.0d0, 120.0d0, 150.0d0, 180.0d0, 210.0d0, 240.0d0, 270.0d0, 300.0d0, 330.0d0, 360.0d0 /)   
+    
+    real(8)     :: present_mon_noleap(nm) = &       ! present-day month lengths in 365-day (noleap) year
+        (/ 31.0d0, 28.0d0, 31.0d0, 30.0d0, 31.0d0, 30.0d0, 31.0d0, 31.0d0, 30.0d0, 31.0d0, 30.0d0, 31.0d0 /)
     real(8)     :: present_beg_365(nm) = &          ! present-day month beginning day in 365-day (noleap) year
         (/  0.0d0, 31.0d0, 59.0d0, 90.0d0, 120.0d0, 151.0d0, 181.0d0, 212.0d0, 243.0d0, 273.0d0, 304.0d0, 334.0d0 /)
     real(8)     :: present_mid_365(nm) = &          ! present-day month middle day in 365-day (noleap) year
         (/ 15.5d0, 45.0d0, 74.5d0, 105.0d0, 135.5d0, 166.0d0, 196.5d0, 227.5d0, 258.0d0, 288.5d0, 319.0d0, 349.5d0 /)
     real(8)     :: present_end_365(nm) = &          ! present-day month ending day in 365-day (noleap) year
-        (/ 31.0d0, 59.0d0, 90.0d0, 120.0d0, 151.0d0, 181.0d0, 212.0d0, 243.0d0, 273.0d0, 304.0d0, 334.0d0, 365.0d0 /)
+        (/ 31.0d0, 59.0d0, 90.0d0, 120.0d0, 151.0d0, 181.0d0, 212.0d0, 243.0d0, 273.0d0, 304.0d0, 334.0d0, 365.0d0 /)    
+    
+    real(8)     :: present_mon_leap(nm) = &         ! present-day month lengths in 366-day (leap) year
+        (/ 31.0d0, 29.0d0, 31.0d0, 30.0d0, 31.0d0, 30.0d0, 31.0d0, 31.0d0, 30.0d0, 31.0d0, 30.0d0, 31.0d0 /)
     real(8)     :: present_beg_366(nm) = &          ! present-day month beginning day in 366-day (leap) year
         (/  0.0d0, 31.0d0, 60.0d0, 91.0d0, 121.0d0, 152.0d0, 182.0d0, 213.0d0, 244.0d0, 274.0d0, 305.0d0, 335.0d0 /)
     real(8)     :: present_mid_366(nm) = &          ! present-day month beginning day in 366-day (leap) year
         (/ 15.5d0, 45.5d0, 75.5d0, 106.0d0, 136.5d0, 167.0d0, 197.5d0, 228.5d0, 259.0d0, 289.5d0, 320.0d0, 350.5d0 /)
     real(8)     :: present_end_366(nm) = &          ! present-day month beginning day in 366-day (leap) year
-        (/ 31.0d0, 60.0d0, 91.0d0, 121.0d0, 152.0d0, 182.0d0, 213.0d0, 244.0d0, 274.0d0, 305.0d0, 335.0d0, 366.0d0 /)
+        (/ 31.0d0, 60.0d0, 91.0d0, 121.0d0, 152.0d0, 182.0d0, 213.0d0, 244.0d0, 274.0d0, 305.0d0, 335.0d0, 366.0d0 /)   
+    
+    real(8)     :: present_mon_365_trop(nm) = &     ! present-day month lengths in a tropical year (note Feb.)
+        (/ 31.0d0, 28.24219876d0, 31.0d0, 30.0d0, 31.0d0, 30.0d0, 31.0d0, 31.0d0, 30.0d0, 31.0d0, 30.0d0, 31.0d0 /)
     real(8)     :: present_beg_365_trop(nm) = &     ! present-day month beginning day in a tropical year
         (/  0.0000d0, 31.0000d0, 59.2422d0, 90.2422d0, 120.2422d0, 151.2422d0, 181.2422d0, 212.2422d0, 243.2422d0, &
             273.2422d0, 304.2422d0, 334.2422d0 /)
@@ -61,7 +82,10 @@ module month_length_subs
             288.7422d0, 319.2422d0, 349.7422d0 /)
     real(8)     :: present_end_365_trop(nm) = &     ! present-day month ending day in a tropical year
         (/ 31.0000d0, 59.2422d0, 90.2422d0, 120.2422d0, 151.2422d0, 181.2422d0, 212.2422d0, 243.2422d0, 273.2422d0, &
-            304.2422d0, 334.2422d0, 365.2422d0 /)
+            304.2422d0, 334.2422d0, 365.2422d0 /)    
+    
+    real(8)     :: present_mon_365_progreg(nm) = &  ! present-day month lengths in a Gregorian year (note Feb.)
+        (/ 31.0d0, 28.2425d0, 31.0d0, 30.0d0, 31.0d0, 30.0d0, 31.0d0, 31.0d0, 30.0d0, 31.0d0, 30.0d0, 31.0d0 /)
     real(8)     :: present_beg_365_progreg(nm) = &  ! present-day month beginning day in a Gregorian year
         (/  0.0000d0, 31.0000d0, 59.2425d0, 90.2425d0, 120.2425d0, 151.2425d0, 181.242d0, 212.2425d0, 243.2425d0, &
             273.2425d0, 304.2425d0, 334.2425d0 /)
@@ -78,7 +102,8 @@ module month_length_subs
 contains
 
 subroutine get_month_lengths(calendar_type, begageBP, endageBP, agestep, nages, begyrCE, nsimyrs, &
-    iageBP, iyearCE, imonlen, imonmid, imonbeg, imonend, rmonlen, rmonmid, rmonbeg, rmonend, VE_day, SS_day, ndays)
+    iageBP, iyearCE, imonlen, imonmid, imonbeg, imonend, rmonlen, rmonmid, rmonbeg, rmonend, VE_day, SS_day, ndays, &
+    VEtoSS, SStoAE, AEtoWS, WStoVE)
 
     use GISS_orbpar_subs
     use GISS_srevents_subs
@@ -96,7 +121,7 @@ subroutine get_month_lengths(calendar_type, begageBP, endageBP, agestep, nages, 
 
     ! individual model simulation year-related variables (controls equinox and solstice days and leap-year status)
     integer(4), intent(in)  :: begyrCE                      ! beginning (pseudo-) year of individual model simulation
-    integer(4), intent(in)  :: nsimyrs                      ! number of years of simulation
+    integer(4), intent(in)  :: nsimyrs                      ! number of simulation years
 
     ! (output) month-length variables
     integer(4), intent(out) :: iageBP(nages*nsimyrs)        ! year BP 1950 (negative, e.g. 1900 CE = -50.0d0 BP)
@@ -112,6 +137,10 @@ subroutine get_month_lengths(calendar_type, begageBP, endageBP, agestep, nages, 
     real(8), intent(out)    :: VE_day(nages*nsimyrs)        ! real-value vernal equinox day in simulation year
     real(8), intent(out)    :: SS_day(nages*nsimyrs)        ! real-value (northern) summer solstice in simulation year
     integer(4), intent(out) :: ndays(nages*nsimyrs)         ! integer number of days in simulation year
+    real(8), intent(out)    :: VEtoSS(nages*nsimyrs)        ! real-value number of days VE to SS
+    real(8), intent(out)    :: SStoAE(nages*nsimyrs)        ! real-value number of days SS to AE
+    real(8), intent(out)    :: AEtoWS(nages*nsimyrs)        ! real-value number of days AE to WS
+    real(8), intent(out)    :: WStoVE(nages*nsimyrs)        ! real-value number of days WS to VE
 
     ! subroutine GISS_orbpars() and GISS_srevents() input and output arguments
     character(2)            :: year_type = 'BP'             ! AD (AD/BC), CE (CE/BCE), BP (before 1950)
@@ -136,6 +165,10 @@ subroutine get_month_lengths(calendar_type, begageBP, endageBP, agestep, nages, 
     real(8)                 :: rmonbeg_0ka_leap(nm)         ! real calculated month beginning day at 0ka in a leap year
     real(8)                 :: rmonmid_0ka_leap(nm)         ! real calculated month mid-month day at 0ka in a leap year
     real(8)                 :: rmonend_0ka_leap(nm)         ! real calculated month ending day at 0ka in a leap year
+    real(8)                 :: VEtoSS_0ka                   ! real number of days VE to SS
+    real(8)                 :: SStoAE_0ka                   ! real number of days SS to AE
+    real(8)                 :: AEtoWS_0ka                   ! real number of days AE to WS
+    real(8)                 :: WStoVE_0ka                   ! real number of days WS to VE
 
     ! arrays for calculating various month-length statistics
     real(8)                 :: rmonlen_rel(nm)              ! difference between real month lengths and present
@@ -151,19 +184,19 @@ subroutine get_month_lengths(calendar_type, begageBP, endageBP, agestep, nages, 
 
     logical                 :: adjust_to_0ka = .true.   ! adjust month-lengths and start days to common values at 0 ka/1950 CE
     
-    character(2048)         :: debugpath
+    !character(2048)         :: debugpath
 
-    ! debugging output
-    debugpath = "/Projects/Calendar/debug/"  ! Windows path  ! Windows path
+    !debugging output
+    !debugpath = "/Projects/Calendar/debug/"  ! Windows path  ! Windows path
     !debugpath = "/Users/bartlein/Projects/Calendar/PaleoCalAdjust/data/debug_files/"  ! Mac path
-    if (debug_write) then
-        open (22,file=trim(debugpath)//trim(calendar_type)//"_monlen_debug.dat")
-        open (11,file=trim(debugpath)//trim(calendar_type)//"_cal_rmonlen_raw.dat")
-        open (12,file=trim(debugpath)//trim(calendar_type)//"_cal_rmonlen_rel.dat")
-        open (13,file=trim(debugpath)//trim(calendar_type)//"_cal_rmonlen_ratio.dat")
-        open (23, file=trim(debugpath)//"kepler_test.dat")
-        open (24, file=trim(debugpath)//"month_test.dat")
-    end if
+    !if (debug_write) then
+    !    open (22,file=trim(debugpath)//trim(calendar_type)//"_monlen_debug.dat")
+    !    open (11,file=trim(debugpath)//trim(calendar_type)//"_cal_rmonlen_raw.dat")
+    !    open (12,file=trim(debugpath)//trim(calendar_type)//"_cal_rmonlen_rel.dat")
+    !    open (13,file=trim(debugpath)//trim(calendar_type)//"_cal_rmonlen_ratio.dat")
+    !    open (23, file=trim(debugpath)//trim(calendar_type)//"kepler_test.dat")
+    !    open (24, file=trim(debugpath)//trim(calendar_type)//"month_test.dat")
+    !end if
 
     ! check for supported calendar types
     select case (trim(calendar_type))
@@ -177,20 +210,28 @@ subroutine get_month_lengths(calendar_type, begageBP, endageBP, agestep, nages, 
 
     ! Step 1:  generate target years -- experiment ages (in yrs BP) and simulation years (in yrs CE)
     write (*,'(a)') "Generating target years..."
-    if (debug_write) write (*,'("begageBP, endageBP, agestep, nages, begyrCE, nsimyrs: ",6i7)') &
-        begageBP, endageBP, agestep, nages, begyrCE, nsimyrs
     if (debug_write) write (22,'("begageBP, endageBP, agestep, nages, begyrCE, nsimyrs: ",6i7)') &
-            begageBP, endageBP, agestep, nages, begyrCE, nsimyrs
-
-    ii=0
-    do n = 1, nages
-        do i = 1, nsimyrs
-            ii = ii+1
-            iageBP(ii) = begageBP + (n - 1) * agestep
-            iyearCE(ii) = begyrCE + (i - 1)
-            if (debug_write) write (22,'("n,i,ii,iageBP,iyearCE ", 5i8)') n,i,ii,iageBP(ii),iyearCE(ii)
+        begageBP, endageBP, agestep, nages, begyrCE, nsimyrs
+    
+    if (begageBP .eq. endageBP) then
+        
+        ! time-slice, or time-slice-like file for a transiet simulation (e.g. at 0 ka)
+        do n = 1, nsimyrs
+            iageBP(n) = begageBP
+            iyearCE(n) = begyrCE + (n - 1)
+            if (debug_write) write (22,'("n,iageBP,iyearCE ", 5i8)') n,iageBP(n),iyearCE(n)
         end do
-    end do
+    
+    else
+        
+        ! transient simulation
+        do n = 1, nages
+            iageBP(n) = begageBP + (n - 1) * agestep
+            iyearCE(n) = begyrCE + (n - 1) * agestep
+            if (debug_write) write (22,'("n,iageBP,iyearCE ", 5i8)') n,iageBP(n),iyearCE(n)
+        end do
+        
+    end if
 
     ! initialize arrays
     imonlen = 0; imonmid = 0; imonbeg = 0; imonend = 0
@@ -215,24 +256,29 @@ subroutine get_month_lengths(calendar_type, begageBP, endageBP, agestep, nages, 
     select case (trim(calendar_type))
     case ('360_day')
         yrlen = dble(nd_360); ndyr = nd_360; veqday = veqday_360; present_monlen = present_mon_360
-        call monlen(yrlen, ndyr, veqday, int(present_monlen), eccen, perih_deg, rmonlen_0ka, rmonbeg_0ka, rmonmid_0ka, rmonend_0ka)
+        call monlen(yrlen, ndyr, veqday, int(present_monlen), eccen, perih_deg, rmonlen_0ka, & 
+            rmonbeg_0ka, rmonmid_0ka, rmonend_0ka, VEtoSS_0ka, SStoAE_0ka, AEtoWS_0ka, WStoVE_0ka)
     case ('noleap', '365_day')
         yrlen = dble(nd_365); ndyr = nd_365; veqday = veqday_365; present_monlen = present_mon_noleap
-        call monlen(yrlen, ndyr, veqday, int(present_monlen), eccen, perih_deg, rmonlen_0ka, rmonbeg_0ka, rmonmid_0ka, rmonend_0ka)
+        call monlen(yrlen, ndyr, veqday, int(present_monlen), eccen, perih_deg, rmonlen_0ka, &
+        rmonbeg_0ka, rmonmid_0ka, rmonend_0ka, VEtoSS_0ka, SStoAE_0ka, AEtoWS_0ka, WStoVE_0ka)
     case ('366_day')
         yrlen = dble(nd_366); ndyr = nd_366; veqday = veqday_366; present_monlen = present_mon_leap
-        call monlen(yrlen, ndyr, veqday,  int(present_monlen), eccen, perih_deg, rmonlen_0ka, rmonbeg_0ka, rmonmid_0ka, rmonend_0ka)
+        call monlen(yrlen, ndyr, veqday,  int(present_monlen), eccen, perih_deg, rmonlen_0ka, &
+            rmonbeg_0ka, rmonmid_0ka, rmonend_0ka, VEtoSS_0ka, SStoAE_0ka, AEtoWS_0ka, WStoVE_0ka)
     case ('365.2425')
         yrlen = dble(progreg_year); ndyr = nd_365; veqday = veqday_365; present_monlen = present_mon_365_progreg
-        call monlen(yrlen, ndyr, veqday, int(present_monlen), eccen, perih_deg, rmonlen_0ka, rmonbeg_0ka, rmonmid_0ka, rmonend_0ka)
+        call monlen(yrlen, ndyr, veqday, int(present_monlen), eccen, perih_deg, rmonlen_0ka, &
+        rmonbeg_0ka, rmonmid_0ka, rmonend_0ka, VEtoSS_0ka, SStoAE_0ka, AEtoWS_0ka, WStoVE_0ka)
     case ('proleptic_gregorian','progreg','gregorian','standard')
         ! 365-day year
         yrlen = dble(nd_365); ndyr = nd_365; veqday = veqday_365; present_monlen = present_mon_noleap
-        call monlen(yrlen, ndyr, veqday, int(present_monlen), eccen, perih_deg, rmonlen_0ka, rmonbeg_0ka, rmonmid_0ka, rmonend_0ka)
+        call monlen(yrlen, ndyr, veqday, int(present_monlen), eccen, perih_deg, rmonlen_0ka, &
+            rmonbeg_0ka, rmonmid_0ka, rmonend_0ka, VEtoSS_0ka, SStoAE_0ka, AEtoWS_0ka, WStoVE_0ka)
         ! 366-day year
         yrlen = dble(nd_366); ndyr = nd_366; veqday = veqday_366; present_monlen = present_mon_leap
         call monlen(yrlen, ndyr, veqday, int(present_monlen), eccen, perih_deg, rmonlen_0ka_leap, & 
-            rmonbeg_0ka_leap, rmonmid_0ka_leap, rmonend_0ka_leap)
+            rmonbeg_0ka_leap, rmonmid_0ka_leap, rmonend_0ka_leap, VEtoSS_0ka, SStoAE_0ka, AEtoWS_0ka, WStoVE_0ka)
     case default
         stop "calendar type not supported"
     end select
@@ -242,7 +288,7 @@ subroutine get_month_lengths(calendar_type, begageBP, endageBP, agestep, nages, 
     ! loop over simulation ages and years
 
     write (*,'(a)') "Looping over ages and years..."
-    if (debug_write) write (*,'("nages, nsimyrs, nages*nsimyrs:  ",3i8)') nages, nsimyrs, nages*nsimyrs
+    if (debug_write) write (22,'("nages, nsimyrs, nages*nsimyrs:  ",3i8)') nages, nsimyrs, nages*nsimyrs
     ii = 0
     do n = 1, nages
         do i = 1, nsimyrs
@@ -264,7 +310,7 @@ subroutine get_month_lengths(calendar_type, begageBP, endageBP, agestep, nages, 
             case ('360_day')
                 yrlen = dble(nd_360); ndyr = nd_360; veqday = veqday_360
                 call monlen(yrlen, ndyr, veqday, int(present_mon_360), eccen, perih_deg, rmonlen(ii,:), &
-                    rmonbeg(ii,:), rmonmid(ii,:), rmonend(ii,:))
+                    rmonbeg(ii,:), rmonmid(ii,:), rmonend(ii,:), VEtoSS(ii), SStoAE(ii), AEtoWS(ii), WStoVE(ii))
                 ! adjust values so that 0 ka (1950 CE) will have nominal present-day month lengths
                 if (adjust_to_0ka) call adjust_to_ref_length(rmonlen(ii,:), rmonlen_0ka, present_mon_360)
                 if (adjust_to_0ka) call adjust_to_ref_day(rmonbeg(ii,:), rmonbeg_0ka, present_beg_360)
@@ -273,7 +319,7 @@ subroutine get_month_lengths(calendar_type, begageBP, endageBP, agestep, nages, 
             case ('noleap', '365_day')
                 yrlen = dble(nd_365); ndyr = nd_365; veqday = veqday_365
                 call monlen(yrlen, ndyr, veqday, int(present_mon_noleap), eccen, perih_deg, rmonlen(ii,:), &
-                    rmonbeg(ii,:), rmonmid(ii,:), rmonend(ii,:))
+                    rmonbeg(ii,:), rmonmid(ii,:), rmonend(ii,:), VEtoSS(ii), SStoAE(ii), AEtoWS(ii), WStoVE(ii))
                 ! adjust values so that 0 ka (1950 CE) will have nominal present-day month lengths
                 if (adjust_to_0ka) call adjust_to_ref_length(rmonlen(ii,:), rmonlen_0ka, present_mon_noleap)
                 if (adjust_to_0ka) call adjust_to_ref_day(rmonbeg(ii,:), rmonbeg_0ka, present_beg_365)
@@ -282,7 +328,7 @@ subroutine get_month_lengths(calendar_type, begageBP, endageBP, agestep, nages, 
             case ('366_day')
                 yrlen = dble(nd_366); ndyr = nd_366; veqday = veqday_366
                 call monlen(yrlen, ndyr, veqday, int(present_mon_leap), eccen, perih_deg, rmonlen(ii,:), &
-                    rmonbeg(ii,:), rmonmid(ii,:), rmonend(ii,:))
+                    rmonbeg(ii,:), rmonmid(ii,:), rmonend(ii,:), VEtoSS(ii), SStoAE(ii), AEtoWS(ii), WStoVE(ii))
                 ! adjust values so that 0 ka (1950 CE) will have nominal present-day month lengths
                 if (adjust_to_0ka) call adjust_to_ref_length(rmonlen(ii,:), rmonlen_0ka, present_mon_leap)
                 if (adjust_to_0ka) call adjust_to_ref_day(rmonbeg(ii,:), rmonbeg_0ka, present_beg_366)
@@ -291,7 +337,7 @@ subroutine get_month_lengths(calendar_type, begageBP, endageBP, agestep, nages, 
             case ('365.2425')
                 yrlen = dble(progreg_year); ndyr = nd_365; veqday = veqday_365
                 call monlen(yrlen, ndyr, veqday, int(present_mon_365_progreg), eccen, perih_deg, rmonlen(ii,:), &
-                    rmonbeg(ii,:), rmonmid(ii,:), rmonend(ii,:))
+                    rmonbeg(ii,:), rmonmid(ii,:), rmonend(ii,:), VEtoSS(ii), SStoAE(ii), AEtoWS(ii), WStoVE(ii))
                 ! adjust values so that 0 ka (1950 CE) will have nominal present-day month lengths
                 if (adjust_to_0ka) call adjust_to_ref_length(rmonlen(ii,:), rmonlen_0ka, present_mon_365_progreg)
                 if (adjust_to_0ka) call adjust_to_ref_day(rmonbeg(ii,:), rmonbeg_0ka, present_beg_365_progreg)
@@ -302,12 +348,12 @@ subroutine get_month_lengths(calendar_type, begageBP, endageBP, agestep, nages, 
             case ('proleptic_gregorian','progreg','gregorian','standard')
                 ! check for leap year
                 nd_progreg = yearlen_CE(iyearCE(ii))
-                if (debug_write) write (22,'("ii, iyearCE, nd_progreg: ",3i6,i4)') ii, iageBP(ii), iyearCE(ii), nd_progreg
+                if (debug_write) write (22,'("ii, iyearCE, nd_progreg: ",3i7,i4)') ii, iageBP(ii), iyearCE(ii), nd_progreg
                 if (nd_progreg .eq. 365) then ! (non leap year)
                     yrlen = dble(nd_365); ndyr = nd_365; veqday = veqday_365
                     ! get real-valued month lengths
                     call monlen(yrlen, ndyr, veqday, int(present_mon_noleap), eccen, perih_deg, rmonlen(ii,:), &
-                        rmonbeg(ii,:), rmonmid(ii,:), rmonend(ii,:))
+                        rmonbeg(ii,:), rmonmid(ii,:), rmonend(ii,:), VEtoSS(ii), SStoAE(ii), AEtoWS(ii), WStoVE(ii))
                     ! adjust values so that 0 ka (1950 CE) will have nominal present-day month lengths
                     if (adjust_to_0ka) call adjust_to_ref_length(rmonlen(ii,:), rmonlen_0ka, present_mon_noleap)
                     if (adjust_to_0ka) call adjust_to_ref_day(rmonbeg(ii,:), rmonbeg_0ka, present_beg_365)
@@ -316,7 +362,7 @@ subroutine get_month_lengths(calendar_type, begageBP, endageBP, agestep, nages, 
                 else ! ndprogreg = 366 (leap year)
                     yrlen = dble(nd_366); ndyr = nd_366; veqday = veqday_366
                     call monlen(yrlen, ndyr, veqday, int(present_mon_leap), eccen, perih_deg, rmonlen(ii,:), &
-                        rmonbeg(ii,:), rmonmid(ii,:), rmonend(ii,:))
+                        rmonbeg(ii,:), rmonmid(ii,:), rmonend(ii,:), VEtoSS(ii), SStoAE(ii), AEtoWS(ii), WStoVE(ii))
                     ! adjust values so that 0 ka (1950 CE) will have nominal present-day month lengths
                     if (adjust_to_0ka) call adjust_to_ref_length(rmonlen(ii,:), rmonlen_0ka_leap, present_mon_leap)
                     if (adjust_to_0ka) call adjust_to_ref_day(rmonbeg(ii,:), rmonbeg_0ka_leap, present_beg_366)
@@ -377,7 +423,8 @@ subroutine get_month_lengths(calendar_type, begageBP, endageBP, agestep, nages, 
 
 end subroutine get_month_lengths
 
-subroutine monlen(yrlen, ndyr, veqday, imonlen, eccen, perih, rmonlen, rmonbeg, rmonmid, rmonend)
+subroutine monlen(yrlen, ndyr, veqday, imonlen, eccen, perih, rmonlen, rmonbeg, rmonmid, rmonend, &
+    tt_VE_to_SS, tt_SS_to_AE, tt_AE_to_WS, tt_WS_to_VE)
 ! calculate month lengths, and beginning, middle and ending day times for a particular orbital configuration, 
 ! calendar and vernal equinox day using a "traverse-time/time-of-flight" expression based on Kepler's equation:
 ! (Curtis, H.D. (2014) Orbital Mechanics for Engineering Students, Elsevier, Ch. 3)
@@ -395,10 +442,21 @@ subroutine monlen(yrlen, ndyr, veqday, imonlen, eccen, perih, rmonlen, rmonbeg, 
     real(8), intent(out)    :: rmonmid(nm)          ! real month middle day
     real(8), intent(out)    :: rmonend(nm)          ! real month ending day
     
-    real(8)                 :: angle_veq_to_Jan1    ! angle between vernal equinox and Jan 1
-    real(8)                 :: tt_perih_to_veq      ! traverse time, perihelion to vernal equinox
+    real(8)                 :: tt_VE_to_SS          ! traverse time, VE to SS
+    real(8)                 :: tt_SS_to_AE          ! traverse time, SS to AE    
+    real(8)                 :: tt_AE_to_WS          ! traverse time, AE to WS
+    real(8)                 :: tt_WS_to_VE          ! traverse time, WS to VE
+    
+    real(8)                 :: angle_VE_to_Jan1     ! angle between vernal equinox and Jan 1
+    real(8)                 :: tt_perih_to_VE       ! traverse time, perihelion to vernal equinox
     real(8)                 :: angle_perih_to_Jan1  ! angle, perihelion to Jan 1
-    real(8)                 :: angle_perih_to_veq   ! angle, perihelion to vernal equinox
+    real(8)                 :: angle_perih_to_VE    ! angle, perihelion to vernal (March) equinox
+    real(8)                 :: angle_perih_to_SS    ! angle, perihelion to summer (June) solstice
+    real(8)                 :: angle_perih_to_AE    ! angle, perihelion to autumn (September) equinox
+    real(8)                 :: angle_perih_to_WS    ! angle, perihelion to winter (December) solstice
+    real(8)                 :: tt_perih_to_SS       ! traverse time, perihelion to summer solstice
+    real(8)                 :: tt_perih_to_AE       ! traverse time, perihelion to autumn equinox
+    real(8)                 :: tt_perih_to_WS       ! traverse time, perihelion to winter solstice
     
     real(8)                 :: mon_angle(nm)        ! month angle (degrees)
     real(8)                 :: beg_angle(nm), mid_angle(nm), end_angle(nm) ! beginning, middle and end of month, relative to Jan 1
@@ -417,32 +475,80 @@ subroutine monlen(yrlen, ndyr, veqday, imonlen, eccen, perih, rmonlen, rmonbeg, 
     rmonlen = 0.0d0; rmonbeg = 0.0d0; rmonmid = 0.0d0; rmonend = 0.0d0 
     
     ! number of days in year
-    if (debug_write) write (*,'("number of days in year: ",i4)') ndyr
+    if (debug_write) write (22,'("number of days in year: ",i4)') ndyr
     
     ! perihelion (perihelion longitude = longitude of vernal equinox + 180 degrees, by definition)
-    if (debug_write) write (*,'("perihelion: ",f14.8)') perih
+    if (debug_write) write (22,'("perihelion: ",f14.8)') perih
 
     ! angle and traverse time, perihelion to vernal equinox 
-    angle_perih_to_veq = 360.00d0 - perih
-    if (debug_write) write (*,'("angle_perih_to_veq: ",f14.8)') angle_perih_to_veq
+    angle_perih_to_VE = 360.00d0 - perih
+    if (debug_write) write (22,'("angle_perih_to_VE: ",f14.8)') angle_perih_to_VE
 
     ! traverse time (along elliptical orbit) perihelion to vernal equinox
-    call kepler_time(eccen, yrlen, angle_perih_to_veq, tt_perih_to_veq)
-    if (debug_write) write (*,'("tt_perih_to_veq: ",f14.8)') tt_perih_to_veq
+    call kepler_time(eccen, yrlen, angle_perih_to_VE, tt_perih_to_VE)
+    if (debug_write) write (22,'("tt_perih_to_VE: ",f14.8)') tt_perih_to_VE
 
     ! angle, perihelion to Jan1
-    angle_perih_to_Jan1 = angle_perih_to_veq - veqday * (360.0d0/yrlen)
-    if (debug_write) write (*,'("angle_perih_to_Jan1: ",f14.8)') angle_perih_to_Jan1
+    angle_perih_to_Jan1 = angle_perih_to_VE - veqday * (360.0d0/yrlen)
+    if (debug_write) write (22,'("angle_perih_to_Jan1: ",f14.8)') angle_perih_to_Jan1
 
     ! angle, vernal equinox to Jan1 (Jan 1 begins at 0.0 (or 360.0 degrees))
-    ! for checking, angle_perih_to_Jan1 * (yrlen/360.0d0) should equal 0.0
-    angle_veq_to_Jan1 = 360.0d0 - veqday * (360.0d0/yrlen)
-    if (debug_write) write (*,'("angle_veq_to_Jan1, check: ",2f14.8)') angle_veq_to_Jan1, angle_perih_to_Jan1 * (yrlen/360.0d0) 
+    angle_VE_to_Jan1 = 360.0d0 - veqday * (360.0d0/yrlen)
+    if (debug_write) write (22,'("angle_VE_to_Jan1: ",1f14.8)') angle_VE_to_Jan1
+    
+    ! angle, perihelion to SS
+    angle_perih_to_SS = angle_perih_to_VE + 90.0d0
+    if (debug_write) write (22,'("angle_perih_to_SS: ",f14.8)') angle_perih_to_SS
+    
+    ! traverse time (along elliptical orbit) perihelion to SS
+    call kepler_time(eccen, yrlen, angle_perih_to_SS, tt_perih_to_SS)
+    if (debug_write) write (22,'("tt_perih_to_SS: ",f14.8)') tt_perih_to_SS
+    
+    ! traverse time (along elliptical orbit) VE to SS
+    tt_VE_to_SS = tt_perih_to_SS - tt_perih_to_VE
+    if (dabs(tt_VE_to_SS) .gt. 180.0d0) tt_VE_to_SS = yrlen - dabs(tt_VE_to_SS)
+    if (debug_write) write (22,'("tt_VE_to_SS: ",2f14.8)') tt_VE_to_SS, angle_perih_to_SS-angle_perih_to_VE
+    
+    ! angle, perihelion to AE
+    angle_perih_to_AE = angle_perih_to_VE + 180.0d0
+    if (debug_write) write (22,'("angle_perih_to_AE: ",f14.8)') angle_perih_to_AE
+    
+    ! traverse time (along elliptical orbit) perihelion to AE
+    call kepler_time(eccen, yrlen, angle_perih_to_AE, tt_perih_to_AE)
+    if (debug_write) write (22,'("tt_perih_to_AE: ",f14.8)') tt_perih_to_AE
+    
+    ! traverse time (along elliptical orbit) SS to AE
+    tt_SS_to_AE = tt_perih_to_AE - tt_perih_to_SS
+    if (dabs(tt_SS_to_AE) .gt. 180.0d0) tt_SS_to_AE = yrlen - dabs(tt_SS_to_AE)
+    if (debug_write) write (22,'("tt_SS_to_AE: ",2f14.8)') tt_SS_to_AE, angle_perih_to_AE-angle_perih_to_SS
+    
+    ! angle, perihelion to WS
+    angle_perih_to_WS = angle_perih_to_VE + 270.0d0
+    if (debug_write) write (22,'("angle_perih_to_WS: ",f14.8)') angle_perih_to_WS
+    
+    ! traverse time (along elliptical orbit) perihelion to WS
+    call kepler_time(eccen, yrlen, angle_perih_to_WS, tt_perih_to_WS)
+    if (debug_write) write (22,'("tt_perih_to_WS: ",f14.8)') tt_perih_to_WS
+    
+    ! traverse time (along elliptical orbit) AE to WS
+    tt_AE_to_WS = tt_perih_to_WS - tt_perih_to_AE
+    if (dabs(tt_AE_to_WS) .gt. 180.0d0) tt_AE_to_WS = yrlen - dabs(tt_AE_to_WS)
+    if (debug_write) write (22,'("tt_AE_to_WS: ",2f14.8)') tt_AE_to_WS, angle_perih_to_WS-angle_perih_to_AE
+    
+    ! traverse time (along elliptical orbit) perihelion to VE
+    if (debug_write) write (22,'("tt_perih_to_VE: ",f14.8)') tt_perih_to_VE
+    
+    ! traverse time (along elliptical orbit) WS to VE
+    tt_WS_to_VE = tt_perih_to_VE - tt_perih_to_WS
+    if (dabs(tt_WS_to_VE) .gt. 180.0d0) tt_WS_to_VE = yrlen - dabs(tt_WS_to_VE)  
+    if (debug_write) write (22,'("tt_WS_to_VE: ",2f14.8)') tt_WS_to_VE, angle_perih_to_VE-angle_perih_to_WS
+    
+    if (debug_write) write (22,'("check: ",f14.8)') tt_VE_to_SS + tt_SS_to_AE + tt_AE_to_WS + tt_WS_to_VE
 
     ! angles, traverse times, month lengths, etc. for individual months
 
     ! month angle (and beginning, middle and end of month, relative to Jan1)
-    if (debug_write) write (*,'(a)') " "
+    if (debug_write) write (22,'(a)') " "
     mon_angle(1) = dble(imonlen(1) * (360.0d0/yrlen))
     beg_angle(1) = 0.0d0
     mid_angle(1) = beg_angle(1) + mon_angle(1)/2.0d0
@@ -455,7 +561,7 @@ subroutine monlen(yrlen, ndyr, veqday, imonlen, eccen, perih, rmonlen, rmonbeg, 
     end do
     if (debug_write) then
         do m = 1,nm
-            write (*,'(i4,5f9.4)') m,dble(imonlen(m)), mon_angle(m), beg_angle(m), mid_angle(m), end_angle(m)
+            write (22,'(i4,5f9.4)') m,dble(imonlen(m)), mon_angle(m), beg_angle(m), mid_angle(m), end_angle(m)
         end do
     end if
 
@@ -473,9 +579,9 @@ subroutine monlen(yrlen, ndyr, veqday, imonlen, eccen, perih, rmonlen, rmonbeg, 
         call kepler_time(eccen, yrlen, perih_angle_month_end(m), tt_month_end(m))
     
         ! traverse time from vernal equinox for each month's beginning, middle and ending days (on elliptical orbit)
-        t_month_beg(m) = tt_month_beg(m) - tt_perih_to_veq
-        t_month_mid(m) = tt_month_mid(m) - tt_perih_to_veq
-        t_month_end(m) = tt_month_end(m) - tt_perih_to_veq
+        t_month_beg(m) = tt_month_beg(m) - tt_perih_to_VE
+        t_month_mid(m) = tt_month_mid(m) - tt_perih_to_VE
+        t_month_end(m) = tt_month_end(m) - tt_perih_to_VE
     
         ! beginning, middle and ending days of each month (relative to Jan1)
         rmonbeg(m) = dmod(t_month_beg(m) + veqday, yrlen)
@@ -492,15 +598,15 @@ subroutine monlen(yrlen, ndyr, veqday, imonlen, eccen, perih, rmonlen, rmonbeg, 
 
     if (debug_write) then
         do m=1,nm
-            write (*,'("m, perih_angle_month_beg, tt_month_beg, t_month_beg, beg_day: ", i3, 4f14.8)') &
+            write (22,'("m, perih_angle_month_beg, tt_month_beg, t_month_beg, beg_day: ", i3, 4f14.8)') &
                 m, perih_angle_month_beg(m), tt_month_beg(m), t_month_beg(m), rmonbeg(m)
         end do
         do m=1,nm
-            write (*,'("m, perih_angle_month_mid, tt_month_mid, t_month_mid, mid_day: ", i3, 4f14.8)') &
+            write (22,'("m, perih_angle_month_mid, tt_month_mid, t_month_mid, mid_day: ", i3, 4f14.8)') &
                 m, perih_angle_month_mid(m), tt_month_mid(m), t_month_mid(m), rmonmid(m)
         end do
         do m=1,nm
-            write (*,'("m, perih_angle_month_end, tt_month_end, t_month_end, end_day: ", i3, 4f14.8)') &
+            write (22,'("m, perih_angle_month_end, tt_month_end, t_month_end, end_day: ", i3, 4f14.8)') &
                 m, perih_angle_month_end(m), tt_month_end(m), t_month_end(m), rmonend(m)
         end do
     end if
@@ -509,11 +615,11 @@ subroutine monlen(yrlen, ndyr, veqday, imonlen, eccen, perih, rmonlen, rmonbeg, 
     do m = 1,nm-1
         rmonlen(m) = t_month_beg(m+1) - t_month_beg(m)
         if (rmonlen(m) .le. 0.0d0) rmonlen(m) = rmonlen(m) + yrlen
-        if (debug_write) write (*,'("m, rmonlen: ", i4,4f14.8)') m, rmonlen(m)
+        if (debug_write) write (22,'("m, rmonlen: ", i4,4f14.8)') m, rmonlen(m)
     end do
     rmonlen(nm) = t_month_beg(1) - t_month_beg(nm)
     if (rmonlen(nm) .le. 0.0d0) rmonlen(nm) = rmonlen(nm) + yrlen
-    if (debug_write) write (*,'("m, rmonlen: ", i4,4f14.8)') nm, rmonlen(nm)
+    if (debug_write) write (22,'("m, rmonlen: ", i4,4f14.8)') nm, rmonlen(nm)
 
 end subroutine monlen
     
@@ -544,6 +650,7 @@ subroutine kepler_time(eccen, T, theta_deg, time)
     M = E - eccen*dsin(E)                                                                   ! eq 3.14
     time = (M / (2.0d0 * pi)) * T                                                           ! eq 3.15
     if (time .lt. 0.0d0) time = time + T
+    ! if (debug_write) write (22, '("theta_deg, theta_rad, E, M, time: ", 5f14.8)') theta_deg, theta_rad, E, M, time
 
     ! for plotting orbit using polar coordinates
     !r = a * (1.0d0 - eccen**2) / (1.0d0 + eccen * dcos(theta_rad))    
@@ -596,7 +703,7 @@ subroutine kepler_theta(eccen, M_angle, theta_deg)
     if (debug_write) then
         ! check
         M = E - eccen * dsin(E)
-        write (*,*) radians(M_angle), M
+        write (22,*) radians(M_angle), M
     end if
     
     theta= 2.0d0 * datan(dsqrt((1.0d0 + eccen)/(1 - eccen)) * dtan(E/2.0d0))
@@ -611,8 +718,7 @@ subroutine kepler_theta(eccen, M_angle, theta_deg)
     
 end subroutine kepler_theta
 
-
-subroutine kepler_daylen(ndyr, yrlen, eccen, veqday, angle_perih_to_Jan1, tt_perih_to_veq, & 
+subroutine kepler_daylen(ndyr, yrlen, eccen, veqday, angle_perih_to_Jan1, tt_perih_to_VE, & 
     perih_angle_day, tt_day, t_day, daylen, start_day)
 
     implicit none
@@ -622,7 +728,7 @@ subroutine kepler_daylen(ndyr, yrlen, eccen, veqday, angle_perih_to_Jan1, tt_per
     real(8), intent(in)     :: eccen                ! eccentricity
     real(8), intent(in)     :: veqday               ! vernal equinox day
     real(8), intent(in)     :: angle_perih_to_Jan1  ! angle (on circle) from perihelion to Jan1
-    real(8), intent(in)     :: tt_perih_to_veq      ! traverse time, from perihelion to veq (same units as yrlen)
+    real(8), intent(in)     :: tt_perih_to_VE       ! traverse time, from perihelion to veq (same units as yrlen)
     
     real(8), intent(out)    :: perih_angle_day(0:ndyr)  ! angle from Jan 1
     real(8), intent(out)    :: tt_day(0:ndyr)           ! traverse time, from perihelion to each day (same units as yrlen)
@@ -642,8 +748,7 @@ subroutine kepler_daylen(ndyr, yrlen, eccen, veqday, angle_perih_to_Jan1, tt_per
     ! traverse time of each day from perihelion (tt_day) and traverse time from vernal equinox (t)
     do i = 1,ndyr
         call kepler_time(eccen, yrlen, perih_angle_day(i), tt_day(i))
-        t_day(i) = tt_day(i) - tt_perih_to_veq
-        !if (i .gt. veqday) t_day(i) = t_day(i) + yrlen
+        t_day(i) = tt_day(i) - tt_perih_to_VE
     end do
     tt_day(0) = tt_day(ndyr); t_day(0) = t_day(ndyr)
 
@@ -670,9 +775,9 @@ subroutine adjust_to_ref_length(rmonlen, rmonlenref, rmonlentarg)
     real(8)                 :: rmonlentot_in, rmonlentot_out
 
     integer(4)              :: m
-
-    rmonlentot_in = 0.0d0; rmonlentot_out = 0.0d0
+    
     ! adjust rmonlen to reference year
+    rmonlentot_in = 0.0d0; rmonlentot_out = 0.0d0
     do m=1,nm
         rmonlentot_in = rmonlentot_in + rmonlen(m)
         rmonlen(m) = rmonlen(m) * (rmonlentarg(m)/rmonlenref(m))
@@ -807,7 +912,7 @@ subroutine integer_monlen(rmonlen, ndtarg, imonlen, iyeartot)
         iyeartot=iyeartot+imonlen(m)
         ryeartot=ryeartot+rmonlen(m)
     end do
-    !write (23,'(13(i4,7x))') imonlen(1:nm),iyeartot
+    if (debug_write) write (23,'(13(i4,7x))') imonlen(1:nm),iyeartot
 
     ! force integer month lengths to sum to ndtarg
     if (iyeartot.ne.ndtarg) then
@@ -819,7 +924,7 @@ subroutine integer_monlen(rmonlen, ndtarg, imonlen, iyeartot)
         ! iterate until iyeartot = ndtarg, incrementing small increment via i (i*inc)
         diff_sign=1
         if ((iyeartot-ndtarg) .gt. 0) diff_sign=-1
-        !write (20,*) diff_sign
+        if (debug_write) write (20,*) diff_sign
         inc=0.000001; i=0
         do
             if (iyeartot.eq.ndtarg) exit

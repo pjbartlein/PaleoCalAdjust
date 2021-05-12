@@ -1,6 +1,8 @@
 module GISS_srevents_subs
-! subroutines based on
-! SREVENTS.FOR    Solar EVENTS each year    2012/05/29
+
+! This module contains subroutines for calculating the timing of the vernal equiox, the solstices and
+! time of perihelion and aphelion, based on
+! SREVENTS.FOR    Solar EVENTS each year    2012/05/29, downloaded from
 ! https://data.giss.nasa.gov/ar5/SOLAR/SREVENTS.FOR downloaded 2017-09-12
 ! also retrievable from https://web.archive.org/web/20150920211936/http://data.giss.nasa.gov/ar5/solar.html   
 ! conversion to .f90 by P.J. Bartlein
@@ -309,9 +311,11 @@ SUBROUTINE DtoYMD (DAY, IYEAR,IMONTH,DATE)
 !
 100 DAY1Y = DAY4Y
     Do 120 M=1,11
-120 If (DAY1Y < JDSUML(M+1))  GoTo 130
+    If (DAY1Y < JDSUML(M+1))  GoTo 130
+120 continue
 !     M=12
-130 IYEAR  = 2000 + int(N4CENT*400) + int(N1CENT*100) + N4YEAR*4 + N1YEAR
+130 continue
+    IYEAR  = 2000 + int(N4CENT*400) + int(N1CENT*100) + N4YEAR*4 + N1YEAR
     IMONTH = M
     DATE   = DAY1Y - JDSUML(M)
     Return
@@ -320,9 +324,11 @@ SUBROUTINE DtoYMD (DAY, IYEAR,IMONTH,DATE)
 !
 200 DAY1Y  = DAY4Y - N1YEAR*JDAY1Y - 1
 210 Do 220 M=1,11
-220 If (DAY1Y < JDSUMN(M+1))  GoTo 230
+    If (DAY1Y < JDSUMN(M+1))  GoTo 230
+220 continue
 !     M=12
-230 IYEAR  = 2000 + int(N4CENT)*400 + int(N1CENT)*100 + N4YEAR*4 + N1YEAR
+230 continue
+    IYEAR  = 2000 + int(N4CENT)*400 + int(N1CENT)*100 + N4YEAR*4 + N1YEAR
     IMONTH = M
     DATE   = DAY1Y - JDSUMN(M)
     Return
