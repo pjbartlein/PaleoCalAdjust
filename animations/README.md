@@ -9,9 +9,10 @@ The folders include:
 		/ input     ! orbital elements and month lengths for the past 150 kyr, and a text file of 
 		! months and days in a 365-day year
 
-		Five subfolders, containing individual .pngs:
+		Six subfolders, containing individual .pngs:
 
 		/ orb_0ka
+		/ orb_insol65n_anm
 		/ orb_monangle
 		/ orb_monlen
 		/ orb_position
@@ -19,14 +20,15 @@ The folders include:
 
 	/files			! text files with ImageMagick 7 command lines and file lists
 	/gifs			! animated .gifs 
-	/ppt			! a folder containing the animated .gifs embedded in a PowerPoint presentation
+	/ppt			! a folder containing the Bartlein and Shafer (2019) AGU PowerPoint.
 	/R    			! R scripts 
 
 (Note that pathnames in the R scripts should be adjusted to reflect the local environment.)
 
 The animations include:
 
-- `orb_0ka.gif` The present-day elliptical orbit, showing the position of the Earth at 5-degree intervals during the year.  
+- `orb_0ka.gif` The present-day elliptical orbit, showing the position of the Earth at 5-degree intervals during the year. 
+- `orb_insol65n_anm`  Insolation long-term mean differences (from 0 ka, also known as "anomalies").
 - `orb_position.gif` Earth's orbit over at 1 kyr intervals over the past 150 kyr.
 - `orb_monlen.gif`  An animated version of Fig. 1 in Bartlein and Shafer (2019, *GMD*), showing the orbit, and month-length "anomalies" (long-term mean differences between 0 ka (1950 CE) and each time.
 - `orb_solstice_anm`  An animated version of Fig. 2 in Bartlein and Shafer (2019), showing the orbit, and differences between the middle day of each month and the June solstice.  

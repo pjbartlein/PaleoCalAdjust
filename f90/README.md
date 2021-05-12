@@ -19,7 +19,9 @@ The `/modules` folder contains the following:
 	pseudo_daily_interp_subs.f90	! subroutines for managing pseudo-daily interpolation
 	mp_interp_epstein_subs.f90		! Epstein (1991) harmonic-regression interpolation
 	mp_interp_harzallah_subs.f90	! Harzallah (1995) iterative-spline interpolation
-	spline.f90						! J. Burkhardt spline-interpolation subroutines
+	spline_subs.f90					! Burkhardt spline-interpolation subroutines 
+
+The module `spline_subs.f90` contains several subroutines and functions from John Burkhardt's library of Fortran90 spline-fitting subroutines, and is used by `mp_interp_harzallah_subs.f90` [[https://people.sc.fsu.edu/~jburkardt/f_src/spline/spline.html)]](https://people.sc.fsu.edu/~jburkardt/f_src/spline/spline.html))
 
 The `/projects` folder contains a set of subfolders, one for each main program, containing example GNU Make makefiles for the individual main programs.  The makefiles must be localized for a particular operating system or file structure (to correctly point to the compiler and source code).  The examples are for macOS.
 
