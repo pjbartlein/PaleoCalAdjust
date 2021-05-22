@@ -483,7 +483,7 @@ do
     case (3)
         do k=1,invar_dimlen(2)      
             ! if daily data, copy into ydh
-            if (trim(time_freq) .eq.'day') ydh(:,:) = var3d_in(:,k,:)
+            !if (trim(time_freq) .eq.'day') ydh(:,:) = var3d_in(:,k,:)
         
             !$omp parallel do
             do j=1,invar_dimlen(1)
@@ -533,7 +533,7 @@ do
         do l=1,invar_dimlen(3)
             do k=1,invar_dimlen(2)      
                 ! if daily data, copy into ydh
-                if (trim(time_freq) .eq.'day') ydh(:,:) = var4d_in(:,k,l,:)
+                !if (trim(time_freq) .eq.'day') ydh(:,:) = var4d_in(:,k,l,:)
         
                 !$omp parallel do
                 do j=1,invar_dimlen(1)

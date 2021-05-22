@@ -210,16 +210,17 @@ subroutine get_month_lengths(calendar_type, begageBP, endageBP, agestep, nages, 
 
     ! Step 1:  generate target years -- experiment ages (in yrs BP) and simulation years (in yrs CE)
     write (*,'(a)') "Generating target years..."
-    if (debug_write) write (22,'("begageBP, endageBP, agestep, nages, begyrCE, nsimyrs: ",6i7)') &
-        begageBP, endageBP, agestep, nages, begyrCE, nsimyrs
+    !if (debug_write) (write 22)
+    !write (*,'("begageBP, endageBP, agestep, nages, begyrCE, nsimyrs: ",6i7)') &
+    !    begageBP, endageBP, agestep, nages, begyrCE, nsimyrs
     
     if (begageBP .eq. endageBP) then
         
-        ! time-slice, or time-slice-like file for a transiet simulation (e.g. at 0 ka)
+        ! time-slice, or time-slice-like file for a time-slice simulation (e.g. at 0 or 6ka)
         do n = 1, nsimyrs
             iageBP(n) = begageBP
             iyearCE(n) = begyrCE + (n - 1)
-            if (debug_write) write (22,'("n,iageBP,iyearCE ", 5i8)') n,iageBP(n),iyearCE(n)
+            if (debug_write) write (*,'("n,iageBP,iyearCE (time-slice): ", 5i8)') n,iageBP(n),iyearCE(n)
         end do
     
     else
@@ -228,7 +229,7 @@ subroutine get_month_lengths(calendar_type, begageBP, endageBP, agestep, nages, 
         do n = 1, nages
             iageBP(n) = begageBP + (n - 1) * agestep
             iyearCE(n) = begyrCE + (n - 1) * agestep
-            if (debug_write) write (22,'("n,iageBP,iyearCE ", 5i8)') n,iageBP(n),iyearCE(n)
+            if (debug_write) write (*,'("n,iageBP,iyearCE (transient):", 5i8)') n,iageBP(n),iyearCE(n)
         end do
         
     end if
