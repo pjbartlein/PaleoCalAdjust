@@ -15,7 +15,7 @@
 	</thead>
 	<tbody>
 		<tr>
-			<td>MPI-ESM-P_000ka_Amon</td>
+			<td>Amon_000ka_progreg</td>
 			<td>progreg</td>
 			<td>0</td>
 			<td>0</td>
@@ -45,7 +45,7 @@ Text 1
 	</thead>
 	<tbody>
 		<tr>
-			<td>MPI-ESM-P_006ka_Amon</td>
+			<td>Amon_006ka_progreg</td>
 			<td>progreg</td>
 			<td>-6000</td>
 			<td>-6000</td>
@@ -75,7 +75,7 @@ Text 2
 	</thead>
 	<tbody>
 		<tr>
-			<td>CCSM4_000ka_Amon</td>
+			<td>Amon_000ka_noleap</td>
 			<td>noleap</td>
 			<td>0</td>
 			<td>0</td>
@@ -105,7 +105,7 @@ Text 3
 	</thead>
 	<tbody>
 		<tr>
-			<td>CCSM4_006ka_Amon</td>
+			<td>Amon_006ka_noleap</td>
 			<td>noleap</td>
 			<td>-6000</td>
 			<td>-6000</td>
@@ -135,7 +135,7 @@ Text 4
 	</thead>
 	<tbody>
 		<tr>
-			<td>CCSM4_000ka_Aclim</td>
+			<td>Aclim_000ka_noleap</td>
 			<td>365_day</td>
 			<td>0</td>
 			<td>0</td>
@@ -165,7 +165,7 @@ Text 5
 	</thead>
 	<tbody>
 		<tr>
-			<td>CCSM4_006ka_Aclim</td>
+			<td>Aclim_006ka_noleap</td>
 			<td>365_day</td>
 			<td>-6000</td>
 			<td>-6000</td>
@@ -195,7 +195,7 @@ Text
 	</thead>
 	<tbody>
 		<tr>
-			<td>Holocene transient</td>
+			<td>Holocene_transient</td>
 			<td>progreg</td>
 			<td>-7949</td>
 			<td>-100</td>
@@ -225,7 +225,7 @@ Text
 	</thead>
 	<tbody>
 		<tr>
-			<td>Holocene transient</td>
+			<td>Holocene_transient_ctrl</td>
 			<td>progreg</td>
 			<td>0</td>
 			<td>0</td>
@@ -255,7 +255,7 @@ Text
 	</thead>
 	<tbody>
 		<tr>
-			<td>tr21</td>
+			<td>TraCE-21ka</td>
 			<td>noleap</td>
 			<td>-22000</td>
 			<td>39</td>
