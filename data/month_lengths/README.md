@@ -81,7 +81,7 @@ Text 2
 			<td>0</td>
 			<td>1</td>
 			<td>1000</td>
-			<td>1</td>
+			<td>301</td>
 			<td>'/path'</td>
 			<td>time-slice</td>
 		</tr>
@@ -225,7 +225,7 @@ Text
 	</thead>
 	<tbody>
 		<tr>
-			<td>Holocene Transient</td>
+			<td>Holocene transient</td>
 			<td>progreg</td>
 			<td>0</td>
 			<td>0</td>
