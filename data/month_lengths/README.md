@@ -271,7 +271,7 @@ Text
 
 <table>
 	<thead>
-		<<tr>
+		<tr>
 			<th>prefix</th>
 			<th>calendar type</th>
 			<th>begageBP</th>
@@ -355,6 +355,5 @@ Text
 			<td>'/path'</td>
 			<td>transient</td>
 		</tr>
-
 	</tbody>
 </table>
