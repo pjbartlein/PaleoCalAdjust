@@ -1,297 +1,19 @@
-## Month-length specification examples ##
-
-The examples here show how to specify the input to `month-length.f90`.  The extension to input for `cal_adjust.f90` is straightforward.
 
 <table>
 	<thead>
 		<tr>
 			<th>prefix</th>
-			<th>calendar_type</th>
+			<th>calendar type</th>
 			<th>begageBP</th>
 			<th>endageBP</th>
 			<th>agestep</th>
 			<th>begyrCE</th>
 			<th>nsimyrs</th>
-			<th>'path'</th>
+			<th>output path</th>
 			<th>note</th>
 		</tr>
 	</thead>
 	<tbody>
-		<tr>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-		</tr>
-		<tr>
-			<td>AWI</td>
-			<td>progreg</td>
-			<td>-6000</td>
-			<td>0</td>
-			<td>1</td>
-			<td>3800</td>
-			<td>1</td>
-			<td>'/Projects/Calendar/data/month_lengths_PACMEDY/'</td>
-			<td>transient</td>
-		</tr>
-		<tr>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-		</tr>
-		<tr>
-			<td>MPI</td>
-			<td>progreg</td>
-			<td>-7949</td>
-			<td>-100</td>
-			<td>1</td>
-			<td>1001</td>
-			<td>1</td>
-			<td>'/Projects/Calendar/data/month_lengths_PACMEDY/'</td>
-			<td>transient</td>
-		</tr>
-		<tr>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-		</tr>
-		<tr>
-			<td>TR5AS-Vlr01</td>
-			<td>noleap</td>
-			<td>-6000</td>
-			<td>-1</td>
-			<td>1</td>
-			<td>2000</td>
-			<td>1</td>
-			<td>'/Projects/Calendar/data/month_lengths_PACMEDY/'</td>
-			<td>transient</td>
-		</tr>
-		<tr>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-		</tr>
-		<tr>
-			<td>TR6AV-Sr02</td>
-			<td>noleap</td>
-			<td>-6000</td>
-			<td>-1</td>
-			<td>1</td>
-			<td>2000</td>
-			<td>1</td>
-			<td>'/Projects/Calendar/data/month_lengths_PACMEDY/'</td>
-			<td>transient</td>
-		</tr>
-		<tr>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-		</tr>
-		<tr>
-			<td>AWI_ctrl</td>
-			<td>progreg</td>
-			<td>0</td>
-			<td>0</td>
-			<td>1</td>
-			<td>3800</td>
-			<td>6001</td>
-			<td>'/Projects/Calendar/data/month_lengths_PACMEDY/'</td>
-			<td>transient</td>
-		</tr>
-		<tr>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-		</tr>
-		<tr>
-			<td>MPI_ctrl</td>
-			<td>progreg</td>
-			<td>0</td>
-			<td>0</td>
-			<td>1</td>
-			<td>1001</td>
-			<td>7850</td>
-			<td>'/Projects/Calendar/data/month_lengths_PACMEDY/'</td>
-			<td>transient</td>
-		</tr>
-		<tr>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-		</tr>
-		<tr>
-			<td>TR5AS-Vlr01_ctrl</td>
-			<td>noleap</td>
-			<td>0</td>
-			<td>0</td>
-			<td>1</td>
-			<td>2000</td>
-			<td>6000</td>
-			<td>'/Projects/Calendar/data/month_lengths_PACMEDY/'</td>
-			<td>transient</td>
-		</tr>
-		<tr>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-		</tr>
-		<tr>
-			<td>TR6AV-Sr02_ctrl</td>
-			<td>noleap</td>
-			<td>0</td>
-			<td>0</td>
-			<td>1</td>
-			<td>2000</td>
-			<td>6000</td>
-			<td>'/Projects/Calendar/data/month_lengths_PACMEDY/'</td>
-			<td>transient</td>
-		</tr>
-		<tr>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-		</tr>
-		<tr>
-			<td>tr21</td>
-			<td>noleap</td>
-			<td>-22000</td>
-			<td>39</td>
-			<td>1</td>
-			<td>-20050</td>
-			<td>1</td>
-			<td>'/Projects/Calendar/data/month_lengths_PACMEDY/'</td>
-			<td>transient</td>
-		</tr>
-		<tr>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-		</tr>
-		<tr>
-			<td>PMIP4_noleap</td>
-			<td>noleap</td>
-			<td>-150000</td>
-			<td>0</td>
-			<td>1000</td>
-			<td>-148050</td>
-			<td>1</td>
-			<td>'/Projects/Calendar/data/month_lengths_PACMEDY/'</td>
-			<td>transient</td>
-		</tr>
-		<tr>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-		</tr>
-		<tr>
-			<td>PMIP_progreg</td>
-			<td>progreg</td>
-			<td>-150000</td>
-			<td>0</td>
-			<td>1000</td>
-			<td>-148050</td>
-			<td>1</td>
-			<td>'/Projects/Calendar/data/month_lengths_PACMEDY/'</td>
-			<td>transient</td>
-		</tr>
-		<tr>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-		</tr>
-		<tr>
-			<td>CommonEra</td>
-			<td>progreg</td>
-			<td>-1949</td>
-			<td>150</td>
-			<td>1</td>
-			<td>1</td>
-			<td>1</td>
-			<td>'/Projects/Calendar/data/month_lengths_PACMEDY/'</td>
-			<td>transient</td>
-		</tr>
-		<tr>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-		</tr>
 		<tr>
 			<td>MPI-ESM-P_000ka_Amon</td>
 			<td>progreg</td>
@@ -300,20 +22,28 @@ The examples here show how to specify the input to `month-length.f90`.  The exte
 			<td>1</td>
 			<td>1000</td>
 			<td>100</td>
-			<td>'/Projects/Calendar/data/month_lengths_PACMEDY/'</td>
+			<td>'/path'</td>
 			<td>time-slice</td>
 		</tr>
+	</tbody>
+</table>
+Text 1
+
+<table>
+	<thead>
 		<tr>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
+			<th>prefix</th>
+			<th>calendar type</th>
+			<th>begageBP</th>
+			<th>endageBP</th>
+			<th>agestep</th>
+			<th>begyrCE</th>
+			<th>nsimyrs</th>
+			<th>output path</th>
+			<th>note</th>
 		</tr>
+	</thead>
+	<tbody>
 		<tr>
 			<td>MPI-ESM-P_006ka_Amon</td>
 			<td>progreg</td>
@@ -322,20 +52,28 @@ The examples here show how to specify the input to `month-length.f90`.  The exte
 			<td>1</td>
 			<td>1850</td>
 			<td>100</td>
-			<td>'/Projects/Calendar/data/month_lengths_PACMEDY/'</td>
+			<td>'/path'</td>
 			<td>time-slice</td>
 		</tr>
+	</tbody>
+</table>
+Text 2
+
+<table>
+	<thead>
 		<tr>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
+			<th>prefix</th>
+			<th>calendar type</th>
+			<th>begageBP</th>
+			<th>endageBP</th>
+			<th>agestep</th>
+			<th>begyrCE</th>
+			<th>nsimyrs</th>
+			<th>output path</th>
+			<th>note</th>
 		</tr>
+	</thead>
+	<tbody>
 		<tr>
 			<td>CCSM4_000ka_Amon</td>
 			<td>noleap</td>
@@ -343,21 +81,29 @@ The examples here show how to specify the input to `month-length.f90`.  The exte
 			<td>0</td>
 			<td>1</td>
 			<td>1000</td>
-			<td>301</td>
-			<td>'/Projects/Calendar/data/month_lengths_PACMEDY/'</td>
+			<td>1</td>
+			<td>'/path'</td>
 			<td>time-slice</td>
 		</tr>
+	</tbody>
+</table>
+Text 3
+
+<table>
+	<thead>
 		<tr>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
+			<th>prefix</th>
+			<th>calendar type</th>
+			<th>begageBP</th>
+			<th>endageBP</th>
+			<th>agestep</th>
+			<th>begyrCE</th>
+			<th>nsimyrs</th>
+			<th>output path</th>
+			<th>note</th>
 		</tr>
+	</thead>
+	<tbody>
 		<tr>
 			<td>CCSM4_006ka_Amon</td>
 			<td>noleap</td>
@@ -366,20 +112,28 @@ The examples here show how to specify the input to `month-length.f90`.  The exte
 			<td>1</td>
 			<td>1000</td>
 			<td>301</td>
-			<td>'/Projects/Calendar/data/month_lengths_PACMEDY/'</td>
+			<td>'/path'</td>
 			<td>time-slice</td>
 		</tr>
+	</tbody>
+</table>
+Text 4
+
+<table>
+	<thead>
 		<tr>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
+			<th>prefix</th>
+			<th>calendar type</th>
+			<th>begageBP</th>
+			<th>endageBP</th>
+			<th>agestep</th>
+			<th>begyrCE</th>
+			<th>nsimyrs</th>
+			<th>output path</th>
+			<th>note</th>
 		</tr>
+	</thead>
+	<tbody>
 		<tr>
 			<td>CCSM4_000ka_Aclim</td>
 			<td>365_day</td>
@@ -388,20 +142,28 @@ The examples here show how to specify the input to `month-length.f90`.  The exte
 			<td>1</td>
 			<td>1000</td>
 			<td>1</td>
-			<td>'/Projects/Calendar/data/month_lengths_PACMEDY/'</td>
+			<td>'/path'</td>
 			<td>time-slice</td>
 		</tr>
+	</tbody>
+</table>
+Text 5
+
+<table>
+	<thead>
 		<tr>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
+			<th>prefix</th>
+			<th>calendar type</th>
+			<th>begageBP</th>
+			<th>endageBP</th>
+			<th>agestep</th>
+			<th>begyrCE</th>
+			<th>nsimyrs</th>
+			<th>output path</th>
+			<th>note</th>
 		</tr>
+	</thead>
+	<tbody>
 		<tr>
 			<td>CCSM4_006ka_Aclim</td>
 			<td>365_day</td>
@@ -410,30 +172,189 @@ The examples here show how to specify the input to `month-length.f90`.  The exte
 			<td>1</td>
 			<td>1000</td>
 			<td>1</td>
-			<td>'/Projects/Calendar/data/month_lengths_PACMEDY/'</td>
+			<td>'/path'</td>
 			<td>time-slice</td>
 		</tr>
+	</tbody>
+</table>
+Text
+
+<table>
+	<thead>
 		<tr>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
+			<th>prefix</th>
+			<th>calendar type</th>
+			<th>begageBP</th>
+			<th>endageBP</th>
+			<th>agestep</th>
+			<th>begyrCE</th>
+			<th>nsimyrs</th>
+			<th>output path</th>
+			<th>note</th>
 		</tr>
+	</thead>
+	<tbody>
 		<tr>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
+			<td>Holocene transient</td>
+			<td>progreg</td>
+			<td>-7949</td>
+			<td>-100</td>
+			<td>1</td>
+			<td>1001</td>
+			<td>1</td>
+			<td>'/path'</td>
+			<td>transient</td>
 		</tr>
+	</tbody>
+</table>
+Text
+
+<table>
+	<thead>
+		<tr>
+			<th>prefix</th>
+			<th>calendar type</th>
+			<th>begageBP</th>
+			<th>endageBP</th>
+			<th>agestep</th>
+			<th>begyrCE</th>
+			<th>nsimyrs</th>
+			<th>output path</th>
+			<th>note</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td>Holocene Transient</td>
+			<td>progreg</td>
+			<td>0</td>
+			<td>0</td>
+			<td>1</td>
+			<td>1001</td>
+			<td>7850</td>
+			<td>'/path'</td>
+			<td>transient</td>
+		</tr>
+	</tbody>
+</table>
+Text
+
+<table>
+	<thead>
+		<tr>
+			<th>prefix</th>
+			<th>calendar type</th>
+			<th>begageBP</th>
+			<th>endageBP</th>
+			<th>agestep</th>
+			<th>begyrCE</th>
+			<th>nsimyrs</th>
+			<th>output path</th>
+			<th>note</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td>tr21</td>
+			<td>noleap</td>
+			<td>-22000</td>
+			<td>39</td>
+			<td>1</td>
+			<td>-20050</td>
+			<td>1</td>
+			<td>'/path'</td>
+			<td>transient</td>
+		</tr>
+	</tbody>
+</table>
+Text
+
+<table>
+	<thead>
+		<<tr>
+			<th>prefix</th>
+			<th>calendar type</th>
+			<th>begageBP</th>
+			<th>endageBP</th>
+			<th>agestep</th>
+			<th>begyrCE</th>
+			<th>nsimyrs</th>
+			<th>output path</th>
+			<th>note</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td>PMIP4_noleap</td>
+			<td>noleap</td>
+			<td>-150000</td>
+			<td>0</td>
+			<td>1000</td>
+			<td>-148050</td>
+			<td>1</td>
+			<td>'/path'</td>
+			<td>transient</td>
+		</tr>
+	</tbody>
+</table>
+Text
+
+<table>
+	<thead>
+		<tr>
+			<th>prefix</th>
+			<th>calendar type</th>
+			<th>begageBP</th>
+			<th>endageBP</th>
+			<th>agestep</th>
+			<th>begyrCE</th>
+			<th>nsimyrs</th>
+			<th>output path</th>
+			<th>note</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td>PMIP_progreg</td>
+			<td>progreg</td>
+			<td>-150000</td>
+			<td>0</td>
+			<td>1000</td>
+			<td>-148050</td>
+			<td>1</td>
+			<td>'/path'</td>
+			<td>transient</td>
+		</tr>
+	</tbody>
+</table>
+Text
+
+<table>
+	<thead>
+		<tr>
+			<th>prefix</th>
+			<th>calendar type</th>
+			<th>begageBP</th>
+			<th>endageBP</th>
+			<th>agestep</th>
+			<th>begyrCE</th>
+			<th>nsimyrs</th>
+			<th>output path</th>
+			<th>note</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td>CommonEra</td>
+			<td>progreg</td>
+			<td>-1949</td>
+			<td>150</td>
+			<td>1</td>
+			<td>1</td>
+			<td>1</td>
+			<td>'/path'</td>
+			<td>transient</td>
+		</tr>
+
 	</tbody>
 </table>
