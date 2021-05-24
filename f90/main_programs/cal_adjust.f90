@@ -47,7 +47,7 @@ program cal_adjust
 !
 !   - renamed main program to cal_adjust.f90 (from cal_adjust_PMIP.f90)
 !   - modified the info file
-!   - infofile name and path are now read as a command-line arguement
+!   - infofile name and path are now read as a command-line argument
 !   - added Harzallah spline pseudo-daily interpolation approach for adjustment of "Amon"-type (timeseries) files
 !   - added enforce_mean() subroutine (to require that the mean of the interpolated values should match that of the input data)
 !   - added interpolation method attributes to adjusted files
