@@ -1,6 +1,6 @@
 prefix,calendar_type,begageBP,endageBP,agestep,begyrCE,nsimyrs,'path',note
-Amon_600ka_progreg,progreg,-6000,-6000,1,1850,100,'/Projects/Calendar/PaleoCalAdjust/data/month_lengths/readme_examples/',time-slice
-Amon_000ka_progreg,progreg,-100,-100,1,1000,100,'/Projects/Calendar/PaleoCalAdjust/data/month_lengths/readme_examples/',time-slice
+Amon_006ka_progreg,progreg,-6000,-6000,1,1850,100,'/Projects/Calendar/PaleoCalAdjust/data/month_lengths/readme_examples/',time-slice
+Amon_000ka_progreg,progreg,-100,-100,1,1850,100,'/Projects/Calendar/PaleoCalAdjust/data/month_lengths/readme_examples/',time-slice
 Amon_006ka_noleap,noleap,-6000,-6000,1,1000,301,'/Projects/Calendar/PaleoCalAdjust/data/month_lengths/readme_examples/',time-slice
 Amon_000ka_noleap,noleap,-100,-100,1,1000,301,'/Projects/Calendar/PaleoCalAdjust/data/month_lengths/readme_examples/',time-slice
 Aclim_006ka_noleap,365_day,-6000,-6000,1,1000,1,'/Projects/Calendar/PaleoCalAdjust/data/month_lengths/readme_examples/',time-slice
