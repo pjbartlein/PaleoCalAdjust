@@ -57,32 +57,32 @@ subroutine get_var_diminfo(ncid_in, invar_name, invar_ndim, invar_dimid, invar_d
 ! gets the dimension characteristics of a variable
 
     implicit none
-    
+
     ! netCDF file and variable name
     integer(4), intent(in)      :: ncid_in
     character(*), intent(in)    :: invar_name
-    
+
     ! dimensions
     integer(4), intent(out)     :: invar_ndim
     integer(4), intent(out)     :: invar_dimid(maxdims), invar_dimlen(maxdims)
     character(nf90_max_name), intent(out)    :: invar_dimname(maxdims)
-    
+
     integer(4)                  :: invarid, i
-    
+
     if (print_out) print '("In get_var_diminfo...")'
     if (print_out) print '("Variable dimensions")'
     call check( nf90_inq_varid(ncid_in, invar_name, invarid) )
     call check( nf90_inquire_variable(ncid_in, invarid, ndims=invar_ndim) )
     if (print_out) print '("invar_name, invarid, invar_ndim: ",a,1x,i5,i3)', trim(invar_name), invarid, invar_ndim
-    
+
     call check( nf90_inquire_variable(ncid_in, invarid, dimids = invar_dimid(:invar_ndim)) )
-    
+
     do i = 1, invar_ndim
         call check( nf90_inquire_dimension(ncid_in, invar_dimid(i), invar_dimname(i), invar_dimlen(i)) )
         if (print_out) print '("i, invar_dimid, invar_dimlen, invar_dimname: ",i3,i5,i6,1x,a)', &
         i, invar_dimid(i), invar_dimlen(i), trim(invar_dimname(i))
     end do
-    
+
 end subroutine get_var_diminfo
 
 subroutine copy_dims_and_glatts(ncid_in, ncid_out, addattname, addatt, nt, time, time_bnds, comment, varid_out)
@@ -104,7 +104,7 @@ subroutine copy_dims_and_glatts(ncid_in, ncid_out, addattname, addatt, nt, time,
     character(256)              :: attname
 
     if (print_out) print '("In copy_dims_and_glatts")'
-    
+
     ! structure of input file
     if (print_out) print '("Define and copy dimensions, dimension variables, and global attributes")'
     call check( nf90_inquire(ncid_in, ndim, nvar, natt, unlimid, ncformat) )
@@ -116,22 +116,22 @@ subroutine copy_dims_and_glatts(ncid_in, ncid_out, addattname, addatt, nt, time,
     do i = 1,ndim
         dimid(i) = i
         call check( nf90_inquire_dimension(ncid_in, dimid(i), dimname(i), dimlen(i)) )
-        if (print_out) print '("   in:  dimid, dimlen, dimname = " ,2i7,1x,a)', i, dimlen(i), trim(dimname(i))    
-        
+        if (print_out) print '("   in:  dimid, dimlen, dimname = " ,2i7,1x,a)', i, dimlen(i), trim(dimname(i))
+
         if (i .eq. unlimid) then
             call check( nf90_def_dim(ncid_out, dimname(i), nf90_unlimited, dimid(i)) )
         else
             call check( nf90_def_dim(ncid_out, dimname(i), dimlen(i), dimid(i)) )
         end if
-        
+
         ! if dimension is time, replace length with new length (nt), and save timedimid
         if (dimname(i) .eq. 'time') then
             dimlen(i) = nt
             timedimid = dimid(i)
         end if
-        
+
     end do
-    
+
     ! define dimension variables
     if (print_out) print '("Define dimension variables:")'
     varid_out = 0
@@ -147,7 +147,7 @@ subroutine copy_dims_and_glatts(ncid_in, ncid_out, addattname, addatt, nt, time,
         select case (varname(i))
         case ('lon', 'lon_bnds', 'lat', 'lat_bnds', 'time', 'time_bnds', 'climatology_bnds', 'height', &
                 'plev', 'j', 'i', 'vertices', 'lon_vertices', 'lat_vertices', 'lev', 'lev_bnds')
-        
+
             ! define variable
             varid_out=varid_out+1
             call check( nf90_def_var(ncid_out, varname(i), xtype(i), vardimids(i,:nvardims(i)), dataid(i)) )
@@ -172,13 +172,13 @@ subroutine copy_dims_and_glatts(ncid_in, ncid_out, addattname, addatt, nt, time,
     end do
 
     ! copy global attributes
-    if (print_out) print '("Copy global attributes")' 
+    if (print_out) print '("Copy global attributes")'
     do i = 1, natt
         call check ( nf90_inq_attname(ncid_in, nf90_global, i, attname) )
-        call check ( nf90_inquire_attribute(ncid_in, nf90_global, trim(attname), atttype) ) 
-        
+        call check ( nf90_inquire_attribute(ncid_in, nf90_global, trim(attname), atttype) )
+
         if (print_out) print '(" global attribute: ", i4, 1x, i12, 1x, a)', i, atttype, trim(attname)
-        
+
         select case(atttype)
         case (0, 1)
             call check ( nf90_get_att(ncid_in, nf90_global, attname, att_byte) )
@@ -218,7 +218,7 @@ subroutine copy_dims_and_glatts(ncid_in, ncid_out, addattname, addatt, nt, time,
         select case (varname(i))
         case ('lon', 'lon_bnds', 'lat', 'lat_bnds', 'time', 'time_bnds', 'climatology_bnds', 'height', &
                 'plev', 'j', 'i', 'vertices', 'lon_vertices', 'lat_vertices', 'lev', 'lev_bnds')
-        
+
             varid_out=varid_out + 1
             if (print_out) print '(" varname: ",a)', trim(varname(i))
             ! how many dimensions?
@@ -227,7 +227,7 @@ subroutine copy_dims_and_glatts(ncid_in, ncid_out, addattname, addatt, nt, time,
                 if (print_out) print '("  i: nvardims(i): ", 2i6, 1x, a)', &
                     i,nvardims(i),trim(varname(i))
                 call check( nf90_get_var(ncid_in, varid_in, var0d) )
-                
+
                 ! if variable is time, replace the existing values with new ones
                 if (varname(i) .eq. 'time') var1d=time
                 call check( nf90_put_var(ncid_out, varid_out, var0d) )
@@ -236,7 +236,7 @@ subroutine copy_dims_and_glatts(ncid_in, ncid_out, addattname, addatt, nt, time,
                     i, nvardims(i), vardimids(i,1), dimlen(vardimids(i,1)),trim(varname(i))
                 allocate(var1d(dimlen(vardimids(i,1))))
                 call check( nf90_get_var(ncid_in, varid_in, var1d) )
-                
+
                 ! if variable is time, replace the existing values with new ones
                 if (varname(i) .eq. 'time') var1d=time
                 call check( nf90_put_var(ncid_out, varid_out, var1d) )
@@ -246,7 +246,7 @@ subroutine copy_dims_and_glatts(ncid_in, ncid_out, addattname, addatt, nt, time,
                     i, nvardims(i), vardimids(i,1), vardimids(i,2), dimlen(vardimids(i,1)), dimlen(vardimids(i,2)), trim(varname(i))
                 allocate(var2d(dimlen(vardimids(i,1)), dimlen(vardimids(i,2))))
                 call check( nf90_get_var(ncid_in, varid_in, var2d) )
-                
+
                 ! if variable is time_bnds or climatology_bnds, replace the existing values with new ones
                 if (varname(i) .eq. 'time_bnds') var2d=time_bnds
                 if (varname(i) .eq. 'climatology_bnds') var2d=time_bnds
@@ -258,13 +258,13 @@ subroutine copy_dims_and_glatts(ncid_in, ncid_out, addattname, addatt, nt, time,
                     dimlen(vardimids(i,1)), dimlen(vardimids(i,2)), dimlen(vardimids(i,3)), trim(varname(i))
                 allocate(var3d(dimlen(vardimids(i,1)), dimlen(vardimids(i,2)), dimlen(vardimids(i,3))))
                 call check( nf90_get_var(ncid_in, varid_in, var3d) )
-                
+
                 ! if variable is time_bnds or climatology_bnds, replace the existing values with new ones
                 if (varname(i) .eq. 'time_bnds') var2d=time_bnds
                 if (varname(i) .eq. 'climatology_bnds') var2d=time_bnds
                 call check( nf90_put_var(ncid_out, varid_out, var3d) )
-                deallocate(var3d)               
-                
+                deallocate(var3d)
+
             case default
                 continue
             end select
@@ -351,7 +351,7 @@ subroutine new_time_month(calendar_type, ncid_in, ny, nm, nt, &
     ! get the existing monthly time values
     call check ( nf90_inq_varid(ncid_in, 'time', timeid) )
     call check ( nf90_get_var(ncid_in, timeid, mon_time) )
-    
+
     ! new time variables -- calculate appropriate monthly values
     if (trim(calendar_type) .eq. '360_day') then
         ref_time = mon_time(1) - 15.0
@@ -360,20 +360,20 @@ subroutine new_time_month(calendar_type, ncid_in, ny, nm, nt, &
     end if
 
     time(1) = rmonmid_ts(1) + ref_time
-    time_bnds(1,1) = rmonbeg_ts(1) + ref_time 
-    time_bnds(2,1) = rmonend_ts(1) + ref_time 
+    time_bnds(1,1) = rmonbeg_ts(1) + ref_time
+    time_bnds(2,1) = rmonend_ts(1) + ref_time
 
     do n = 2,nt
         ndyr = ndays_ts(n) - ndays_ts(1)
-        time(n) = rmonmid_ts(n) + dble(ndyr) + ref_time 
+        time(n) = rmonmid_ts(n) + dble(ndyr) + ref_time
         time_bnds(1,n) = time_bnds(2,n-1)
-        time_bnds(2,n) = rmonend_ts(n) + dble(ndyr) + ref_time 
+        time_bnds(2,n) = rmonend_ts(n) + dble(ndyr) + ref_time
     end do
 
 end subroutine new_time_month
-    
 
-subroutine define_outvar(ncid_in, ncid_out, varinname, varid_out, varoutname, addvarattname, addvaratt, varid_in) 
+
+subroutine define_outvar(ncid_in, ncid_out, varinname, varid_out, varoutname, addvarattname, addvaratt, varid_in)
 
     implicit none
 
@@ -381,7 +381,7 @@ subroutine define_outvar(ncid_in, ncid_out, varinname, varid_out, varoutname, ad
     character(*), intent(in)    :: varinname, varoutname
     integer(4), intent(in)      :: varid_out
     character(*), intent(in)    :: addvarattname, addvaratt
-    integer(4), intent(out)     :: varid_in 
+    integer(4), intent(out)     :: varid_in
 
     integer(4)                  :: i, ii
 
@@ -411,26 +411,26 @@ subroutine define_outvar(ncid_in, ncid_out, varinname, varid_out, varoutname, ad
 
     ! add new variable attribute
     call check ( nf90_put_att(ncid_out, varid_out, addvarattname, addvaratt) )
-    
+
     ! define month-length time series variables
-    
+
     if (print_out) print '("Defining month-length variables...")'
-    
+
     call check ( nf90_def_var(ncid_out, 'rmonlen', nf90_double, timedimid, rmonlenid) )
     call check ( nf90_put_att(ncid_out, rmonlenid, 'long_name', 'month length') )
     call check ( nf90_put_att(ncid_out, rmonlenid, 'units', 'd') )
     call check ( nf90_put_att(ncid_out, rmonlenid, 'comment', 'real-value month length (days)') )
-    
+
     call check ( nf90_def_var(ncid_out, 'rmonmid', nf90_double, timedimid, rmonmidid) )
     call check ( nf90_put_att(ncid_out, rmonmidid, 'long_name', 'mid-month day in year') )
     call check ( nf90_put_att(ncid_out, rmonmidid, 'units', 'd') )
     call check ( nf90_put_att(ncid_out, rmonmidid, 'comment', 'real-value mid-month day in year') )
-    
+
     call check ( nf90_def_var(ncid_out, 'rmonbeg', nf90_double, timedimid, rmonbegid) )
     call check ( nf90_put_att(ncid_out, rmonbegid, 'long_name', 'beginning day in year') )
     call check ( nf90_put_att(ncid_out, rmonbegid, 'units', 'd') )
     call check ( nf90_put_att(ncid_out, rmonbegid, 'comment', 'real-value month beginning day in year') )
-    
+
     call check ( nf90_def_var(ncid_out, 'rmonend', nf90_double, timedimid, rmonendid) )
     call check ( nf90_put_att(ncid_out, rmonendid, 'long_name', 'ending day in year') )
     call check ( nf90_put_att(ncid_out, rmonendid, 'units', 'd') )
