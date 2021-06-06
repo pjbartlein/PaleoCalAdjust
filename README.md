@@ -7,8 +7,8 @@ Bartlein, P. J. and Shafer, S. L.: Paleo calendar-effect adjustments in time-sli
 
 The current version is v1.1.  Relative to previous versions, this version includes:
 
-- updated versions of `month_length.f90` and `cal_andjust.f90` (renamed from `cal_adjust_PMIP.f90` because the updated version is  no longer tied to the specific CMIP/PMIP-file naming structure);
-- a new format for the "infofile" for each of these two programs that allows for the explicit specification of file paths and names, replacing "hard-wired" ;
+- updated versions of `month_length.f90` and `cal_andjust.f90` (renamed from `cal_adjust_PMIP.f90` because the updated version is no longer tied to the specific CMIP/PMIP-file naming structure);
+- a new format for the "infofile" for each of these two programs that allows for the explicit specification of file paths and names;
 - specification of the infofile path and name on the command line;
 - addition of the adjusted month lengths and beginning, middle, and ending dates to the output file;
 - a choice of two mean-preserving interpolation methods, including the Epstein (1991) approach implemented in v1.0, as well as the Harzallah (1995) iterated-spline approach;
@@ -18,13 +18,14 @@ The Epstein (1991) interpolation approach is intrinsically periodic, meaning tha
 
 Despite the name, "mean-preserving" interpolation methods do not necessarily yield interpolated data that exactly reproduce the input data.  This can be addressed by setting a "tolerance" value for reproduction of the input values (typically 0.01 or 0.001 times the mean value of the data), that when exceeded, causes the discrepancy to be redistributed among the interpolated values.  Further discussion of this issue, and comparisons among several practical approaches for mean-preserving interpolation can be found in the GitHub repository at [[https://github.com/pjbartlein/mp-interp]](https://github.com/pjbartlein/mp-interp).  Contact Pat Bartlein (bartlein@uoregon.edu) for further information.
 
+With the new infofile format, filenames are listed explicitly, instead of being assembled from the components of a CMIP-style filename.  This broadens the scope of appliations of the program.  For example, the program has been successfully applied to Holocene-long transient simulations.  Files that use non-standard dimension names (e.g. `time_counter` and opposed to `time` can generally be handled by using the `ncrename` program in `NCO` to rename the dimensions and attributes. 
+
 Animations used in a presentation at the Fall 2019 AGU Meeting can be found in the `/animations` folder.  
 
 References:  
 Epstein, E), On obtaining daily climatological values from monthly means, *J. Climate* 4:365-368.  
 Harzallah, A. (1995) The interpolation of data series using a constrained iterating technique *Monthly Weather Review* 123:2251-2254.
 Bartlein, P.J. and S.L. Shafer, 2019, Paleo calendar effects on radiation, atmospheric circulation, and surface temperature, moisture, and energy-balance variables can produce interpretable but spurious large-scale patterns and trends in analyses of paleoclimatic simulations. PP31A-08, AGU 2019 Fall Meeting.  [[https://agu.confex.com/agu/fm19/meetingapp.cgi/Paper/525140]](https://agu.confex.com/agu/fm19/meetingapp.cgi/Paper/525140)
-
 
 ### Abstract ###
 

@@ -10,117 +10,129 @@ module pseudo_daily_interp_subs
 
 contains
     
-subroutine enforce_mean(nctrl, ntargs, nsubint, tol, ym_targ, yd, ymiss)
+subroutine enforce_mean(nctrl, ntargs, nsubint, tol, ym, yd, ymiss)
 ! adjustes daily values to match target mean
 
     implicit none
     
-    integer(4), parameter   :: maxtargs = 7305
     integer(4), intent(in)  :: nctrl
     integer(4), intent(in)  :: ntargs
     integer(4), intent(in)  :: nsubint(nctrl)
     real(8), intent(in)     :: tol
-    real(8), intent(in)     :: ym_targ(nctrl)
+    real(8), intent(in)     :: ym(nctrl)
     real(8), intent(inout)  :: yd(ntargs)
     real(8), intent(in)     :: ymiss
-    !
-    integer(4), parameter   :: maxwgts = 31, maxiter=100
-    real(8)                 :: ydm(nctrl)
-    real(8)                 :: nonzero_sum(nctrl), yd_adjust_sum(nctrl), yd_next_sum(nctrl)
-    real(8)                 :: yd_next_mean(nctrl), new_diff(nctrl)
-    real(8)                 :: diff(nctrl), yd_adjust
     
-    integer(4)              :: ii, ib, ie, j, jj, k, niter(nctrl), ntotiter
+    real(8)                 :: ydm(nctrl)
+    real(8)                 :: nonzero_sum, nonzero_mean, yd_adjust_sum, yd_adjust_mean, yd_out_sum, yd_out_mean
+    real(8)                 :: diff, yd_old, yd_adjust, new_diff
+    
+    integer(4)              :: i, ii, ib, ie, j, jj, n, nn, nzero 
     
     if (debug_em) write (debug_unit,'(a)') "In enforce_mean"
     if (debug_em) write (debug_unit,'("tol: ", f8.5)') tol
     if (debug_em) write (debug_unit,'("nctrl, ntargs: ", 2i8/)') nctrl, ntargs
         
-    ! get means of current daily values
-    
+    ! get means of current daily values    
     call interval_mean(nctrl, nsubint, ntargs, yd, ymiss, ydm)
     
-    ii = 0
-    ntotiter = 1
-    yd_adjust_sum = 0.0d0;  yd_next_sum = 0.0d0
-    do k = 1, nctrl
-        niter(k) = 0
-        if (debug_em) write (debug_unit, '(/"Interval ", i8)') k 
-        ib = ii + 1; ie = ib + nsubint(k) - 1
+    nn = 0
+    do n = 1, nctrl
+        if (debug_em) write (debug_unit, '(/"Interval ", 2i8)') n, nn
         
-        if (debug_em) write (debug_unit, '("ym_targ,ydm,ym_targ-ydm: ",3g16.9)') ym_targ(k), ydm(k), ym_targ(k) - ydm(k)
+        ! beginning and ending subintervals
+        ib = nn + 1; ie = ib + nsubint(n) - 1    
+        ! update for next iteration
+        nn = nn + nsubint(n)
         
-        ! if ym(k) = 0.0, set all days to 0.0
-        if (ym_targ(k) .eq. 0.0d0) then
-            if (debug_em) write(debug_unit, '(a)') "       k      ib      ie   ndays ym_targ"
-            if (debug_em) write(debug_unit, '(4i8, g16.9)')  k, ib, ie, ie - ib + 1, ym_targ(k)
+        if (debug_em) write (debug_unit, '("ym,ydm,ym-ydm: ",3f12.6)') ym(n), ydm(n), ym(n) - ydm(n)
+        if (debug_em) write (debug_unit, *) ym(n)
+        
+        ! if ym(n) = 0.0, set all days to 0.0
+        if (ym(n) .eq. 0.0d0) then
+            if (debug_em) write(debug_unit, '(a)') "ym(n) = 0.0d0"
+            if (debug_em) write(debug_unit, '(a)') "       n      ib      ie   ndays          ym"
+            !if (debug_em) write(debug_unit, '(4i8, f12.6)')  n, ib, ie, ie - ib + 1, ym(n)
             if (debug_em) write (debug_unit, '(a)') "Setting all subinterval values to 0.0"
             yd(ib:ie) = 0.0d0
-            if (debug_em) write (debug_unit, '(10g14.6)') yd(ib:ie)
-            
-        else if (ym_targ(k) .eq. ymiss .or. ydm(k) .eq. ymiss) then
-            if (debug_em) write(debug_unit, '(a)') "       k      ib      ie   ndays ym_targ"
-            if (debug_em) write(debug_unit, '(4i8, g16.9)')  k, ib, ie, ie - ib + 1, ym_targ(k)
+            if (debug_em) write (debug_unit, '(10f12.6)') yd(ib:ie)
+            cycle
+        end if
+        
+        ! or set them to missing
+        if (ym(n) .eq. ymiss .or. ydm(n) .eq. ymiss) then
+            if (debug_em) write(debug_unit, '(a)') "       n      ib      ie   ndays          ym"
+            if (debug_em) write(debug_unit, '(4i8, f12.6)')  n, ib, ie, ie - ib + 1, ym(n)
             if (debug_em) write (debug_unit, '(a)') "Setting all subinterval values to missing"
             yd(ib:ie) = ymiss
             if (debug_em) write (debug_unit, '(10g16.9)') yd(ib:ie)
-        else    
+            cycle
+        end if
+        
+        ! otherwise, adjust or adopt the daily values
             
-            ! check for differences in actual mean and mean of interpolated values
-            diff(k) = ym_targ(k) - ydm(k)
-            if (debug_em) write(debug_unit, '(a)') "       k      ib      ie   ndays ym_targ"// &
-                "         ydm            diff         tol  dabs(diff)"
-            if (debug_em) write(debug_unit, '( 4i8, 5g16.9)')  & 
-                k, ib, ie, ie - ib + 1, ym_targ(k), ydm(k), diff(k), tol, dabs(diff(k))
+        ! check for differences in actual mean and mean of interpolated values
+        diff = ym(n) - ydm(n)
+        if (debug_em) write(debug_unit, '(a)') "       n      ib      ie   ndays          ym"// &
+            "         ydm        diff         tol  dabs(diff)"
+        if (debug_em) write(debug_unit, '( 4i8, 5f12.6)')  & 
+            n, ib, ie, ie - ib + 1, ym(n), ydm(n), diff, tol, dabs(diff)
             
-            ! if absolute value of difference is greater than tol, adjust subinterval values            
-            if (dabs(diff(k)) .gt. tol) then
+        ! if absolute value of difference is greater than tol, adjust subinterval values            
+        if (dabs(diff) .gt. tol) then
                 
-                if (debug_em) write (debug_unit, '(a)') "Adjusting subinterval values..."
+            if (debug_em) write (debug_unit, '(a)') "Adjusting subinterval values..."
                 
-                ! get sum of nonzero values
-                if (debug_em) write (debug_unit, '(a)') "       j      jj          yd nonzero_sum"
-                nonzero_sum = 0.0d0     
-                jj = 0
-                do j = ib, ie
-                    jj = jj + 1
-                    if (yd(j) .ne. 0.0d0)  nonzero_sum(k) = nonzero_sum(k) + yd(j)
-                    if (debug_em) write (debug_unit, '(2i8, 2g16.9)') j, jj, yd(j), nonzero_sum(k)
-                end do 
+            ! get sum, total number, and mean of nonzero values
+            if (debug_em) write (debug_unit, '(a)') "       i      ii          yd nonzero_sum, nzero"
+            nzero = 0; nonzero_sum = 0.0d0     
+            ii = 0
+            do i = ib, ie
+                ii = ii + 1
+                if (yd(i) .ne. 0.0d0)  then
+                    nonzero_sum = nonzero_sum + yd(i)
+                    nzero = nzero + 1
+                end if
+                if (debug_em) write (debug_unit, '(2i8, 2f12.6, i4)') i, ii, yd(i), nonzero_sum, nzero
+            end do 
+                
+            if (nzero .gt. 0) nonzero_mean = nonzero_sum / dble(nzero)
+            if (debug_em) write (debug_unit, '("nzero_sum, nzero, nzero_mean: ", f12.6, i4, f12.6)') &
+                nonzero_sum, nzero, nonzero_mean
                     
-                ! apply porportions of differences
-                if (debug_em) write (debug_unit, '(a)') "       j      jj          yd   yd_adjust"
-                jj = 0
-                do j = ib, ie
-                    jj = jj + 1
-                    if (yd(j) .ne. 0.0d0) then
-                        yd_adjust = ((yd(j) / nonzero_sum(k)) * diff(k)) * nsubint(k)
-                        yd(j) = yd(j) + yd_adjust
-                        yd_next_sum(k) = yd_next_sum(k) + yd(j)
-                        yd_adjust_sum(k) = yd_adjust_sum(k) + yd_adjust
-                        if (debug_em) write (debug_unit, '(2i8, 3f12.6)') j, jj, yd(j), yd_adjust
-                    else
-                        if (debug_em) write (debug_unit, '(2i8, 3f12.6)') j, jj, yd(j)
-                    end if   
-                end do
-                yd_next_mean(k) = yd_next_sum(k) / nsubint(k)
-                new_diff(k) = ym_targ(k) - yd_next_mean(k)
-                if (debug_em) write (debug_unit, '(a)') "yd_adjust_sum yd_next_sum yd_next_mean  new_diff"
-                if (debug_em) write (debug_unit, '(4f12.6)') yd_adjust_sum(k), yd_next_sum(k), yd_next_mean(k), new_diff(k)
-            else  
+            ! apply porportions of difference to each nonzero subinterval
+            if (debug_em) write (debug_unit, '("diff, nzero, yd_adjust: ", f12.6, i3, f12.6)') diff, nzero, yd_adjust
+            if (debug_em) write (debug_unit, '(a)') "       i      ii      yd_old   yd_adjust   yd(i)"
+            ii = 0; yd_adjust_sum = 0.0d0; yd_out_sum = 0.0d0; yd_adjust_mean = 0.0d0; yd_out_mean = 0.0d0
+            do i = ib, ie
+                yd_old = yd(i)
+                ii = ii + 1
+                if (yd(i) .ne. 0.0d0) then
+                    yd_adjust = ((yd(i) / nonzero_sum) * diff) * dble(nsubint(n))
+                    yd(i) = yd(i) + yd_adjust
+                    yd_out_sum = yd_out_sum + yd(i)
+                    yd_adjust_sum = yd_adjust_sum + yd_adjust
+                    if (debug_em) write (debug_unit, '(2i8, 3f12.6)') i, ii, yd_old, yd_adjust, yd(i)
+                else
+                    if (debug_em) write (debug_unit, '(2i8, 3f12.6)') i, ii, yd_old, 0.0d0, yd(i)
+                end if   
+            end do
+            yd_out_mean = yd_out_sum / nsubint(n)
+            yd_adjust_mean = yd_adjust_sum / nsubint(n)
+            new_diff = ym(n) - yd_out_mean
+            if (debug_em) write (debug_unit, '(a)') "yd_adjust_sum, yd_out_sum, yd_out_mean,    ym(n),   new_diff"
+            if (debug_em) write (debug_unit, '(5f12.6)') yd_adjust_sum, yd_out_sum, yd_out_mean, ym(n), new_diff
+        else  
             
-                if (debug_em) write (debug_unit, '(a)') "Adopting subinterval values..."
-            
-            end if
+            if (debug_em) write (debug_unit, '(a)') "Adopting subinterval values..."
             
         end if
-        ii = ii + nsubint(k)
 
     end do
     
 end subroutine enforce_mean
 
-subroutine day_to_rmon_ts(ny,ndays,rmonbeg,rmonend,ndtot,yd,yfill,ym_adj)
+subroutine day_to_rmon_ts(ny, ndays, imonbeg, imonend, rmonbeg, rmonend, ndtot, idaynum, yd, ym, yfill, ym_adj)
 ! aggregation of pseudo- or actual daily data to real-length months using a paleo calendar
 
     implicit none
@@ -128,8 +140,11 @@ subroutine day_to_rmon_ts(ny,ndays,rmonbeg,rmonend,ndtot,yd,yfill,ym_adj)
     integer(4), parameter       :: nm=12, nd=366
     integer(4), intent(in)      :: ny, ndtot        ! number of years, total number of days
     integer(4), intent(in)      :: ndays(ny)        ! number of days in each year
-    real(8), intent(in)         :: rmonbeg(ny,nm), rmonend(ny,nm)   ! beginning and ending days of each month
+    integer(4), intent(in)      :: imonbeg(ny,nm), imonend(ny,nm)   ! integer beginning and ending days of each maonth
+    real(8), intent(in)         :: rmonbeg(ny,nm), rmonend(ny,nm)   ! real beginning and ending days of each month
+    integer(8), intent(in)      :: idaynum(ndtot)   ! integer day number
     real(8), intent(in)         :: yd(ndtot)        ! daily values
+    real(8), intent(in)         :: ym(ny*nm)        ! monthly means
     real(8), intent(in)         :: yfill            ! _FillValue
     real(8), intent(out)        :: ym_adj(ny*nm)    ! (aggregated) average monthly values
     
@@ -137,13 +152,15 @@ subroutine day_to_rmon_ts(ny,ndays,rmonbeg,rmonend,ndtot,yd,yfill,ym_adj)
     integer(4)              :: ibegday, iendday             ! beginning day and ending day of each year
     integer(4)              :: ibeg(nm), iend(nm)           ! beginning and ending (integer) day of each month
     integer(4)              :: ndays_in_month(nm)           ! integer number of days in month
+    integer(8)              :: idaynumx(-29:nd+30)          ! integer day number for current year, padded 
     real(8)                 :: ydx(-29:nd+30)               ! daily data for current year, padded by data from adjacent years
     real(8)                 :: wgt(-29:nd+30), wsum         ! weights (for interpolating over fractional days)
     integer(4)              :: nfill                        ! number of days with fill values
     
-    integer(4)              :: n, m, i, nn
+    integer(4)              :: n, m, i, nn, ii
     
-    logical                 :: debug_day = .false.
+    !integer(4)              :: debug_unit = 14
+    !logical                 :: debug_day = .true.
 
     if (debug_day) write (debug_unit,'(a)') "In day_to_rmon..."
     if (debug_day) write (debug_unit,*) ny, ndtot
@@ -152,71 +169,93 @@ subroutine day_to_rmon_ts(ny,ndays,rmonbeg,rmonend,ndtot,yd,yfill,ym_adj)
     iendday = 0; nn = 0
     ym_adj=0.0d0
     do n=1,ny
-        if (debug_day) write (debug_unit,'("n, ndays:", 2i5)') n,ndays(n)
+        if (debug_day) write (debug_unit, '(/"n, ndays:", i6, i4)') n,ndays(n)
+        if (debug_day) write (debug_unit, '("imonbeg(n,1), imonbeg(n,nm), rmonbeg(n,1), rmonend(n,nm): ", 4f12.6)') &
+            imonbeg(n,1), imonbeg(n,nm), rmonbeg(n,1), rmonend(n,nm)
         ibegday = iendday + 1
         iendday = ibegday + ndays(n) - 1
-        if (debug_day) write (debug_unit,*) n,ibegday,iendday
+        if (debug_day) write (debug_unit, '("ibegday, iendday: ", 2i8)') ibegday,iendday
         
         if (ny .eq. 1) then       ! single-year Aclim data  
             ! wrap the input daily data
             ydx(-29:0)=yd(ndays(n)-30+1:ndays(n))
             ydx(1:ndays(n))=yd(1:ndays(n))
             ydx(ndays(n)+1:ndays(n)+30)=yd(1:30)
+            idaynumx(-29:0)=yd(ndays(n)-30+1:ndays(n))
+            idaynumx(1:ndays(n))=yd(1:ndays(n))
+            idaynumx(ndays(n)+1:ndays(n)+30)=yd(1:30)
         else 
             ! copy current year into ydx
             ydx(1:ndays(n)) = yd(ibegday:iendday)
+            idaynumx(1:ndays(n)) = idaynum(ibegday:iendday)
             ! pad beginning and end of ydx
             if (n .eq. 1) then
                 ydx(-29:0) = yd(ndays(n)-30+1:ndays(n))
                 ydx(ndays(n)+1:ndays(n)+30) = yd(iendday+1:iendday+30)
+                idaynumx(-29:0) = idaynum(ndays(n)-30+1:ndays(n))
+                idaynumx(ndays(n)+1:ndays(n)+30) = idaynum(iendday+1:iendday+30)
             elseif (n .eq. ny) then
                 ydx(-29:0) = yd(ibegday-30:ibegday-1)
                 ydx(ndays(n)+1:ndays(n)+30) = yd(ibegday+1:ibegday+30)
+                idaynumx(-29:0) = idaynum(ibegday-30:ibegday-1)
+                idaynumx(ndays(n)+1:ndays(n)+30) = idaynum(ibegday+1:ibegday+30)
             else
                 ydx(-29:0) = yd(ibegday-30:ibegday-1)
                 ydx(ndays(n)+1:ndays(n)+30) = yd(iendday+1:iendday+30)
+                idaynumx(-29:0) = idaynum(ibegday-30:ibegday-1)
+                idaynumx(ndays(n)+1:ndays(n)+30) = idaynum(iendday+1:iendday+30)
             end if
         end if
     
         ! integer beginning and end of each month, and number of days in each month
         ! ndays_in_month should be equal to the integer month length + 1
         ibeg=ceiling(rmonbeg(n,:)); iend=ceiling(rmonend(n,:)); ndays_in_month=(iend-ibeg+1)
-        if (debug_day) write (debug_unit,'("rmonbeg:  ",12f14.8)') rmonbeg(n,:)
-        if (debug_day) write (debug_unit,'("rmonend:  ",12f14.8)') rmonend(n,:)
-        if (debug_day) write (debug_unit,'("ibeg:  ",12i4)') ibeg
-        if (debug_day) write (debug_unit,'("iend:  ",12i4)') iend
-        if (debug_day) write (debug_unit,'("ndays: ",13i4)') ndays_in_month, sum(ndays_in_month)
+
+        if (debug_day) write (debug_unit,'("rmonbeg:  ",12f12.6)') rmonbeg(n,:)
+        if (debug_day) write (debug_unit,'("rmonend:  ",12f12.6)') rmonend(n,:)
+        if (debug_day) write (debug_unit,'("1monbeg:  ",12i12)') imonbeg(n,:)
+        if (debug_day) write (debug_unit,'("1monend:  ",12i12)') imonend(n,:)
+        if (debug_day) write (debug_unit,'("ibeg:  ",12i12)') ibeg
+        if (debug_day) write (debug_unit,'("iend:  ",12i12)') iend
+        if (debug_day) write (debug_unit,'("ndays: ",13i12)') ndays_in_month, sum(ndays_in_month)
  
         ! monthly means
         do m=1,nm
             nn = nn + 1
             nfill = 0; wgt=1.0d0; wsum=0.0d0
-            wgt(ibeg(m))=abs(rmonbeg(n,m)-dble(ibeg(m)))
-            wgt(iend(m))=abs(rmonend(n,m)-dble(iend(m)-1))
+            wgt(ibeg(m)) = abs(dble(ibeg(m)) - rmonbeg(n,m))
+            wgt(iend(m)) = 1.0d0 - abs(rmonend(n,m) - dble(iend(m)))
+            if (debug_day) & 
+                write (debug_unit,'(/, "m,rmonbeg,ibeg,rmonend,iend,wgt(ibeg(m)),wgt(iend(mm)): ", i3, 2(f14.7,i4), 2f12.6)') &
+                    m,rmonbeg(n,m),ibeg(m),rmonend(n,m),iend(m),wgt(ibeg(m)),wgt(iend(m))
+            ii = 0
             do i=ibeg(m),iend(m)
+                ii = ii + 1
                 if (ydx(i) .ne. yfill) then
                     ym_adj(nn)=ym_adj(nn)+ydx(i)*wgt(i)
                     wsum=wsum+wgt(i)
                     if (debug_day) &
-                    write (debug_unit,'("m, i, yd(i), ym_adj(nn), wgt(i), wsum: ",2i4,2f12.6,2f12.6)') &
-                        m,i,ydx(i),ym_adj(nn),wgt(i),wsum
+                    write (debug_unit,'("n,m,nn,i,idaynum,ii,yd,ym_adj,wgt,wsum: ", i6, i3, 2i6, i8, i3, 4f12.6)') &
+                        n, m, nn, i, idaynumx(i), ii, ydx(i), ym_adj(nn), wgt(i), wsum
                 else
                     nfill = nfill + 1
-                    if (debug_day) write (debug_unit, *) m, i, ydx(i), nfill
+                    if (debug_day) & 
+                    write (debug_unit, '("n,m,nn,i,idaynum,ii,yd,ym_adj: ", i6, i3, 2i6, i8, i3, 2f12.6)'), &
+                        n, m, nn, i, idaynumx(i), ii, ydx(i), nfill
                 end if
             end do
-            if (debug_day) write (debug_unit, *) wsum, nfill, ym_adj(nn)
             if (wsum .ne. 0.0d0 .and. nfill .eq. 0) then
                 ym_adj(nn)=ym_adj(nn)/wsum
             else
                 ym_adj(nn)=yfill
             end if
 
-            if (debug_day) write (debug_unit, *) m,ym_adj(nn),sngl(ym_adj(nn))
+            if (debug_day) write (debug_unit, '("n, m, nn, ym(nn), ym_adj(nn), ym_adj-ym, : ", i6, i3, i6, 4f12.5/)') &
+                n, m, nn, ym(nn), ym_adj(nn), ym_adj(nn) - ym(nn) !, sngl(ym_adj(nn))
         end do
     end do 
     
-    if (debug_day) write (debug_unit,'(12g14.6)') ym_adj
+    !if (debug_day) write (debug_unit,'(12g14.6)') ym_adj
 
 end subroutine day_to_rmon_ts
 

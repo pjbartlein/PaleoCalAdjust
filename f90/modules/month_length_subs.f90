@@ -959,10 +959,10 @@ subroutine imon_begmidend(imonlen, rmonbeg, imonbeg, imonmid, imonend)
     integer(4)              :: m
 
     imonbeg(1) = idint(rmonbeg(1))
-    imonend(1) = imonbeg(1) + imonlen(1) - 1
+    imonend(1) = imonbeg(1) + imonlen(1)
     do m=2,nm
         imonbeg(m) = imonend(m-1) + 1
-        imonend(m) = imonend(m-1) + imonlen(m)
+        imonend(m) = imonend(m-1) + imonlen(m) 
     end do
     do m=1,nm
         imonmid(m) = imonbeg(m) + imonlen(m)/2

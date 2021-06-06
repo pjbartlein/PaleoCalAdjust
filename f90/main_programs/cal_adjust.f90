@@ -124,6 +124,7 @@ integer(4), allocatable :: imonend_ts(:)        ! (nt) integer-value paleo month
 integer(4), allocatable :: ndays_ts(:)          ! (nt) integer-value times series of paleo year lengths
 real(8), allocatable    :: x_ctrl(:)            ! (nt) real-value control points for pseudo-daily interpolation
 real(8), allocatable    :: x_targ(:)            ! (ndtot) real_value target points for pseudo-daily interpolation
+integer(8), allocatable :: idaynum(:)           ! (integer) day number
 character(256)          :: time_comment         ! source of new (adjusted) monthly time values
 real(8), allocatable    :: mon_time(:)          ! (nt) new (adjusterd) monthly time values for daily-input files
 real(8), allocatable    :: mon_time_bnds(:,:)   ! (2,nt) new (adjusted) monthly time-bounds values for daily input files
@@ -329,7 +330,7 @@ do
     end do
     
     ! generate control and target points for interpolation
-    allocate (x_ctrl(nt), x_targ(ndtot))
+    allocate (x_ctrl(nt), x_targ(ndtot), idaynum(ndtot))
     
     ! control points
     x_ctrl(1:nm) = rmonmid_0ka_ts(1:nm)
@@ -345,6 +346,7 @@ do
     ! target points
     do i = 1, ndtot
         x_targ(i) = dble(i)
+        idaynum(i) = i
     end do
 
     write (*,'("ny, nt, ndtot: ",3i8)') ny, nt, ndtot
@@ -505,10 +507,12 @@ do
                         stop "interp_method"
                     end select
                     ! reaggregate daily data using correct calendar
-                    call day_to_rmon_ts(ny,ndays,rmonbeg,rmonend,ndtot,ydh(j,:),dble(vfill),var_adj(j,:))
+                    call day_to_rmon_ts(ny,ndays,imonbeg,imonend,rmonbeg,rmonend,ndtot,idaynum,ydh(j,:), &
+                        dble(var3d_in(j,k,:)),dble(vfill),var_adj(j,:))
                 else
                     ! input data are already daily, so just reaggregate using correct calendar
-                    call day_to_rmon_ts(ny,ndays,rmonbeg,rmonend,ndtot,ydh(j,:),dble(vfill),var_adj(j,:))
+                    call day_to_rmon_ts(ny,ndays,imonbeg,imonend,rmonbeg,rmonend,ndtot,idaynum,ydh(j,:), &
+                        dble(var3d_in(j,k,:)),dble(vfill),var_adj(j,:))
                 end if
             
                 var3d_out(j,k,:)=sngl(var_adj(j,:))
@@ -555,10 +559,12 @@ do
                             stop "interp_method"
                         end select
                         ! reaggregate daily data using correct calendar
-                        call day_to_rmon_ts(ny,ndays,rmonbeg,rmonend,ndtot,ydh(j,:),dble(vfill),var_adj(j,:))
+                        call day_to_rmon_ts(ny,ndays,imonbeg,imonend,rmonbeg,rmonend,ndtot,idaynum,ydh(j,:), &
+                            dble(var4d_in(j,k,l,:)),dble(vfill),var_adj(j,:))
                     else
                         ! input data are already daily, so just reaggregate using correct calendar
-                        call day_to_rmon_ts(ny,ndays,rmonbeg,rmonend,ndtot,ydh(j,:),dble(vfill),var_adj(j,:))
+                        call day_to_rmon_ts(ny,ndays,imonbeg,imonend,rmonbeg,rmonend,ndtot,idaynum,ydh(j,:), &
+                            dble(var4d_in(j,k,l,:)),dble(vfill),var_adj(j,:))
                     end if
             
                     var4d_out(j,k,l,:)=sngl(var_adj(j,:))
@@ -625,7 +631,7 @@ do
     deallocate (VEtoSS,SStoAE,AEtoWS,WStoVE)
     deallocate (imonmid_ts, imonbeg_ts,imonend_ts, rmonlen_ts, rmonmid_ts, rmonbeg_ts, rmonend_ts)
     deallocate (rmonlen_0ka, rmonmid_0ka, rmonbeg_0ka, rmonend_0ka)
-    deallocate (x_ctrl, x_targ)
+    deallocate (x_ctrl, x_targ, idaynum)
     deallocate (mon_time, mon_time_bnds)
     select case (invar_ndim)
     case (3)

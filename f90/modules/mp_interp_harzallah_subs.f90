@@ -215,7 +215,7 @@ subroutine hz_int(spline_case, nctrl, ym, ymiss, x_ctrl, nsubint, ntargs, x_targ
     integer(4)                      :: ibcbeg = 0, ibcend = 0           ! boundary condition flags
     real(8)                         :: ybcbeg = 0.0d0, ybcend = 0.0d0   ! boundary conditions
     real(8)                         :: ypp(nctrl)                       ! derivatives
-    real(8)                         :: ypval, yppval    ! first and second derivatives
+    real(8)                         :: ypval, yppval                    ! first and second derivatives
     
     integer(4), parameter           :: max_iter = 16
     real(8)                         :: tol = 0.01                       ! tolerance
@@ -260,9 +260,7 @@ subroutine hz_int(spline_case, nctrl, ym, ymiss, x_ctrl, nsubint, ntargs, x_targ
             case default
                 stop "spline_case"
         end select
-        
-        !if (debug_write) write (debug_unit, '("y int_mat", i4)') k
-        !if (debug_write) write (debug_unit,'(10g14.6)') y_int_mat(k, :)
+    
         
         ! interval mean values
         if (debug_write) write (debug_unit, '("calling interval_mean() from hz_int(), k, nctrl, ntargs: ", 3i8)') k, nctrl, ntargs
@@ -279,8 +277,6 @@ subroutine hz_int(spline_case, nctrl, ym, ymiss, x_ctrl, nsubint, ntargs, x_targ
         if (maxval(resid) .lt. tol) exit
         
         ym_mat(k + 1, :) = resid(:)
-        !if (debug_write) write (debug_unit, '("ym_mat new", i4)') k
-        !if (debug_write) write (debug_unit,'(16g14.6)') ym_mat(k+1, :)
      
     end do
     
