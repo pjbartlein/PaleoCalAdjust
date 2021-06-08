@@ -1,0 +1,1 @@
+magick -delay 50 @orb_solstice_anm_files.txt -resize 1080x1080 -loop 0 -layers Optimize orb_solstice_anm.gif
