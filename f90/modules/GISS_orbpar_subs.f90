@@ -1,8 +1,4 @@
 module giss_orbpar_subs
-
-! This moodule is .f90 version of the ORBPAR() subroutine contained in the file
-! https://data.giss.nasa.gov/ar5/SOLAR/ORBPAR.FOR downloaded 2017-09-04 17:17
-! also retrievable from https://web.archive.org/web/20150920211936/http://data.giss.nasa.gov/ar5/solar.html
     
 contains
     
@@ -32,7 +28,7 @@ subroutine GISS_orbpars(year_type, year, eccen, obliq_deg, perih_deg, precc)
     ! NOTE:  Year CE/AD = 0 is assumed to exist, and is equivalent to 1950 BP (-1950)
     ! subroutine orbpar() expects real-valued YearCE, but converts to YearBP for calculations
     select case (year_type)
-    case ('CE', 'AD', 'ce', 'ad')
+    case ('CE', 'AD' , 'ce', 'ad')
         YearCE = year
         YearBP = year - 1950.0d0
     case ('BP', 'bp')
@@ -54,17 +50,16 @@ subroutine orbpar(year, eccen, obliq, omegvp)   ! year should be YearCE
 
 ! NOTE:  Year CE/AD = 0 is assumed to not exist
     
-! .f90 version of the ORBPAR() subroutine contained in the file
+! .f90 version of the ORBPAR() subroutine contained in
 !  https://data.giss.nasa.gov/ar5/SOLAR/ORBPAR.FOR downloaded 2017-09-04 17:17
-!  also retrievable from https://web.archive.org/web/20150920211936/http://data.giss.nasa.gov/ar5/solar.html
 ! 
 !  ORBPAR calculates the three orbital parameters as a function of
 !  YEAR.  The source of these calculations is: Andre L. Berger,
 !  1978, "Long-Term Variations of Daily Insolation and Quaternary
 !  Climatic Changes", JAS, v.35, p.2362.  Also useful is: Andre L.
 !  Berger, May 1978, "A Simple Algorithm to Compute Long Term
-!  Variations of Daily Insolation", published by the Institut
-!  d'Astronomie et de Geophysique, Universite Catholique de Louvain,
+!  Variations of Daily Insolation", published by Institut
+!  D'Astronomie de Geophysique, Universite Catholique de Louvain,
 !  Louvain-la Neuve, No. 18.
 ! 
 !  Tables and equations refer to the first reference (JAS).  The
@@ -77,7 +72,7 @@ subroutine orbpar(year, eccen, obliq, omegvp)   ! year should be YearCE
 !  Input:  YEAR   = years A.D. are positive, B.C. are negative
 !  Output: ECCEN  = eccentricity of orbital ellipse
 !          OBLIQ  = latitude of Tropic of Cancer in radians
-!          OMEGVP = longitude of perihelion 
+!          OMEGVP = longitude of perihelion =
 !                 = spatial angle from vernal equinox to perihelion
 !                   in radians with sun as angle vertex
 ! 
@@ -111,7 +106,7 @@ subroutine orbpar(year, eccen, obliq, omegvp)   ! year should be YearCE
            15.3936813d0,  1.010530d0,  28.9300d0, &
            14.6660938d0,  7.437771d0, 123.5968d0, &
           -11.7273029d0, 55.782177d0,  20.2082d0, &
-           10.2742696d0,  0.373813d0,  40.8226d0, &
+           10.2742696d0,   .373813d0,  40.8226d0, &
             6.4914588d0, 13.218362d0, 123.4722d0, &
             5.8539148d0, 62.583231d0, 155.6977d0, &
            -5.4872205d0, 63.593761d0, 184.6277d0, &

@@ -1,10 +1,7 @@
 module GISS_srevents_subs
-
-! This module contains subroutines for calculating the timing of the vernal equiox, the solstices and
-! time of perihelion and aphelion, based on
-! SREVENTS.FOR    Solar EVENTS each year    2012/05/29, downloaded from
+! subroutines based on
+! SREVENTS.FOR    Solar EVENTS each year    2012/05/29
 ! https://data.giss.nasa.gov/ar5/SOLAR/SREVENTS.FOR downloaded 2017-09-12
-! also retrievable from https://web.archive.org/web/20150920211936/http://data.giss.nasa.gov/ar5/solar.html   
 ! conversion to .f90 by P.J. Bartlein
 
     implicit none
@@ -20,7 +17,7 @@ module GISS_srevents_subs
 
 contains
 
-subroutine GISS_srevents(year_type, iyear, EDAYzY, veqday, ssday, perihelion, aphelion, ndays_in_year)
+subroutine GISS_srevents(year_type, iyear, EDAYzY, veqday, perihelion, aphelion, ndays_in_year)
 ! subroutines based on
 ! SREVENTS.FOR    Solar EVENTS each year    2012/05/29
 ! https://data.giss.nasa.gov/ar5/SOLAR/SREVENTS.FOR downloaded 2017-09-12
@@ -33,7 +30,7 @@ subroutine GISS_srevents(year_type, iyear, EDAYzY, veqday, ssday, perihelion, ap
     character(2), intent(in)    :: year_type
     integer(4), intent(in)      :: iyear
     real(8), intent(in)         :: EDAYzY
-    real(8), intent(out)        :: veqday, ssday, perihelion, aphelion
+    real(8), intent(out)        :: veqday, perihelion, aphelion
     integer(4), intent(out)     :: ndays_in_year
 
     integer(4)                  :: YearCE, YearBP
@@ -57,9 +54,9 @@ subroutine GISS_srevents(year_type, iyear, EDAYzY, veqday, ssday, perihelion, ap
         (/ 31.0d0, 28.0d0, 31.0d0, 30.0d0, 31.0d0, 30.0d0, 31.0d0, 31.0d0, 30.0d0, 31.0d0, 30.0d0, 31.0d0 /)
     real(8)     :: nd_leap(nm) = &         ! present-day month lengths in 366-day (leap) year
         (/ 31.0d0, 29.0d0, 31.0d0, 30.0d0, 31.0d0, 30.0d0, 31.0d0, 31.0d0, 30.0d0, 31.0d0, 30.0d0, 31.0d0 /)
-    real(8)     :: accumday_noleap(nm) = &       ! present-day accumulated day lengths in 365-day (noleap) year
+    real(8)     :: accumday_noleap(nm) = &       ! present-day accumulated days lengths in 365-day (noleap) year
         (/  0.0d0, 31.0d0, 59.0d0, 90.0d0,120.0d0,151.0d0,181.0d0,212.0d0,243.0d0,273.0d0,304.0d0,334.0d0 /)
-    real(8)     :: accumday_leap(nm) = &         ! present-day accumulated day lengths in 366-day (leap) year
+    real(8)     :: accumday_leap(nm) = &         ! present-day accumulated days in 366-day (leap) year
         (/  0.0d0, 31.0d0, 60.0d0, 91.0d0,121.0d0,152.0d0,182.0d0,213.0d0,244.0d0,274.0d0,305.0d0,335.0d0 /)
 
 
@@ -69,7 +66,7 @@ subroutine GISS_srevents(year_type, iyear, EDAYzY, veqday, ssday, perihelion, ap
     ! NOTE:  Year CE/AD = 0 is assumed to exist, and is equivalent to 1950 BP (-1950)
     ! subroutine orbpar() expects real-valued YearCE, but converts to YearBP for calculations
     select case (year_type)
-    case ('CE', 'AD', 'ce', 'ad')
+    case ('CE', 'AD' , 'ce', 'ad')
         YearCE = iyear
         YearBP = iyear - 1950
     case ('BP', 'bp')
@@ -82,22 +79,18 @@ subroutine GISS_srevents(year_type, iyear, EDAYzY, veqday, ssday, perihelion, ap
 !  Determine orbital parameters
     YEAR = dble(YearCE)
     CALL ORBPAR (YEAR, ECCEN,OBLIQ,OMEGVP) ! orbpar() expects YearCE input
-    !write (*,'("YEAR, ECCEN,OBLIQ,OMEGVP:" 4f14.7)') YEAR, ECCEN,OBLIQ,OMEGVP 
     BSEMI  = dSQRT (1.0d0-ECCEN*ECCEN)
 !  Vernal Equinox
-    VEREQX = VERNAL (YearCE, EDAYzY)! NOTE:  made EDAYzY an argument
-    !VEREQX = dmod(VERNAL (YearCE, EDAYzY), EDAYzy) ! NOTE:  made EDAYzY an argument
+    VEREQX = VERNAL (YearCE, EDAYzY) ! NOTE:  made EDAYzY an argument
     CALL DtoYMDHM (VEREQX, JVEYR,JVEMON,JVEDAT,JVEHR,JVEMIN)
     TAofVE = - OMEGVP
     EAofVE = dATAN2 (dSIN(TAofVE)*BSEMI, dCOS(TAofVE)+ECCEN)
     MAofVE = EAofVE - ECCEN*dSIN(EAofVE)
     IF(MAofVE.lt.0.0d0)  MAofVE = MAofVE + TWOPI
-    !write (*,'("VEREQX, TAofVE, EAofVE, MAofVE: ",4f14.7)') VEREQX, TAofVE, EAofVE, MAofVE
 !  Perihelion
     KPERIH = 0
     PERIH1 = VEREQX - MAofVE*EDAYzY/TWOPI
     PERIH2 = PERIH1 + EDAYzY
-    !write (*,'("EDAYzY, PERIH1, PERIH2: ",3f14.7)') EDAYzY, PERIH1, PERIH2
     Call DtoYMDHM (PERIH1, JPRYR,JPRMON,JPRDAT,JPRHR,JPRMIN)
     If (JPRYR /= IYEAR)  GoTo 210
     KPERIH = 1
@@ -141,21 +134,17 @@ subroutine GISS_srevents(year_type, iyear, EDAYzY, veqday, ssday, perihelion, ap
     WINSOL = VEREQX + (MAofWS-MAofVE)*EDAYzY/TWOPI
     Call DtoYMDHM (WINSOL, JWSYR,JWSMON,JWSDAT,JWSHR,JWSMIN)
 
-! vernal equinox and northern summer solstice days
+! vernal equinox day
 
-    veqday = 0.0d0; ssday = 0.0d0
+    veqday = 0.0d0
     if(isleap(YearCE)) then
         ndays_in_year = 366
         veqday = veqday + nd_leap(1) + nd_leap(2) + dble(JVEDAT) + dble(JVEHR)/24.0d0 + dble(JVEMIN)/1440.0d0
-        ssday = ssday + nd_leap(1) + nd_leap(2) + nd_leap(3) + nd_leap(4) + nd_leap(5) &
-            + dble(JSSDAT) + dble(JSSHR)/24.0d0 + dble(JSSMIN)/1440.0d0
         perihelion = dble(accumday_leap(JPRMON)) + dble(JPRDAT) + dble(JPRHR)/24.0d0 + dble(JPRMIN)/1440.0d0
         aphelion   = dble(accumday_leap(JAPMON)) + dble(JAPDAT) + dble(JAPHR)/24.0d0 + dble(JAPMIN)/1440.0d0
     else
         ndays_in_year = 365
         veqday = veqday + nd_noleap(1) + nd_noleap(2) + dble(JVEDAT) + dble(JVEHR)/24.0d0 + dble(JVEMIN)/1440.0d0
-        ssday = ssday + nd_noleap(1) + nd_noleap(2) + nd_noleap(3) + nd_noleap(4) + nd_noleap(5) &
-            + dble(JSSDAT) + dble(JSSHR)/24.0d0 + dble(JSSMIN)/1440.0d0
         perihelion = dble(accumday_noleap(JPRMON)) + dble(JPRDAT) + dble(JPRHR)/24.0d0 + dble(JPRMIN)/1440.0d0
         aphelion   = dble(accumday_noleap(JAPMON)) + dble(JAPDAT) + dble(JAPHR)/24.0d0 + dble(JAPMIN)/1440.0d0
     end if
@@ -165,7 +154,7 @@ end subroutine GISS_srevents
 logical(4) function isleap(yearCE)
 ! is yearCE a leap year? -- no year zero or Gregorian-Julian adjustment
 
-    ! NOTE:  Year CE/AD = 0 is assumed to exist, and is equivalent to 1950 BP (-1950)
+    ! NOTE:  Year CE/AD = 0 is assumbed to exist, and is equivalent to 1950 BP (-1950)
 
     implicit none
 
@@ -200,22 +189,22 @@ real(8) function vernal (iyear, edayzy)
 ! SREVENTS.FOR    Solar EVENTS each year    2012/05/29
 ! https://data.giss.nasa.gov/ar5/SOLAR/SREVENTS.FOR downloaded 2017-09-12
 
-!  For a given year, vernal calculates an approximate time of vernal
-!  equinox in days measured from 2000 January 1, hour 0.
+!  for a given year, vernal calculates an approximate time of vernal
+!  equinox in days measured from 2000 january 1, hour 0.
 !
-!  Vernal assumes that vernal equinoxes from one year to the next
+!  vernal assumes that vernal equinoxes from one year to the next
 !  are separated by exactly 365.2425 days, a tropical year
-!  [Explanatory Supplement to the Astronomical Ephemeris].  If the
+!  [explanatory supplement to the astronomical ephemeris].  if the
 !  tropical year is 365.2422 days, as indicated by other references,
 !  then the time of the vernal equinox will be off by 2.88 hours in
 !  400 years.
 !
-!  Time of vernal equinox for year 2000 A.D. is March 20, 7:36 GMT
-!  [NASA Reference Publication 1349, Oct. 1994].  Vernal assumes
-!  that vernal equinox for year 2000 will be on March 20, 7:30, or
-!  79.3125 days from 2000 January 1, hour 0.  Vernal equinoxes for
+!  time of vernal equinox for year 2000 a.d. is march 20, 7:36 gmt
+!  [nasa reference publication 1349, oct. 1994].  vernal assumes
+!  that vernal equinox for year 2000 will be on march 20, 7:30, or
+!  79.3125 days from 2000 january 1, hour 0.  vernal equinoxes for
 !  other years returned by vernal are also measured in days from
-!  2000 January 1, hour 0.  79.3125 = 31 + 29 + 19 + 7.5/24.
+!  2000 january 1, hour 0.  79.3125 = 31 + 29 + 19 + 7.5/24.
 
     implicit none
 
@@ -224,7 +213,6 @@ real(8) function vernal (iyear, edayzy)
     integer(4), intent(in)  :: iyear
 
     vernal = ve2000 + dble((iyear-2000))*edayzy
-    ! write (*,*) iyear, edayzy, ve2000, vernal, dble((iyear-2000))
 
 end function vernal
 
@@ -311,11 +299,9 @@ SUBROUTINE DtoYMD (DAY, IYEAR,IMONTH,DATE)
 !
 100 DAY1Y = DAY4Y
     Do 120 M=1,11
-    If (DAY1Y < JDSUML(M+1))  GoTo 130
-120 continue
+120 If (DAY1Y < JDSUML(M+1))  GoTo 130
 !     M=12
-130 continue
-    IYEAR  = 2000 + int(N4CENT*400) + int(N1CENT*100) + N4YEAR*4 + N1YEAR
+130 IYEAR  = 2000 + int(N4CENT*400) + int(N1CENT*100) + N4YEAR*4 + N1YEAR
     IMONTH = M
     DATE   = DAY1Y - JDSUML(M)
     Return
@@ -324,11 +310,9 @@ SUBROUTINE DtoYMD (DAY, IYEAR,IMONTH,DATE)
 !
 200 DAY1Y  = DAY4Y - N1YEAR*JDAY1Y - 1
 210 Do 220 M=1,11
-    If (DAY1Y < JDSUMN(M+1))  GoTo 230
-220 continue
+220 If (DAY1Y < JDSUMN(M+1))  GoTo 230
 !     M=12
-230 continue
-    IYEAR  = 2000 + int(N4CENT)*400 + int(N1CENT)*100 + N4YEAR*4 + N1YEAR
+230 IYEAR  = 2000 + int(N4CENT)*400 + int(N1CENT)*100 + N4YEAR*4 + N1YEAR
     IMONTH = M
     DATE   = DAY1Y - JDSUMN(M)
     Return
