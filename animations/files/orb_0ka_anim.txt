@@ -1,0 +1,1 @@
+magick -delay 10 @orb_0ka_files.txt -resize 1080x1080 -loop 0 -layers Optimize orb_0ka.gif

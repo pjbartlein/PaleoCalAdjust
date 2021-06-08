@@ -1,8 +1,9 @@
 program giss_orbpar
 ! calls GISS subroutine ORBPAR(YEAR, ECCEN,OBLIQ,OMEGVP) to compute orbital parameters
-! using Berger (1978) JAS 35:2362-2367 algorithm and tables
-! https://data.giss.nasa.gov/ar5/SOLAR/ORBPAR.FOR downloCEed 2017-09-04 17:17
-
+! using Berger (1978, JAS 35:2362-2367) algorithm and tables
+! https://data.giss.nasa.gov/ar5/SOLAR/ORBPAR.FOR downloaded 2017-09-04 17:17
+! also retrievable from https://web.archive.org/web/20150920211936/http://data.giss.nasa.gov/ar5/solar.html
+    
 use GISS_orbpar_subs
 
 implicit none
@@ -26,8 +27,8 @@ integer(4)      :: n                ! year index
 
 character(2056) :: outpath, outfile ! output file name
 
-!outpath = "/Users/bartlein/Projects/Calendar/PaleoCalendarAdjust/data/GISS_orbital/"    ! Mac path
-outpath = "/Projects/Calendar/PaleoCalendarAdjust/data/GISS_orbital/"   ! Windows path
+outpath = "/Projects/Calendar/PaleoCalAdjust/data/GISS_orbital/"   ! Windows path
+!outpath = "/Users/bartlein/Projects/Calendar/PaleoCalAdjust/data/GISS_orbital/"    ! Mac path
 outfile="orb_elt_150ka_1kyr.csv"
 write (*,'(a)') trim(outpath)//trim(outfile)
 open (1, file=trim(outpath)//trim(outfile))
@@ -42,7 +43,7 @@ do n=begyr,endyr,yrstep
     ! NOTE:  Year CE/AD = 0 is assumed to exist, and is equivalent to 1950 BP (-1950)
     ! subroutine orbpar() expects real-valued YearCE, but converts to YearBP for calculations
     select case (year_type)
-    case ('CE', 'AD' , 'ce', 'ad')
+    case ('CE', 'AD', 'ce', 'ad')
         YearCE = dble(n)
         YearBP = dble(n) - 1950.0d0
     case ('BP', 'bp')
@@ -57,6 +58,8 @@ do n=begyr,endyr,yrstep
     write (1,'(f10.1,", ",f10.1,4(", ",f17.12))') yearCE, yearBP, eccen, obliq_deg, perih_deg, precc
 
 end do
+
+write (*,'(a)') "Done (GISS_orbpar_driver)"
 
 end program giss_orbpar
 

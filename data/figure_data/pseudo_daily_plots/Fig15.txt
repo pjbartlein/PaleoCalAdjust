@@ -1,0 +1,81 @@
+Comparison of linear and harmonic pseudo-daily interpolation
+
+Example 1, Madison CFSR tas (Fig. 15a):
+           ym:    -6.770   -4.330    1.520    8.350   14.740   20.290   23.220   22.170   16.940   10.350    3.080   -4.290
+Weighted annual mean of input data:     8.843014
+
+Linear interpolation (not mean preserving):
+           ym:    -6.770   -4.330    1.520    8.350   14.740   20.290   23.220   22.170   16.940   10.350    3.080   -4.290
+    ym_linear:    -6.147   -3.855    1.725    8.404   14.731   20.037   22.732   21.585   16.676   10.150    2.948   -3.743
+   difference:     0.623    0.475    0.205    0.054   -0.009   -0.253   -0.488   -0.585   -0.264   -0.200   -0.132    0.547
+Annual mean of interpolated data:     8.838343    Difference:    0.004670
+
+Mean-preserving (harmonic) interpolation (Epstein, 1991):
+           ym:    -6.770   -4.330    1.520    8.350   14.740   20.290   23.220   22.170   16.940   10.350    3.080   -4.290
+  ym_harmonic:    -6.770   -4.330    1.520    8.350   14.740   20.290   23.220   22.170   16.940   10.350    3.080   -4.290
+   difference:    -0.000   -0.000   -0.000    0.000    0.000    0.000    0.000    0.000    0.000    0.000    0.000   -0.000
+Annual mean of interpolated data:     8.843013    Difference:    0.000001
+
+Example 2, Australia CFSR tas (Fig. 15b):
+           ym:    25.320   24.930   22.630   19.730   16.170   13.000   12.380   14.040   17.360   19.780   22.520   24.040
+Weighted annual mean of input data:    19.291781
+
+Linear interpolation (not mean preserving):
+           ym:    25.320   24.930   22.630   19.730   16.170   13.000   12.380   14.040   17.360   19.780   22.520   24.040
+    ym_linear:    25.120   24.681   22.520   19.596   16.164   13.282   12.675   14.295   17.296   19.863   22.405   24.030
+   difference:    -0.200   -0.249   -0.110   -0.134   -0.006    0.282    0.295    0.255   -0.064    0.083   -0.115   -0.010
+Annual mean of interpolated data:    19.296286    Difference:   -0.004505
+
+Mean-preserving (harmonic) interpolation (Epstein, 1991):
+           ym:    25.320   24.930   22.630   19.730   16.170   13.000   12.380   14.040   17.360   19.780   22.520   24.040
+  ym_harmonic:    25.320   24.930   22.630   19.730   16.170   13.000   12.380   14.040   17.360   19.780   22.520   24.040
+   difference:     0.000    0.000    0.000    0.000   -0.000   -0.000   -0.000   -0.000    0.000   -0.000    0.000   -0.000
+Annual mean of interpolated data:    19.291782    Difference:   -0.000001
+
+Example 3, Madison CMAP precip (Fig. 15c):
+           ym:     0.900    0.980    1.570    2.490    2.710    3.350    3.070    3.160    2.700    2.070    1.960    1.170
+Weighted annual mean of input data:     2.182438
+
+Linear interpolation (not mean preserving):
+           ym:     0.900    0.980    1.570    2.490    2.710    3.350    3.070    3.160    2.700    2.070    1.960    1.170
+    ym_linear:     0.942    1.046    1.622    2.413    2.770    3.240    3.115    3.087    2.670    2.130    1.869    1.228
+   difference:     0.042    0.066    0.052   -0.077    0.060   -0.110    0.045   -0.073   -0.030    0.060   -0.091    0.058
+Annual mean of interpolated data:     2.183020    Difference:   -0.000582
+
+Mean-preserving (harmonic) interpolation (Epstein, 1991):
+           ym:     0.900    0.980    1.570    2.490    2.710    3.350    3.070    3.160    2.700    2.070    1.960    1.170
+  ym_harmonic:     0.900    0.980    1.570    2.490    2.710    3.350    3.070    3.160    2.700    2.070    1.960    1.170
+   difference:    -0.000   -0.000   -0.000    0.000   -0.000    0.000   -0.000    0.000    0.000   -0.000    0.000   -0.000
+Annual mean of interpolated data:     2.182439    Difference:   -0.000000
+
+Example 4, Indian Ocean CMAP precip (pathological precipitation case) (Fig. 15d):
+           ym:     0.210    0.070    0.030    0.090    2.530    8.230    2.000    1.090    1.730    2.230    2.480    1.020
+Weighted annual mean of input data:     1.808959
+
+Linear interpolation (not mean preserving):
+           ym:     0.210    0.070    0.030    0.090    2.530    8.230    2.000    1.090    1.730    2.230    2.480    1.020
+    ym_linear:     0.282    0.080    0.043    0.403    3.011    6.759    2.620    1.283    1.722    2.204    2.260    1.086
+   difference:     0.072    0.010    0.013    0.313    0.481   -1.471    0.620    0.193   -0.008   -0.026   -0.220    0.066
+Annual mean of interpolated data:     1.816437    Difference:   -0.007478
+
+Harmonic (Epstein, 1991) interpolation (mean preserving):
+           ym:     0.210    0.070    0.030    0.090    2.530    8.230    2.000    1.090    1.730    2.230    2.480    1.020
+  ym_harmonic:     0.210    0.138    0.150    0.209    2.555    8.231    2.031    1.103    1.730    2.230    2.480    1.020
+   difference:    -0.000    0.068    0.120    0.119    0.025    0.001    0.031    0.013   -0.000    0.000    0.000   -0.000
+Annual mean of interpolated data:     1.840077    Difference:   -0.031118
+
+Example 5,  pre with zeros (Not in Fig. 15):
+           ym:    44.000   60.000  182.000  103.000    7.000    0.000    0.000    0.000    6.000   36.000   78.000   66.000
+Weighted annual mean of input data:    48.424658
+
+Linear interpolation (not mean preserving):
+           ym:    44.000   60.000  182.000  103.000    7.000    0.000    0.000    0.000    6.000   36.000   78.000   66.000
+    ym_linear:    48.734   73.746  156.297   99.475   17.475    0.803    0.000    0.812    9.246   38.116   71.607   64.498
+   difference:     4.734   13.746  -25.703   -3.525   10.475    0.803    0.000    0.812    3.246    2.116   -6.393   -1.502
+Annual mean of interpolated data:    48.226630    Difference:    0.198028
+
+Harmonic (Epstein, 1991) interpolation (mean preserving):
+           ym:    44.000   60.000  182.000  103.000    7.000    0.000    0.000    0.000    6.000   36.000   78.000   66.000
+  ym_harmonic:    44.000   59.990  182.013  102.999    6.996    0.000    0.000    0.000    5.999   35.999   78.004   66.000
+   difference:    -0.000   -0.010    0.013   -0.001   -0.004    0.000    0.000    0.000   -0.001   -0.001    0.004   -0.000
+Annual mean of interpolated data:    48.424613    Difference:    0.000044
