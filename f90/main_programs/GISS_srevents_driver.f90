@@ -2,10 +2,11 @@ program srevents
 ! f90 version of SREVENTS.FOR driver program
 ! subroutines based on GISS program SREVENTS.FOR -- Solar EVENTS each year    2003/10/22
 ! downloaded 2016-10-07 16:20
+! also retrieveable from https://web.archive.org/web/20150920211936/http://data.giss.nasa.gov/ar5/solar.html
     
 ! NOTE:  Year CE/AD = 0 is assumed to exist, and is equivalent to 1950 BP (-1950)
     
-use GISS_orbital_subs
+use GISS_orbpar_subs
 use GISS_srevents_subs
       
 implicit none
@@ -14,13 +15,13 @@ real(8), parameter      :: EDAYzY=365.2425d0 ! 365.24219876d0 ) !
 integer(4), parameter   :: nm=12
 
 integer(4)      :: iyminBP, iymaxBP, iyinc, iyminCE, iymaxCE, iyearCE, ndays, i4yrs
-real(8)         :: veqday, veqday2, perihelion, aphelion
+real(8)         :: veqday, veqday2, ssday, ssday2, perihelion, aphelion
 character(2)    :: year_type
 character(2056) :: outpath
 character(64)   :: sreventsfile, VPAdayfile
 
-!outpath = "/Users/bartlein/Projects/Calendar/PaleoCalendarAdjust/data/GISS_orbital/" ! Mac Path
-outpath = "/Projects/Calendar/PaleoCalendarAdjust/data/GISS_orbital/" ! Windows path
+outpath = "/Projects/Calendar/PaleoCalAdjust/data/GISS_orbital/" ! Windows path
+!outpath = "/Users/bartlein/Projects/Calendar/PaleoCalAdjust/data/GISS_orbital/" ! Mac Path
 sreventsfile="srevents_150ka_1kyr.txt" 
 VPAdayfile="VPAday_150ka_1kyr.csv" 
 
@@ -37,14 +38,14 @@ iymaxCE = iymaxBP + 1950
 
 !  Write header information
 WRITE (1,920) EDAYzY
-write (2,'(a)') "YearBP, YearCE, ndays, before_leap, veq_day, veq_day2, perihelion_day, aphelion_day"
+write (2,'(a)') "YearBP, YearCE, ndays, before_leap, veq_day, veq_day2, ss_day, ss_day2, perihelion_day, aphelion_day"
 
 ! loop over years
 
 i4yrs = before_leap(iyminCE + iyinc)
 do iyearCE = iyminCE,iymaxCE,iyinc
     
-    call GISS_srevents(year_type, iyearCE, edayzy, veqday, perihelion, aphelion, ndays)
+    call GISS_srevents(year_type, iyearCE, edayzy, veqday, ssday, perihelion, aphelion, ndays)
 
     if(KPERIH==1 .and. KAPHEL==1)  then
         write (1,927) iyearCE, &
@@ -68,11 +69,12 @@ do iyearCE = iyminCE,iymaxCE,iyinc
     end if
     
     veqday2 =  80.0d0 + (dble(i4yrs) * 0.25d0)
+    ssday2 = 170.5d0 + (dble(i4yrs) * 0.25d0)
     i4yrs = i4yrs + 1
     if (i4yrs.gt.3) i4yrs = 0
 
-    write (2,'(i8,", ",i8,2(", ",i4),2(", ",f10.6), 2(", ",f12.6))') & 
-        iyearCE-1950, iyearCE, ndays, i4yrs, veqday, veqday2, perihelion, aphelion
+    write (2,'(i8,", ",i8,2(", ",i4),4(", ",f10.6), 2(", ",f12.6))') & 
+        iyearCE-1950, iyearCE, ndays, i4yrs, veqday, veqday2, ssday, ssday2, perihelion, aphelion
 
 end do
 
@@ -88,6 +90,8 @@ GO TO 999
             13x, i4,'/',i2.2,i3,':',i2.2)
 ! 981 format (a / a)
 999 continue
+    
+write (*,'(a)') "Done (GISS_srevents_driver)"
     
 end program srevents 
 
