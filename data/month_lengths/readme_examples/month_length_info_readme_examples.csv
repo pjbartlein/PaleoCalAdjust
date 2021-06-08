@@ -1,0 +1,13 @@
+prefix,calendar_type,begageBP,endageBP,agestep,begyrCE,nsimyrs,'path',note
+Amon_006ka_progreg,progreg,-6000,-6000,1,1850,100,'/Projects/Calendar/PaleoCalAdjust/data/month_lengths/readme_examples/',time-slice
+Amon_000ka_progreg,progreg,-100,-100,1,1850,100,'/Projects/Calendar/PaleoCalAdjust/data/month_lengths/readme_examples/',time-slice
+Amon_006ka_noleap,noleap,-6000,-6000,1,1000,301,'/Projects/Calendar/PaleoCalAdjust/data/month_lengths/readme_examples/',time-slice
+Amon_000ka_noleap,noleap,-100,-100,1,1000,301,'/Projects/Calendar/PaleoCalAdjust/data/month_lengths/readme_examples/',time-slice
+Aclim_006ka_noleap,365_day,-6000,-6000,1,1000,1,'/Projects/Calendar/PaleoCalAdjust/data/month_lengths/readme_examples/',time-slice
+Aclim_000ka_noleap,365_day,-100,-100,1,1000,1,'/Projects/Calendar/PaleoCalAdjust/data/month_lengths/readme_examples/',time-slice
+Holocene_transient,progreg,-7949,-100,1,1001,1,'/Projects/Calendar/PaleoCalAdjust/data/month_lengths/readme_examples/',transient
+Holocene_transient_ctrl,progreg,0,0,1,1001,7850,'/Projects/Calendar/PaleoCalAdjust/data/month_lengths/readme_examples/',transient
+TraCE-21ka,noleap,-22000,39,1,-20050,1,'/Projects/Calendar/PaleoCalAdjust/data/month_lengths/readme_examples/',transient
+PMIP4_noleap,noleap,-150000,0,1000,-148050,1,'/Projects/Calendar/PaleoCalAdjust/data/month_lengths/readme_examples/',transient
+PMIP4_progreg,progreg,-150000,0,1000,-148050,1,'/Projects/Calendar/PaleoCalAdjust/data/month_lengths/readme_examples/',transient
+CommonEra,progreg,-1949,150,1,1,1,'/Projects/Calendar/PaleoCalAdjust/data/month_lengths/readme_examples/',transient
