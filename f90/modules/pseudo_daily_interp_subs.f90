@@ -97,18 +97,17 @@ subroutine enforce_mean(nctrl, ntargs, nsubint, tol, ym, yd, ymiss)
             end do 
                 
             if (nzero .gt. 0) nonzero_mean = nonzero_sum / dble(nzero)
-            if (debug_em) write (debug_unit, '("nzero_sum, nzero, nzero_mean: ", f12.6, i4, f12.6)') &
-                nonzero_sum, nzero, nonzero_mean
+            if (debug_em) write (debug_unit, '("nzero_sum, nzero, nzero_mean, diff: ", f12.6, i4, 2f12.6)') &
+                nonzero_sum, nzero, nonzero_mean, diff
                     
             ! apply porportions of difference to each nonzero subinterval
-            if (debug_em) write (debug_unit, '("diff, nzero, yd_adjust: ", f12.6, i3, f12.6)') diff, nzero, yd_adjust
             if (debug_em) write (debug_unit, '(a)') "       i      ii      yd_old   yd_adjust   yd(i)"
             ii = 0; yd_adjust_sum = 0.0d0; yd_out_sum = 0.0d0; yd_adjust_mean = 0.0d0; yd_out_mean = 0.0d0
             do i = ib, ie
                 yd_old = yd(i)
                 ii = ii + 1
                 if (yd(i) .ne. 0.0d0) then
-                    yd_adjust = ((yd(i) / nonzero_sum) * diff) * dble(nsubint(n))
+                    yd_adjust = yd_old * ((dble(nsubint(n)) * diff) / nonzero_sum)
                     yd(i) = yd(i) + yd_adjust
                     yd_out_sum = yd_out_sum + yd(i)
                     yd_adjust_sum = yd_adjust_sum + yd_adjust
@@ -158,9 +157,6 @@ subroutine day_to_rmon_ts(ny, ndays, imonbeg, imonend, rmonbeg, rmonend, ndtot, 
     integer(4)              :: nfill                        ! number of days with fill values
     
     integer(4)              :: n, m, i, nn, ii
-    
-    !integer(4)              :: debug_unit = 14
-    !logical                 :: debug_day = .true.
 
     if (debug_day) write (debug_unit,'(a)') "In day_to_rmon..."
     if (debug_day) write (debug_unit,*) ny, ndtot
