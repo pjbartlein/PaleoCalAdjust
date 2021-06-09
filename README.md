@@ -36,7 +36,7 @@ Animations used in a presentation at the Fall 2019 AGU Meeting can be found in t
 
 References:  
 Epstein, E), On obtaining daily climatological values from monthly means, *J. Climate* 4:365-368.  
-Harzallah, A. (1995) The interpolation of data series using a constrained iterating technique *Monthly Weather Review* 123:2251-2254.
+Harzallah, A. (1995) The interpolation of data series using a constrained iterating technique *Monthly Weather Review* 123:2251-2254.  
 Bartlein, P.J. and S.L. Shafer, 2019, Paleo calendar effects on radiation, atmospheric circulation, and surface temperature, moisture, and energy-balance variables can produce interpretable but spurious large-scale patterns and trends in analyses of paleoclimatic simulations. PP31A-08, AGU 2019 Fall Meeting.  [[https://agu.confex.com/agu/fm19/meetingapp.cgi/Paper/525140]](https://agu.confex.com/agu/fm19/meetingapp.cgi/Paper/525140)
 
 ## Version history ##
