@@ -10,7 +10,7 @@ module pseudo_daily_interp_subs
 
 contains
     
-subroutine enforce_mean(nctrl, ntargs, nsubint, tol, ym, yd, ymiss)
+subroutine enforce_mean(nctrl, ntargs, nsubint, tol, no_negatives, ym, yd, ymiss)
 ! adjustes daily values to match target mean
 
     implicit none
@@ -19,6 +19,7 @@ subroutine enforce_mean(nctrl, ntargs, nsubint, tol, ym, yd, ymiss)
     integer(4), intent(in)  :: ntargs
     integer(4), intent(in)  :: nsubint(nctrl)
     real(8), intent(in)     :: tol
+    logical, intent(in)     :: no_negatives
     real(8), intent(in)     :: ym(nctrl)
     real(8), intent(inout)  :: yd(ntargs)
     real(8), intent(in)     :: ymiss
@@ -107,8 +108,11 @@ subroutine enforce_mean(nctrl, ntargs, nsubint, tol, ym, yd, ymiss)
                 yd_old = yd(i)
                 ii = ii + 1
                 if (yd(i) .ne. 0.0d0) then
-                    yd_adjust = yd_old * ((dble(nsubint(n)) * diff) / nonzero_sum)
-                    yd(i) = yd(i) + yd_adjust
+                    
+                    yd_adjust = diff * (nsubint(n) / nzero)
+                    yd(i) = yd(i) + yd_adjust             
+                    if (no_negatives .and. yd(i) .le. 0.0d0) yd(i) = 0.0d0
+                    
                     yd_out_sum = yd_out_sum + yd(i)
                     yd_adjust_sum = yd_adjust_sum + yd_adjust
                     if (debug_em) write (debug_unit, '(2i8, 3f12.6)') i, ii, yd_old, yd_adjust, yd(i)

@@ -200,7 +200,7 @@ subroutine mp_interp_epstein(n_outer, n_inner, nctrl, ym, yfill, x_ctrl, nsubint
     if (debug_write) write (debug_unit,*) nctrl, ntargs
     if (match_mean) then
         if (debug_write) write (debug_unit, '(a)') "call enforce_mean() "
-        call enforce_mean(nctrl, ntargs, nsubint, tol, ym, y_int, yfill)
+        call enforce_mean(nctrl, ntargs, nsubint, tol, no_negatives, ym, y_int, yfill)
     end if
     
     call interval_mean(nctrl, nsubint, ntargs, y_int, yfill, ym_int)

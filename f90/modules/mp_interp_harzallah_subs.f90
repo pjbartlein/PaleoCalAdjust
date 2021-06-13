@@ -177,15 +177,15 @@ subroutine mp_interp_harzallah(n_outer, n_inner, nctrl, ym, yfill, x_ctrl, nsubi
     if (debug_write) write (debug_unit,*) nctrl, ntargs
     if (match_mean) then
         if (debug_write) write (debug_unit, '(a)') "call enforce_mean() "
-        call enforce_mean(nctrl, ntargs, nsubint, tol, ym, y_int, yfill)
+        call enforce_mean(nctrl, ntargs, nsubint, tol, no_negatives, ym, y_int, yfill)
     end if
-    
-    call interval_mean(nctrl, nsubint, ntargs, y_int, yfill, ym_int)
     
     if (debug_write) write (debug_unit,'(a)') "y_int_after_enforce_mean"
     if (debug_write) write (debug_unit,'(10g14.6)') y_int
     if (debug_write) write (debug_unit,'(12g14.6)') ym_int
-    
+
+    call interval_mean(nctrl, nsubint, ntargs, y_int, yfill, ym_int)   
+     
 end subroutine mp_interp_harzallah
     
 subroutine hz_int(spline_case, nctrl, ym, ymiss, x_ctrl, nsubint, ntargs, x_targ, y_int, ym_int)
