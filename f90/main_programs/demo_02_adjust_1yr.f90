@@ -74,7 +74,7 @@ call mp_interp_epstein(ny, nm, nt, ym_06ka_cal, yfill, rmonmid_00, int(rmonlen_0
     ydh, ym_int)
 
 ! reaggregate pseudo-daily values to new calendar
-call day_to_rmon_ts(ny, ndays, rmonbeg_06, rmonend_06, nd, ydh, yfill, ym_adj_cal)
+call day_to_mon_ts(ny, ndays, rmonbeg_06, rmonend_06, nd, ydh, yfill, ym_adj_cal)
 
 write (out_unit,'(/a)') "Paleo month-length adjusted values on 6ka calendar:"
 write (out_unit,'("   ym_adj_cal: ",12f9.3)') ym_adj_cal

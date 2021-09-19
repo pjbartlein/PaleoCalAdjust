@@ -12,7 +12,7 @@ module CMIP_netCDF_subs
 
     implicit none
 
-    integer, parameter          :: maxdims = 5, maxvars = 10, maxatts = 100, maxdimsize = 1440
+    integer, parameter          :: maxdims = 16, maxvars = 64, maxatts = 100, maxdimsize = 1440
 
     ! dimensions
     integer(4)                  :: ncid_in, ncid_out, ndim, nvar, natt, nglatt, unlimid, ncformat
@@ -22,7 +22,8 @@ module CMIP_netCDF_subs
     ! variables
     integer(4)                  :: varid_in, varid_out
     integer(4)                  :: xtype(maxvars), nvardims(maxvars), vardimids(maxvars,nf90_max_var_dims), nvaratts(maxvars)
-    character(nf90_max_name)    :: varname(maxvars)
+    !character(nf90_max_name)    :: varname(maxvars)
+    character(2048)    :: varname(maxvars)
     integer(4)                  :: dataid(maxvars), timedimid, rmonlenid, rmonmidid, rmonbegid, rmonendid
     
     ! input variable dimensions
@@ -116,7 +117,7 @@ subroutine copy_dims_and_glatts(ncid_in, ncid_out, addattname, addatt, nt, time,
     do i = 1,ndim
         dimid(i) = i
         call check( nf90_inquire_dimension(ncid_in, dimid(i), dimname(i), dimlen(i)) )
-        if (print_out) print '("   in:  dimid, dimlen, dimname = " ,2i7,1x,a)', i, dimlen(i), trim(dimname(i))
+        if (print_out) print '(" dimid, dimlen, dimname = " ,2i7,1x,a)', i, dimlen(i), trim(dimname(i))
 
         if (i .eq. unlimid) then
             call check( nf90_def_dim(ncid_out, dimname(i), nf90_unlimited, dimid(i)) )
@@ -133,13 +134,14 @@ subroutine copy_dims_and_glatts(ncid_in, ncid_out, addattname, addatt, nt, time,
     end do
 
     ! define dimension variables
-    if (print_out) print '("Define dimension variables:")'
+    if (print_out) print '("Finding dimension variables:")'
     varid_out = 0
     do i = 1,nvar
 
         varid_in = i
         call check( nf90_inquire_variable(ncid_in, varid_in, varname(i), xtype(i), ndims=nvardims(i), natts=nvaratts(i)) )
-        if (print_out) print '(" i, xtype, nvardims, nvaratts = ", 4i6, 1x, a)', i,xtype(i),nvardims(i),nvaratts(i),trim(varname(i))
+        if (print_out) print '(" i, xtype, nvardims, nvaratts, varname = ", 4i6, 1x, a)', &
+            i,xtype(i),nvardims(i),nvaratts(i),trim(varname(i))
         call check( nf90_inquire_variable(ncid_in, varid_in, dimids=vardimids(i,:nvardims(i))) )
         if (print_out) print '("    vardimids = ", 6i6)', vardimids(i,:nvardims(i))
 
@@ -210,12 +212,15 @@ subroutine copy_dims_and_glatts(ncid_in, ncid_out, addattname, addatt, nt, time,
     call check( nf90_enddef(ncid_out) )
 
     ! copy dimension variable values, replacing time and time_bnds
+
     if (print_out) print '("Copy dimension variables")'
     varid_out = 0
     do i = 1,nvar
 
         varid_in = i
+        if (print_out) print '(" i, varname(i): ", i4, 1x, a)', i, trim(varname(i))
         select case (varname(i))
+        ! add other dimension variables as needed
         case ('lon', 'lon_bnds', 'lat', 'lat_bnds', 'time', 'time_bnds', 'climatology_bnds', 'height', &
                 'plev', 'j', 'i', 'vertices', 'lon_vertices', 'lat_vertices', 'lev', 'lev_bnds')
 
@@ -389,6 +394,8 @@ subroutine define_outvar(ncid_in, ncid_out, varinname, varid_out, varoutname, ad
 
     ! find input variable number
     do i=1,nvar
+        if (print_out) print '(" i, nvardim(i), varname(i): ", 2i4, 1x, a)',  &
+            i, nvardims(i), trim(varname(i))
         if (trim(varname(i)) .eq. trim(varinname)) exit
     end do
     varid_in = i

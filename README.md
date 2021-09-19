@@ -22,7 +22,8 @@ The current version is v1.1.  Relative to previous versions, this version includ
 - specification of the infofile path and name on the command line, so that once built locally, the programs can be run in a terminal window;
 - addition of the adjusted month lengths, and beginning, middle, and ending dates to the output file;
 - a choice of two mean-preserving interpolation methods, including the Epstein (1991) approach implemented in v1.0, as well as the Harzallah (1995) iterated-spline approach;
-- the inclusion of a subroutine, `enforce_mean()` that requires the pseudo-daily interpolated values to have the same monthly mean as the input monthly values.
+- the inclusion of a subroutine, `enforce_mean()` that requires the pseudo-daily interpolated values to have the same monthly mean as the input monthly values;
+- some modifications of I/O to accommodate (some) "non-standard" files (e.g. TraCE-21ka).
 
 ## Interpolation methods ##
 

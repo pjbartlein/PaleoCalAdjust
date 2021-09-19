@@ -133,7 +133,7 @@ real(8), allocatable    :: mon_time_bnds(:,:)   ! (2,nt) new (adjusted) monthly 
 character(32)           :: calendar_type        ! CF calendar type (e.g. "noleap", "proleptic_gregorian", etc.)
 
 ! strings
-character(12)            :: activity             ! simple label (e.g. "PMIP3" or "PMIP4"), or some other label (e.g. "transient")
+character(12)           :: activity             ! simple label (e.g. "PMIP3" or "PMIP4"), or some other label (e.g. "transient")
 character(64)           :: variable             ! variable name
 character(8)            :: time_freq            ! CMIP/PMIP-style output time-frequency type (e.g. "Amon", "Aclim", "day", "Oclim" ...)
 character(14)           :: tol_string           ! enforce_mean() tolerance value as string
@@ -173,6 +173,7 @@ integer(4)              :: max_threads          ! if OpenMP enabled
 integer(4)              :: iostatus             ! IOSTAT value
 integer(4)              :: infofile_len         ! length of the info file
 integer(4)              :: infofile_status      ! info file read status
+integer(4)              :: fill_status          ! _FillValue status
 
 ! file paths and names
 character(2048)         :: source_path, source_file, ncfile_in, adjusted_path, adjusted_file, ncfile_out
@@ -254,7 +255,7 @@ do
     case ("harzallah", "Harzallah")
         interp_method = "Harzallah"
         max_nctrl_in = 12 + 2 * npad            ! include padding
-        max_ntargs_in = 366 + 2 * npad * 31         ! include padding
+        max_ntargs_in = 366 + 2 * (npad + 1) * 31         ! include padding
     case ("none", "None")
         interp_method = "none"
     end select
@@ -454,8 +455,16 @@ do
     end select
 
     ! get _FillValue
-    call check( nf90_get_att(ncid_in, varid_in, '_FillValue', vfill) )
-    write (*,'("_FillValue:", g14.6)') vfill
+    !call check( nf90_get_att(ncid_in, varid_in, '_FillValue', vfill) )
+    !write (*,'("_FillValue:", g14.6)') vfill
+    !write (*,'(a,f7.2)') "Read time: ", secnds(read_secs)
+    vfill = 0.0
+    fill_status = nf90_get_att(ncid_in, varid_in, '_FillValue', vfill)
+    if (fill_status.eq.nf90_noerr) then
+        print '("  _FillValue = ",g14.6)', vfill
+    else
+        print '(" no _FillValue")'
+    end if
     write (*,'(a,f7.2)') "Read time: ", secnds(read_secs)
     
     ! Step 7:  Get calendar-adjusted values

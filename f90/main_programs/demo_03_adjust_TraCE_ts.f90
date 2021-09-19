@@ -69,7 +69,7 @@ infile = "TraCE_c30r40_tas_land_monlen0ka_Jan-Dec.csv"
 !dailyfile = "TraCE_c30r40_tas_land_monlen0ka_Jan-Dec_ts_daily.csv" ! uncomment to see daily data
 outfile = "TraCE_c30r40_tas_land_monlenadj_Jan-Dec.csv"
 
-monlenpath = "/Projects/Calendar/PaleoCalAdjust/data/month_lengths/"
+monlenpath = "/Projects/Calendar/PaleoCalAdjust/data/month_lengths/files/"
 monfile = "tr21_cal_noleap_rmonlen.csv"
 
 ! open output files and write headers
@@ -164,7 +164,7 @@ call mp_interp_harzallah(ny, nm, nt, ym, yfill, x_ctrl, imonlen, &
 ! calendar adjustment
 write (*,*) "Calendar adjustment..."
 
-call day_to_rmon_ts(ny, ndays, rmonbeg, rmonend, ndtot, ydh, yfill, ym_adj)
+call day_to_mon_ts(ny, ndays, rmonbeg, rmonend, ndtot, ydh, yfill, ym_adj)
 
 do n=1,ny
     write (3,'(f8.3,12(", ",g14.6))') yrbp(n),(ym_adj((n-1)*nm + m), m=1,nm)
