@@ -1,6 +1,6 @@
 ## Programs (PaleoCalAdjust v1.1) ##
 
-Main programs, including `month_length.f90` and `cal_adjust_PMIP.f90`, plus additional driver and demonstration programs are in the folder `/main_programs`:
+Main programs, including `month_length.f90` and `cal_adjust.f90`, plus additional driver and demonstration programs are in the folder `/main_programs`:
 
 	month_length.f90				! month-length tables
 	cal_adjust.f90					! paleo calendar adjustment
@@ -21,7 +21,7 @@ The `/modules` folder contains the following:
 	mp_interp_harzallah_subs.f90	! Harzallah (1995) iterative-spline interpolation
 	spline_subs.f90					! Burkhardt spline-interpolation subroutines 
 
-The module `spline_subs.f90` contains several subroutines and functions from John Burkhardt's library of Fortran90 spline-fitting subroutines, and is used by `mp_interp_harzallah_subs.f90` [[https://people.sc.fsu.edu/~jburkardt/f_src/spline/spline.html)]](https://people.sc.fsu.edu/~jburkardt/f_src/spline/spline.html))
+The module `spline_subs.f90` contains several subroutines and functions from John Burkhardt's library of Fortran90 spline-fitting subroutines, and is used by `mp_interp_harzallah_subs.f90` [[https://people.sc.fsu.edu/~jburkardt/f_src/spline/spline.html)]](https://people.sc.fsu.edu/~jburkardt/f_src/spline/spline.html)
 
 The `/projects` folder contains a set of subfolders, one for each main program, containing example GNU Make makefiles for the individual main programs.  The makefiles must be localized for a particular operating system or file structure (to correctly point to the compiler and source code).  The examples are for macOS.
 
@@ -34,7 +34,7 @@ The programs are used as follows:
 
 - `GISS_orpar_driver.f90` and `GISS_srevents_driver.f90` write orbital-parameter output to the folder `/GISS_orbital`, using specific parameter values set in the programs;
 - `month_length.f90` reads the info file `month_length_info.csv` in the folder `/info_files` and writes month-length tables to the folder `/month_lengths`;
-- `cal_adjust_PMIP.f90` reads the info file `cal_adj_info.csv` in the folder `/info_files`, and source netCDF files from the folders `/nc_files/PMIP3_source` and `/nc_files/PMIP4_source` and writes paleo calendar-adjusted netCDF files to the folder `/nc_files/PMIP3_adjusted` and `/nc_files/PMIP4_adjusted`;
+- `cal_adjust_PMIP.f90` reads the info file specified on the command line, and source netCDF files from the `/nc_files/test1/source/`, `/nc_files/test2/source/`, and `/nc_files/test3/source/` folders and writes paleo calendar-adjusted netCDF files to the folder `/nc_files/test1/adjusted/`, `/nc_files/test2/adjusted/` and `/nc_files/test3/adjusted/`;
 - `demo_01_pseudo_daily_interp.f90`, and `demo_02_adjust_1yr.f90`, are stand-alone programs, writing only to the console;
 - `demo_03_adjust_TraCE_ts.f90` reads, for example, the file `TraCE_c30r40_tas_land_monlen0ka_Jan-Dec.csv` in the folder `/TraCE_example` and writes a paleo calendar-adjusted output file into the same folder.
 

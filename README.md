@@ -3,7 +3,7 @@ PaleoCalAdjust
 
 This is the repository that accompanies the paper:
 
-Bartlein, P. J. and Shafer, S. L.: Paleo calendar-effect adjustments in time-slice and transient climate-model simulations (PaleoCalAdjust v1.0): impact and strategies for data analysis, *Geosci. Model Dev.*,  [https://doi.org/10.5194/gmd-12-3889-2019](https://doi.org/10.5194/gmd-12-3889-2019), 2019.
+Bartlein, P. J. and Shafer, S. L.: Paleo calendar-effect adjustments in time-slice and transient climate-model simulations (PaleoCalAdjust v1.0): impact and strategies for data analysis, *Geosci. Model Dev., 12, 3889-3913*,  [https://doi.org/10.5194/gmd-12-3889-2019](https://doi.org/10.5194/gmd-12-3889-2019), 2019.
 
 ## Abstract ##
 
@@ -11,9 +11,9 @@ The “paleo calendar effect” is a common expression for the impact that the c
 
 ## Programs ##
 
-The current version of the key program is `cal_adjust.f90` (in the folder `/f90/main_programs`), which applies the paleo calendar-effect adjustment to CMIP/PMIP-type netCDF files, but should also work in the case of files that are "CF-compliant" (or nearly so), and they are also known to work with netCDF files of transient paleoclimatic simulations.  There is a related program, `month_length.f90`, that can be used to produce tables of the changing length of months over time that are used by `cal_adjust.f90`.   Figures illustrating the paleo calendar effect are in the folder `/figures`, and relevant data sets for exercising the programs are in the folder `/data`.  
+The current version of the key program is `cal_adjust.f90` (in the folder `/f90/main_programs`).  This program applies the paleo calendar-effect adjustment to CMIP/PMIP-type netCDF files, but should also work in the case of files that are "CF-compliant" (or nearly so), and is known to work with netCDF files of transient paleoclimatic simulations.  There is a related program, `month_length.f90`, that can be used to produce tables of the changing length of months over time that are used by `cal_adjust.f90`.   Figures illustrating the paleo calendar effect are in the folder `/figures`, and relevant data sets for exercising the programs are in the folder `/data`.  
 
-Several minor modifications to the main program and its modules were made since the original *Geoscientific Model Development Discussions (GMDD)* manuscript submission to accommodate the adjustment of CMIP6-PMIP4 files.  Additionally, following a referee's suggestion, we replaced the approach used in the initial submission of the paper for calculating month lengths (i.e., the approximation of Kutzbach and Gallimore (1988, *J. Geophys. Res.* 93(D1):803-821)), with a direct approach based on Kepler's equation. This substitution of approaches had no practical significance.  Several other code modifications were made over time in the interests of transparency.
+Several minor modifications to the main program and its modules were made since the original *Geoscientific Model Development Discussions (GMDD)* manuscript submission to accommodate the adjustment of CMIP6-PMIP4 files.  Additionally, following a referee's suggestion, we replaced the approach used in the initial submission of the paper for calculating month lengths (i.e., the approximation of Kutzbach and Gallimore (198)), with a direct approach based on Kepler's (1609) equation. This substitution of approaches had no practical significance.  Several other code modifications were made over time in the interests of transparency.
 
 The current version is v1.1.  Relative to previous versions, this version includes:
 
@@ -22,23 +22,30 @@ The current version is v1.1.  Relative to previous versions, this version includ
 - specification of the infofile path and name on the command line, so that once built locally, the programs can be run in a terminal window;
 - addition of the adjusted month lengths, and beginning, middle, and ending dates to the output file;
 - a choice of two mean-preserving interpolation methods, including the Epstein (1991) approach implemented in v1.0, as well as the Harzallah (1995) iterated-spline approach;
-- the inclusion of a subroutine, `enforce_mean()` that requires the pseudo-daily interpolated values to have the same monthly mean as the input monthly values;
+- the inclusion in `pseudo_daily_interp_subs.f90` of a subroutine, `enforce_mean()` that requires the pseudo-daily interpolated values to have the same monthly mean as the input monthly values;
 - some modifications of I/O to accommodate (some) "non-standard" files (e.g. TraCE-21ka).
 
 ## Interpolation methods ##
 
-The Epstein (1991) interpolation approach is intrinsically periodic, meaning that when applied to interpolate pseudo-daily values from monthly input values, the interpolated daily values at the end of the year will be consistent with those at the beginning, which is a desirable feature.  However, when iteratively applied to multi-annual time series of monthly data, small discontinuities will arise between years.  In the v1.0 implementation, this discontinuity was removed by smoothing the interpolated daily values at the end and beginning of the year.  The Harzallah (1995) approach, which involves iteratively fitting splines to the input data (and to the residuals from the original fit) is intrinsically not periodic, meaning the interpolated daily values at the end of the year will not be consistent with those at the beginning of a single year.  However, because this approach involves local as opposed to global fitting (as in the Epstein approach), the input data can be padded, either cyclically in the case of a single year's data, or with data from adjacent years in the case of time series.  This effectively eliminates the discontinuity between years.  The Epstein (1991) approach is recommended for adjusting "climatology" data sets (e.g. CMIP/PMIP "Aclim" time-frequency data), while the Harzallah (1995) approach is better suited for adjusting time-series data (e.g. "Amon"-type data sets), or transient-simulation data.
+The Epstein (1991) interpolation approach is intrinsically periodic, meaning that when applied to interpolate pseudo-daily values from monthly input values, the interpolated daily values at the end of the year will be consistent with those at the beginning, which is a desirable feature.  However, when iteratively applied to multi-annual time series of monthly data, small discontinuities will arise between years.  In the v1.0 implementation, this discontinuity was removed by smoothing the interpolated daily values at the end and beginning of the year.  The Harzallah (1995) approach, which involves iteratively fitting splines to the input data (and to the residuals from the original fit) is intrinsically not periodic, meaning the interpolated daily values at the end of the year will not be consistent with those at the beginning of a single year.  However, because this approach involves local as opposed to global fitting (as in the Epstein approach), the input data can be padded, either cyclically in the case of a single year's data, or with data from adjacent years in the case of time series.  This effectively eliminates the discontinuity between years.  The Epstein (1991) approach is recommended for adjusting "climatology" data sets (e.g. CMIP/PMIP "Aclim"-type time-frequency data), while the Harzallah (1995) approach is better suited for adjusting time-series data (e.g. "Amon"-type data sets), or transient-simulation data.
 
-Despite the name, "mean-preserving" interpolation methods do not necessarily yield interpolated data that exactly reproduce the input data.  This can be addressed by setting a "tolerance" (`tol`) value for reproduction of the input values (typically 0.01 or 0.001 times the mean value of the data), that when exceeded, causes the discrepancy to be redistributed among the interpolated values.  Values of `tol` that are too large may lead to differences between the input monthly means and the means of the pseudo-daily interpolated values.  Values of `tol` that are too low may result in anomalously large adjusted values.  This will be easily seen in maps of the calendar effect, the difference between the adjusted and input monthly values.
+Despite the name, "mean-preserving" interpolation methods do not necessarily yield interpolated data that exactly reproduce the input data.  This issue can be addressed by setting a "tolerance" (`tol`) value for reproduction of the input values (typically 0.01 or 0.001 times the mean value of the data), that when exceeded, causes the discrepancy to be redistributed among the interpolated values.  Values of `tol` that are too large may lead to differences between the input monthly means and the means of the pseudo-daily interpolated values.  Values of `tol` that are too low may result in anomalously large adjusted values.  This will be easily seen in maps of the calendar effect, that display the difference between the adjusted and input monthly values.
 
 Further discussion of mean-preserving interpolation, and comparisons among several practical approaches for its application can be found in the GitHub repository at [[https://github.com/pjbartlein/mp-interp]](https://github.com/pjbartlein/mp-interp).  Contact Pat Bartlein (bartlein@uoregon.edu) for further information.
 
 Animations used in a presentation at the Fall 2019 AGU Meeting can be found in the `/animations` folder.  
 
 References:  
-Epstein, E), On obtaining daily climatological values from monthly means, *J. Climate* 4:365-368.  
-Harzallah, A. (1995) The interpolation of data series using a constrained iterating technique *Monthly Weather Review* 123:2251-2254.  
-Bartlein, P.J. and S.L. Shafer, 2019, Paleo calendar effects on radiation, atmospheric circulation, and surface temperature, moisture, and energy-balance variables can produce interpretable but spurious large-scale patterns and trends in analyses of paleoclimatic simulations. PP31A-08, AGU 2019 Fall Meeting.  [[https://agu.confex.com/agu/fm19/meetingapp.cgi/Paper/525140]](https://agu.confex.com/agu/fm19/meetingapp.cgi/Paper/525140)
+Bartlein, P.J. and S.L. Shafer: Paleo calendar effects on radiation, atmospheric circulation, and surface temperature, moisture, and energy-balance variables can produce interpretable but spurious large-scale patterns and trends in analyses of paleoclimatic simulations, PP31A-08, AGU 2019 Fall Meeting, https://agu.confex.com/agu/fm19/meetingapp.cgi/Paper/525140, 2019.  
+
+Epstein, E.S.: On obtaining daily climatological values from monthly means, *J. Climate*, 4, 365-368, https://doi.org/10.1175/1520-0442(1991)004<0365:OODCVF>2.0.CO;2, 1991.  
+
+Harzallah, A.: The interpolation of data series using a constrained iterating technique, *Monthly Weather Review*, 123, 2251-2254, https://doi.org/10.1175/1520-0493(1995)123<2251:TIODSU>2.0.CO;2, 1995.  
+
+Kepler, J.: *New Astronomy (Astronomia Nova)*, translated from the Latin by: Donahue, W. H., Cambridge University Press, Cambridge, UK, 681 pp., 1992, 1609.   
+
+Kutzbach, J.E. and Gallimore, R.G.: Sensitivity of a coupled atmosphere/mixed layer ocean model to changes in orbital forcing at 9000 years B.P., *J. Geophys. Res.-Atmos.*, 93, 803–821, https://doi.org/10.1029/JD093iD01p00803, 1988. 
+
 
 ## Version history ##
 
