@@ -189,7 +189,7 @@ integer(4)              :: ntotalpts, numberdone, nprogress, nextra
 real(4)                 :: onepercent, nextonepercent
 
 ! if OpenMP enabled
-max_threads = omp_get_max_threads()
+max_threads = 16 ! omp_get_max_threads()
 write (*,'("OMP max_threads: ",i4)') max_threads
 max_threads = max_threads !- 2 ! subtract 2 to free up threads for other computational processes if necessary
 call omp_set_num_threads(max_threads)
