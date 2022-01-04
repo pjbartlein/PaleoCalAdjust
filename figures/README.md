@@ -1,3 +1,5 @@
+## Figures from Bartlein and Shafer (2019) ##
+
 **Figure 1.** Variations over the past 150 kyr in the beginning and
 ending days of ﬁxed-angular months for a 365 d *noleap* calendar, shown
 for 1 kyr intervals beginning at 0 ka (1950 CE). The left side of each
